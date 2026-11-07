@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ui:UXML
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ui="UnityEngine.UIElements"
+    xmlns:uie="UnityEditor.UIElements"
+    xsi:noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd"
+>
+    <!-- Link out to our stylesheet -->
+    <ui:Style src="MainMenuStyles.uss" />
+
+    <ui:VisualElement class="main-container">
+        <!-- Title -->
+        <ui:Label text="CHOOSE YOUR HERO" class="main-title" />
+        
+        <!-- Carousel row -->
+        <ui:VisualElement class="selection-area">
+            
+            <!-- Previous Button -->
+            <ui:Button name="prev-btn" text="&lt;" class="nav-btn" />
+            
+            <!-- The Card itself -->
+            <ui:VisualElement class="character-card">
+                <ui:VisualElement name="character-preview" class="character-preview" />
+                <ui:Label name="character-name" text="Hero Name" class="character-name" />
+                <ui:Label name="character-desc" text="Hero description goes here..." class="character-desc" />
+            </ui:VisualElement>
+            
+            <!-- Next Button -->
+            <ui:Button name="next-btn" text="&gt;" class="nav-btn" />
+
+        </ui:VisualElement>
+        
+        <!-- Start Game Button -->
+        <ui:Button name="start-btn" text="START RUN" class="start-btn" />
+
+    </ui:VisualElement>
+
+</ui:UXML>

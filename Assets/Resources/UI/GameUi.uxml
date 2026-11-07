@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ui:UXML
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ui="UnityEngine.UIElements"
+    xmlns:uie="UnityEditor.UIElements"
+    xsi:noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd"
+>
+    <ui:Style src="GameUi.uss" />
+
+    <ui:VisualElement name="battle-root" class="battle-root">
+        <ui:VisualElement name="run-hud" class="run-hud">
+            <ui:Label name="encounter-label" text="Encounter 1" class="run-hud-label"/>
+            <ui:Label name="gold-label" text="0 Gold" class="run-hud-label gold-label"/>
+        </ui:VisualElement>
+        <ui:VisualElement name="run-rewards" class="run-rewards"/>
+        <ui:VisualElement name="stats-panel-left" class="stats-panel-left">
+            <ui:VisualElement name="stats-panel-portrait" class="stats-panel-portrait"/>
+            <ui:Label name="stats-panel-name" class="stats-panel-name" text=""/>
+            <ui:ProgressBar name="stats-panel-hp" class="stats-panel-hp health-player"/>
+            <ui:ProgressBar name="stats-panel-mp" class="stats-panel-mp" style="display: none;"/>
+            <ui:VisualElement name="stats-panel-rows" class="stats-panel-rows"/>
+        </ui:VisualElement>
+        <ui:VisualElement name="bottom-hud" class="bottom-hud">
+            <ui:VisualElement name="action-zone" class="action-zone">
+                <ui:Button name="attack-btn" class="action-btn">
+                    <ui:VisualElement name="attack-btn-icon" class="action-btn-icon"/>
+                    <ui:Label text="ATTACK" class="action-btn-label"/>
+                </ui:Button>
+                <ui:Button name="special-btn" class="action-btn">
+                    <ui:VisualElement name="special-btn-icon" class="action-btn-icon"/>
+                    <ui:Label text="SPECIAL" class="action-btn-label"/>
+                </ui:Button>
+                <ui:Button name="item-btn" class="action-btn">
+                    <ui:VisualElement name="item-btn-icon" class="action-btn-icon"/>
+                    <ui:Label text="ITEM" class="action-btn-label"/>
+                </ui:Button>
+                <ui:Button name="defend-btn" class="action-btn">
+                    <ui:VisualElement name="defend-btn-icon" class="action-btn-icon"/>
+                    <ui:Label text="DEFEND" class="action-btn-label"/>
+                </ui:Button>
+            </ui:VisualElement>
+            <ui:VisualElement name="target-panel-zone" class="target-panel-zone" style="display: none;"/>
+        </ui:VisualElement>
+        <ui:ScrollView name="battle-log-scroll" class="battle-log-scroll">
+            <ui:VisualElement name="battle-log-content" class="battle-log-content"/>
+        </ui:ScrollView>
+        <ui:VisualElement name="bottom-message-zone" class="bottom-message-zone">
+            <ui:Label name="battle-message" text="" class="battle-message" style="display: none;"/>
+        </ui:VisualElement>
+        <ui:VisualElement name="intermission-panel" class="overlay-panel">
+            <ui:VisualElement class="intermission-layout">
+                <ui:Label name="intermission-title" text="Victory!" class="overlay-title"/>
+                <ui:Label name="intermission-gold" text="+0 Gold" class="overlay-subtitle"/>
+                <ui:Label text="Choose an upgrade:" class="overlay-instruction"/>
+                <ui:VisualElement name="upgrade-choices" class="upgrade-choices"/>
+                <ui:VisualElement name="reroll-container" class="reroll-container"/>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="run-summary-panel" class="overlay-panel">
+            <ui:VisualElement class="overlay-card">
+                <ui:Label name="summary-title" text="Run Complete!" class="overlay-title"/>
+                <ui:Label name="summary-stats" text="" class="overlay-subtitle"/>
+                <ui:Button name="summary-restart" text="New Run" class="menu-button restart-button"/>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
+

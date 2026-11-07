@@ -1,0 +1,61 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/GameUi.uss?fileID=7433441132597879392&amp;guid=541b0963999756a46a890b6d93ee07aa&amp;type=3#GameUi"/>
+    <ui:VisualElement name="battle-root" class="battle-root">
+        <ui:VisualElement name="run-hud" class="run-hud">
+            <ui:Label name="encounter-label" text="Encounter 1" class="run-hud-label"/>
+            <ui:VisualElement class="gold-display">
+                <ui:Label name="gold-label" text="0 Gold" class="run-hud-label gold-label"/>
+                <ui:VisualElement name="gold-icon" class="run-hud-icon"/>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="run-rewards" class="run-rewards"/>
+        <ui:VisualElement name="stats-panel-left" class="stats-panel-left" style="top: 10%;">
+            <ui:Label name="stats-panel-name" text="" class="stats-panel-name" style="margin-bottom: 4px;"/>
+            <ui:VisualElement name="stats-panel-portrait" class="stats-panel-portrait" style="height: 161px;"/>
+            <ui:VisualElement name="stats-panel-rows" class="stats-panel-rows" style="margin-top: 10px; background-color: rgba(0, 0, 0, 0); -unity-background-image-tint-color: rgba(255, 255, 255, 0);"/>
+        </ui:VisualElement>
+        <ui:VisualElement name="bottom-hud" class="bottom-hud">
+            <ui:VisualElement name="action-zone" class="action-zone">
+                <ui:Button name="attack-btn" class="action-btn">
+                    <ui:VisualElement name="attack-btn-icon" class="action-btn-icon"/>
+                    <ui:Label text="ATTACK" class="action-btn-label"/>
+                </ui:Button>
+                <ui:Button name="special-btn" class="action-btn">
+                    <ui:VisualElement name="special-btn-icon" class="action-btn-icon"/>
+                    <ui:Label text="SPECIAL" class="action-btn-label"/>
+                </ui:Button>
+                <ui:Button name="item-btn" class="action-btn">
+                    <ui:VisualElement name="item-btn-icon" class="action-btn-icon"/>
+                    <ui:Label text="ITEM" class="action-btn-label"/>
+                </ui:Button>
+                <ui:Button name="defend-btn" class="action-btn">
+                    <ui:VisualElement name="defend-btn-icon" class="action-btn-icon"/>
+                    <ui:Label text="DEFEND" class="action-btn-label"/>
+                </ui:Button>
+            </ui:VisualElement>
+            <ui:VisualElement name="target-panel-zone" class="target-panel-zone" style="display: none;"/>
+        </ui:VisualElement>
+        <ui:VisualElement name="bottom-message-zone" class="bottom-message-zone" style="bottom: 96px; right: -1px; left: -1px; opacity: 1; height: 38px;">
+            <ui:Label name="battle-message" text="" class="battle-message" style="display: none;"/>
+        </ui:VisualElement>
+        <ui:VisualElement name="intermission-panel" class="overlay-panel">
+            <ui:VisualElement class="intermission-layout">
+                <ui:Label name="intermission-title" text="Victory!" class="overlay-title"/>
+                <ui:Label name="intermission-gold" text="+0 Gold" class="overlay-subtitle"/>
+                <ui:Label text="Choose an upgrade:" class="overlay-instruction"/>
+                <ui:VisualElement name="upgrade-choices" class="upgrade-choices"/>
+                <ui:VisualElement name="reroll-container" class="reroll-container"/>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="run-summary-panel" class="overlay-panel">
+            <ui:VisualElement class="overlay-card">
+                <ui:Label name="summary-title" text="Run Complete!" class="overlay-title"/>
+                <ui:Label name="summary-stats" text="" class="overlay-subtitle"/>
+                <ui:Button name="summary-restart" text="New Run" class="menu-button restart-button"/>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:ScrollView name="battle-log-scroll" class="battle-log-scroll" style="bottom: 139px; right: 1px; height: 360px;">
+            <ui:VisualElement name="battle-log-content" class="battle-log-content"/>
+        </ui:ScrollView>
+    </ui:VisualElement>
+</ui:UXML>

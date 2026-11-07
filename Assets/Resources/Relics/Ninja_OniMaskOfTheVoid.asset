@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c7c3ed853dd2d034c9d3900c8c69aa5a, type: 3}
+  m_Name: Ninja_OniMaskOfTheVoid
+  m_EditorClassIdentifier: Assembly-CSharp::LegendaryRelicSO
+  targetCharacterName: Ninja
+  relicName: Oni Mask of the Void
+  description: The mask of a defeated shadow demon. Through it, the wearer glimpses
+    fate itself.
+  flavorText: '"The oni stares. Luck bends."'
+  icon: {fileID: 0}
+  statBoosts:
+  - name: +10 Attack
+    description: +10 Attack.
+    upgradeType: 1
+    value: 10
+  - name: +20 Speed
+    description: +20 Speed.
+    upgradeType: 3
+    value: 20
+  - name: +10 Luck
+    description: +10 Luck.
+    upgradeType: 5
+    value: 10
+  grantedAttack: {fileID: 11400000, guid: 3c57176a405fec84a9cebdaaa72df8af, type: 2}
+  visuals: []

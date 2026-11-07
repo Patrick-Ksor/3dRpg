@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17b91a9c71ed8074f9906a932456a0e1, type: 3}
+  m_Name: Relic_Ninja_ShadowGate
+  m_EditorClassIdentifier: Assembly-CSharp::AttackAction
+  actionName: Shadow Gate
+  minDamage: 50
+  maxDamage: 75
+  manaCost: 8
+  isRanged: 1
+  isAoE: 0
+  animationName: Ninja_Shuriken_Storm
+  hitDelay: 6
+  finishDelay: 1.8
+  hitVfxPrefab: {fileID: 8597731318025692521, guid: ae6bdf3417a5d6047a559654858dac31, type: 3}
+  projectilePrefab: {fileID: 3534901308331839952, guid: 0af13ec0ebbce1b45879c57fe8d6618b, type: 3}
+  chargeSoundEffect: {fileID: 8300000, guid: f1cb5d83282f2904a85f73111d068616, type: 3}
+  hitSoundEffect: {fileID: 8300000, guid: 0f438e0af182c134c815a1c71f9e14d9, type: 3}
+  projectileSpeed: 15
+  projectileFireDelay: 5.5
+  projectileCount: 1
+  projectileSpreadAngle: 0
+  delayBetweenProjectiles: 0
+  hitCount: 1
+  delayBetweenHits: 1

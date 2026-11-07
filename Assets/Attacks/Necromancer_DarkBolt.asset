@@ -1,0 +1,52 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17b91a9c71ed8074f9906a932456a0e1, type: 3}
+  m_Name: Necromancer_DarkBolt
+  m_EditorClassIdentifier: Assembly-CSharp::AttackAction
+  actionName: Dark Bolt
+  minDamage: 10
+  maxDamage: 20
+  manaCost: 0
+  isRanged: 1
+  isAoE: 0
+  animationName: Necromancer_Attack
+  hitDelay: 0.5
+  finishDelay: 0.5
+  chargeVfxPrefab: {fileID: 0}
+  hitVfxPrefab: {fileID: 7904898002847524615, guid: a2ccf81a1d5b163448ebdf66b5e746d6, type: 3}
+  projectilePrefab: {fileID: 3790952303070669070, guid: b63b9bafcc2571b43952bde14b3fffab, type: 3}
+  hitVfxDamageDelay: 0
+  chargeSoundEffect: {fileID: 8300000, guid: 6ba5239096332284587af6867617c7c2, type: 3}
+  gruntSound: {fileID: 0}
+  gruntSoundDelay: 0
+  hitSoundEffect: {fileID: 8300000, guid: d151d8d56836c2447b662fb79147ae98, type: 3}
+  projectileSpeed: 10
+  spinProjectile: 0
+  rotateToFaceTarget: 0
+  returnsToCaster: 0
+  projectileFireDelay: 0.9
+  projectileCount: 2
+  projectileSpreadAngle: 0
+  delayBetweenProjectiles: 0.2
+  hitCount: 1
+  delayBetweenHits: 0.1
+  appliesStatus: 0
+  statusDuration: 2
+  statusValue: 0.08
+  statusChance: 1
+  isSummon: 0
+  summonCount: 1
+  summonPrefab: {fileID: 0}
+  summonSpawnVfxPrefab: {fileID: 0}
+  summonSpawnSoundEffect: {fileID: 0}
+  summonHitDelay: 0.35
+  lifeStealPercent: 0

@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c7c3ed853dd2d034c9d3900c8c69aa5a, type: 3}
+  m_Name: Knight_BladeOfTheFallenKing
+  m_EditorClassIdentifier: Assembly-CSharp::LegendaryRelicSO
+  targetCharacterName: Knight
+  relicName: Blade of the Fallen King
+  description: An ancient sword radiating crimson energy. Those who wield it are
+    consumed by battle-lust.
+  flavorText: '"The king fell. The blade did not."'
+  icon: {fileID: 0}
+  statBoosts:
+  - name: +20 Attack
+    description: +20 Attack.
+    upgradeType: 1
+    value: 20
+  - name: +15 Max HP
+    description: +15 Max HP.
+    upgradeType: 0
+    value: 15
+  - name: Enraged
+    description: Deal double damage below 50% HP.
+    upgradeType: 9
+    value: 0
+  grantedAttack: {fileID: 11400000, guid: d229f9eca57d2b749adbecc72b07943b, type: 2}
+  visuals: []

@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17b91a9c71ed8074f9906a932456a0e1, type: 3}
+  m_Name: NInja_BaseAttack
+  m_EditorClassIdentifier: Assembly-CSharp::AttackAction
+  actionName: Shuriken
+  minDamage: 3
+  maxDamage: 4
+  manaCost: 0
+  isRanged: 1
+  isAoE: 0
+  animationName: Ninja_Attack
+  hitDelay: 0
+  finishDelay: 1.8
+  chargeVfxPrefab: {fileID: 0}
+  hitVfxPrefab: {fileID: 2965222256817593503, guid: a164e676dbbd6e54587237e619372c98, type: 3}
+  projectilePrefab: {fileID: 5967069257118214839, guid: 038e366be84cf704c9b9618c9373cd7c, type: 3}
+  hitVfxDamageDelay: 0
+  chargeSoundEffect: {fileID: 0}
+  gruntSound: {fileID: 8300000, guid: 1010a119372c71142a0d1bd525cba0a1, type: 3}
+  gruntSoundDelay: 0.5
+  hitSoundEffect: {fileID: 8300000, guid: 065bec9d79a6f8a45ba0b02a660c0225, type: 3}
+  projectileSpeed: 10
+  projectileScaleMultiplier: 1
+  spinProjectile: 1
+  rotateToFaceTarget: 1
+  returnsToCaster: 0
+  projectileFireDelay: 0.75
+  projectileCount: 5
+  projectileSpreadAngle: 0
+  delayBetweenProjectiles: 0.1
+  hitCount: 1
+  delayBetweenHits: 0.3
+  appliesStatus: 2
+  statusDuration: 1
+  statusValue: 0.08
+  statusChance: 0.2
+  isSummon: 0
+  summonCount: 1
+  summonPrefab: {fileID: 0}
+  summonSpawnVfxPrefab: {fileID: 0}
+  summonSpawnSoundEffect: {fileID: 0}
+  summonHitDelay: 0.35
+  lifeStealPercent: 0

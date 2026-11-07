@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17b91a9c71ed8074f9906a932456a0e1, type: 3}
+  m_Name: SkeletonMinion_BaseAttack
+  m_EditorClassIdentifier: Assembly-CSharp::AttackAction
+  actionName: Slash
+  minDamage: 5
+  maxDamage: 10
+  manaCost: 0
+  isRanged: 0
+  isAoE: 0
+  animationName: Knight_Attack
+  hitDelay: 0.6
+  finishDelay: 1.06
+  chargeVfxPrefab: {fileID: 0}
+  hitVfxPrefab: {fileID: 85941164691198867, guid: bad3cf055489f0e4e9cd51bd9cdb7008, type: 3}
+  projectilePrefab: {fileID: 0}
+  chargeSoundEffect: {fileID: 0}
+  gruntSound: {fileID: 0}
+  gruntSoundDelay: 0
+  hitSoundEffect: {fileID: 8300000, guid: 127f2ef88875c9f4fb38192bab67bab7, type: 3}
+  projectileSpeed: 15
+  spinProjectile: 1
+  rotateToFaceTarget: 1
+  returnsToCaster: 0
+  projectileFireDelay: 0.4
+  projectileCount: 1
+  projectileSpreadAngle: 0
+  delayBetweenProjectiles: 0
+  hitCount: 1
+  delayBetweenHits: 0.05
+  appliesStatus: 0
+  statusDuration: 2
+  statusValue: 0.08
+  statusChance: 1
+  isSummon: 0
+  summonCount: 1
+  summonPrefab: {fileID: 0}
+  summonSpawnVfxPrefab: {fileID: 0}
+  summonSpawnSoundEffect: {fileID: 0}
+  summonHitDelay: 0.35
+  lifeStealPercent: 0

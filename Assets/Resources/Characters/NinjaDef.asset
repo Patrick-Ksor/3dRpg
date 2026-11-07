@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 757e5edb5932dc44588ae38bdd6485f6, type: 3}
+  m_Name: NinjaDef
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterDefinitionSO
+  characterName: Ninja
+  description: A swift and disciplined ninja stands in a low, balanced stance.
+  icon: {fileID: 21300000, guid: 666962dfb52e03b4696d17e429ce42e3, type: 3}
+  characterPrefab: {fileID: 8008301962833846410, guid: fae1d6d1f6a725a41a7fc8dac34f85f6, type: 3}

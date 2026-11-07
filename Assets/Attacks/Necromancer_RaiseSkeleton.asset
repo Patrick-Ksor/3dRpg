@@ -1,0 +1,52 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17b91a9c71ed8074f9906a932456a0e1, type: 3}
+  m_Name: Necromancer_RaiseSkeleton
+  m_EditorClassIdentifier: Assembly-CSharp::AttackAction
+  actionName: Raise Skeleton
+  minDamage: 10
+  maxDamage: 20
+  manaCost: 10
+  isRanged: 1
+  isAoE: 0
+  animationName: Necromancer_Summon
+  hitDelay: 0.05
+  finishDelay: 0.5
+  chargeVfxPrefab: {fileID: 3377181292992421420, guid: 48c5715f9603c3842a353516a8baefbb, type: 3}
+  hitVfxPrefab: {fileID: 7904898002847524615, guid: a2ccf81a1d5b163448ebdf66b5e746d6, type: 3}
+  projectilePrefab: {fileID: 0}
+  hitVfxDamageDelay: 0
+  chargeSoundEffect: {fileID: 8300000, guid: 8233e6d1512afca499bd43cbd8739d21, type: 3}
+  gruntSound: {fileID: 8300000, guid: e529e62d0396479449358f0ed9a2fada, type: 3}
+  gruntSoundDelay: 0.1
+  hitSoundEffect: {fileID: 8300000, guid: 88b1cbe3caa3fee4b8b103b5edd7aba9, type: 3}
+  projectileSpeed: 1
+  spinProjectile: 1
+  rotateToFaceTarget: 1
+  returnsToCaster: 0
+  projectileFireDelay: 0.1
+  projectileCount: 2
+  projectileSpreadAngle: 0
+  delayBetweenProjectiles: 0
+  hitCount: 1
+  delayBetweenHits: 0.05
+  appliesStatus: 2
+  statusDuration: 1
+  statusValue: 0.08
+  statusChance: 0.05
+  isSummon: 1
+  summonCount: 3
+  summonPrefab: {fileID: 964972502034143467, guid: 44f6ca474de3ec04ebc02eebe63f9cdb, type: 3}
+  summonSpawnVfxPrefab: {fileID: 0}
+  summonSpawnSoundEffect: {fileID: 8300000, guid: d151d8d56836c2447b662fb79147ae98, type: 3}
+  summonHitDelay: 0.9
+  lifeStealPercent: 0

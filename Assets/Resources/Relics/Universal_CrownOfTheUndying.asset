@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c7c3ed853dd2d034c9d3900c8c69aa5a, type: 3}
+  m_Name: Universal_CrownOfTheUndying
+  m_EditorClassIdentifier: Assembly-CSharp::LegendaryRelicSO
+  targetCharacterName: Any
+  relicName: Crown of the Undying
+  description: A tarnished crown wrested from a death-god. The wearer cannot be felled
+    easily.
+  flavorText: '"Death tried. It failed."'
+  icon: {fileID: 0}
+  statBoosts:
+  - name: +50 Max HP
+    description: +50 Max HP.
+    upgradeType: 0
+    value: 50
+  - name: +15 Defense
+    description: +15 Defense.
+    upgradeType: 2
+    value: 15
+  - name: Regeneration
+    description: Heal 8% Max HP per turn.
+    upgradeType: 8
+    value: 0
+  grantedAttack: {fileID: 11400000, guid: c3c3f09ddc0e44c4cae026710d58f716, type: 2}
+  visuals: []

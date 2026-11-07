@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17b91a9c71ed8074f9906a932456a0e1, type: 3}
+  m_Name: Knight_Judgment
+  m_EditorClassIdentifier: Assembly-CSharp::AttackAction
+  actionName: Judgement
+  minDamage: 10
+  maxDamage: 12
+  manaCost: 20
+  isRanged: 1
+  isAoE: 0
+  animationName: Knight_Judgement
+  hitDelay: 1
+  finishDelay: 3
+  chargeVfxPrefab: {fileID: 7131401307255788800, guid: 4d9a3b35b3bc07649b697df7fb497b6d, type: 3}
+  hitVfxPrefab: {fileID: 2944396702758532163, guid: e190bf97c041e58448af6b043116cba0, type: 3}
+  projectilePrefab: {fileID: 8428443716322637999, guid: 284c6d3f8b553fc4d8a6cbe2e07e6865, type: 3}
+  hitVfxDamageDelay: 0
+  chargeSoundEffect: {fileID: 8300000, guid: f1cb5d83282f2904a85f73111d068616, type: 3}
+  gruntSound: {fileID: 8300000, guid: ec9eb0861f60a5e48bb077fec585c736, type: 3}
+  gruntSoundDelay: 0.8
+  hitSoundEffect: {fileID: 8300000, guid: 6a88bdeeddefdf9468cfaf2d9ea348b9, type: 3}
+  projectileSpeed: 3
+  projectileScaleMultiplier: 1
+  spinProjectile: 1
+  rotateToFaceTarget: 1
+  returnsToCaster: 0
+  projectileFireDelay: 0.8
+  projectileCount: 10
+  projectileSpreadAngle: 50
+  delayBetweenProjectiles: 0.01
+  hitCount: 1
+  delayBetweenHits: 0.3
+  appliesStatus: 1
+  statusDuration: 4
+  statusValue: 0.5
+  statusChance: 1
+  isSummon: 0
+  summonCount: 1
+  summonPrefab: {fileID: 0}
+  summonSpawnVfxPrefab: {fileID: 0}
+  summonSpawnSoundEffect: {fileID: 0}
+  summonHitDelay: 0.35
+  lifeStealPercent: 0

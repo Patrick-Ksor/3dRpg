@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 757e5edb5932dc44588ae38bdd6485f6, type: 3}
+  m_Name: NecromancerDef
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterDefinitionSO
+  characterName: Necromancer
+  description: A dark and commanding necromancer stands with a composed, symmetrical
+    form.
+  icon: {fileID: 21300000, guid: dabbee89bc57e49459bfcc7d00d3a60f, type: 3}
+  characterPrefab: {fileID: 5653174877498918787, guid: 67b7067a623023744a22f5b56f9b3a8e, type: 3}

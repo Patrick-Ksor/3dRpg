@@ -1,0 +1,131 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &946192869662812802
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 76429a06473c8b14d8375a39e3603850, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.9
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 76429a06473c8b14d8375a39e3603850, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.9
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 76429a06473c8b14d8375a39e3603850, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.9
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 76429a06473c8b14d8375a39e3603850, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -8.784666
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 76429a06473c8b14d8375a39e3603850, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.000000018837625
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 76429a06473c8b14d8375a39e3603850, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -8.335118
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 76429a06473c8b14d8375a39e3603850, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 76429a06473c8b14d8375a39e3603850, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 76429a06473c8b14d8375a39e3603850, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 76429a06473c8b14d8375a39e3603850, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 76429a06473c8b14d8375a39e3603850, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 76429a06473c8b14d8375a39e3603850, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 76429a06473c8b14d8375a39e3603850, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 76429a06473c8b14d8375a39e3603850, type: 3}
+      propertyPath: m_Name
+      value: Wizard
+      objectReference: {fileID: 0}
+    - target: {fileID: 5866666021909216657, guid: 76429a06473c8b14d8375a39e3603850, type: 3}
+      propertyPath: m_Avatar
+      value: 
+      objectReference: {fileID: 9000000, guid: bec5b2b3e3871cc4796d3d2531bc7d1b, type: 2}
+    - target: {fileID: 5866666021909216657, guid: 76429a06473c8b14d8375a39e3603850, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 4f1c430f0ab87084a999df6354e36d77, type: 2}
+    - target: {fileID: 8111781155169087978, guid: 76429a06473c8b14d8375a39e3603850, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 4f4f5b6d096ba5145b0d346a024d5622, type: 2}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 76429a06473c8b14d8375a39e3603850, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7846794978904249932}
+  m_SourcePrefab: {fileID: 100100000, guid: 76429a06473c8b14d8375a39e3603850, type: 3}
+--- !u!1 &135359464412764115 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 76429a06473c8b14d8375a39e3603850, type: 3}
+  m_PrefabInstance: {fileID: 946192869662812802}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &7846794978904249932
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 135359464412764115}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ae5a8b19c6fa0443bdbe7c70c880db7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Unit
+  unitName: Wizard
+  portrait: {fileID: 21300000, guid: d1c1cbad56f94ea42b42ef2d582c231f, type: 3}
+  isPlayer: 0
+  attack: 30
+  defense: 5
+  speed: 15
+  luck: 0
+  maxHealth: 100
+  currentHealth: 100
+  maxMana: 20
+  currentMana: 20
+  isDead: 0
+  runAnimatorState: Run
+  idleAnimatorState: Idle
+  hitSound: {fileID: 8300000, guid: 2bf0d8f0b6254274e916f3606dd41025, type: 3}
+  basicAttack: {fileID: 11400000, guid: 06e754e3a5082134f928b2fd56b49939, type: 2}
+  specialAttacks: []
+  availableAttacks:
+  - {fileID: 11400000, guid: 06e754e3a5082134f928b2fd56b49939, type: 2}
+  unlockableAttacks:
+  - {fileID: 11400000, guid: 7e700de64a6cae14caf7a9fb4e706f19, type: 2}
+  inventory: []
+  isDefending: 0
+  hasVampiric: 0
+  hasThorns: 0
+  hasRegeneration: 0
+  hasEnraged: 0
+  bonusSummonCount: 0

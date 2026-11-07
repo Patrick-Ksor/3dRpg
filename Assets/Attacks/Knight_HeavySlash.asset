@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17b91a9c71ed8074f9906a932456a0e1, type: 3}
+  m_Name: Knight_HeavySlash
+  m_EditorClassIdentifier: Assembly-CSharp::AttackAction
+  actionName: Heavy Slash
+  minDamage: 40
+  maxDamage: 55
+  manaCost: 10
+  isRanged: 0
+  isAoE: 0
+  animationName: Knight_Heavy_Attack
+  hitDelay: 0.6
+  finishDelay: 1.06
+  hitVfxPrefab: {fileID: 500345726442012828, guid: 50a810bfd70577b41a2d43ae0241ea2d, type: 3}
+  projectilePrefab: {fileID: 0}
+  chargeSoundEffect: {fileID: 0}
+  gruntSound: {fileID: 8300000, guid: ec9eb0861f60a5e48bb077fec585c736, type: 3}
+  hitSoundEffect: {fileID: 8300000, guid: 6a88bdeeddefdf9468cfaf2d9ea348b9, type: 3}
+  projectileSpeed: 15
+  projectileFireDelay: 0.4
+  projectileCount: 1
+  projectileSpreadAngle: 0
+  delayBetweenProjectiles: 0
+  hitCount: 1
+  delayBetweenHits: 0.1

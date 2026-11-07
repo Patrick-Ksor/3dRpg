@@ -1,0 +1,52 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17b91a9c71ed8074f9906a932456a0e1, type: 3}
+  m_Name: DarkKnight_HeavySlash
+  m_EditorClassIdentifier: Assembly-CSharp::AttackAction
+  actionName: Heavy Slash
+  minDamage: 15
+  maxDamage: 20
+  manaCost: 10
+  isRanged: 0
+  isAoE: 0
+  animationName: DarkKnight_Heavy_Attack
+  hitDelay: 1
+  finishDelay: 2
+  chargeVfxPrefab: {fileID: 0}
+  hitVfxPrefab: {fileID: 7904898002847524615, guid: a2ccf81a1d5b163448ebdf66b5e746d6, type: 3}
+  projectilePrefab: {fileID: 0}
+  hitVfxDamageDelay: 0
+  chargeSoundEffect: {fileID: 0}
+  gruntSound: {fileID: 8300000, guid: ec9eb0861f60a5e48bb077fec585c736, type: 3}
+  gruntSoundDelay: 0
+  hitSoundEffect: {fileID: 8300000, guid: 6a88bdeeddefdf9468cfaf2d9ea348b9, type: 3}
+  projectileSpeed: 15
+  spinProjectile: 1
+  rotateToFaceTarget: 1
+  returnsToCaster: 0
+  projectileFireDelay: 0.4
+  projectileCount: 1
+  projectileSpreadAngle: 0
+  delayBetweenProjectiles: 0
+  hitCount: 1
+  delayBetweenHits: 0.1
+  appliesStatus: 0
+  statusDuration: 2
+  statusValue: 0.08
+  statusChance: 1
+  isSummon: 0
+  summonCount: 1
+  summonPrefab: {fileID: 0}
+  summonSpawnVfxPrefab: {fileID: 0}
+  summonSpawnSoundEffect: {fileID: 0}
+  summonHitDelay: 0.35
+  lifeStealPercent: 0

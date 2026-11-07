@@ -1,0 +1,1044 @@
+.battle-root {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    color: rgb(240, 240, 240);
+}
+
+.hud-panel {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding-left: 12px;
+    padding-right: 12px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.portrait-panel {
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 16px;
+    margin-bottom: 8px;
+}
+
+.unit-card {
+    width: 155px;
+    align-items: stretch;
+    gap: 3px;
+    background-color: rgba(0, 0, 0, 0.35);
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.unit-name {
+    color: rgb(240, 240, 240);
+    font-size: 12px;
+    -unity-font-style: bold;
+    unity-text-align: middle-center;
+    overflow: hidden;
+    white-space: nowrap;
+    margin-bottom: 2px;
+}
+
+.unit-stats {
+    flex-direction: row;
+    justify-content: space-between;
+    margin-top: 1px;
+    margin-bottom: 1px;
+}
+
+.stat-chip {
+    color: rgb(190, 190, 190);
+    font-size: 10px;
+    background-color: rgba(0, 0, 0, 0.4);
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+    padding-left: 4px;
+    padding-right: 4px;
+    padding-top: 0;
+    padding-bottom: 0;
+    flex-grow: 1;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin-left: 1px;
+    margin-right: 1px;
+}
+
+.stat-chip-icon {
+    width: 12px;
+    height: 12px;
+    min-width: 12px;
+    min-height: 12px;
+    max-width: 12px;
+    max-height: 12px;
+    margin-right: 2px;
+    flex-shrink: 0;
+}
+
+.stat-chip-value {
+    color: rgb(190, 190, 190);
+    font-size: 10px;
+    -unity-font-style: bold;
+}
+
+.health-bar {
+    height: 18px;
+}
+
+.health-bar .unity-progress-bar__background,
+.mana-bar .unity-progress-bar__background {
+    background-color: rgba(20, 20, 20, 0.8);
+}
+
+.health-bar .unity-progress-bar__title,
+.mana-bar .unity-progress-bar__title {
+    color: rgb(240, 240, 240);
+    -unity-font-style: bold;
+    font-size: 10px;
+}
+
+.health-player .unity-progress-bar__progress {
+    background-color: rgb(46, 204, 113);
+}
+
+.health-enemy .unity-progress-bar__progress {
+    background-color: rgb(231, 76, 60);
+}
+
+.mana-bar {
+    height: 12px;
+}
+
+.mana-bar .unity-progress-bar__progress {
+    background-color: rgb(52, 152, 219);
+}
+
+.unit-portrait {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
+    max-width: 40px;
+    max-height: 40px;
+    align-self: center;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+    border-left-color: rgba(255, 255, 255, 0.35);
+    border-right-color: rgba(255, 255, 255, 0.35);
+    border-top-color: rgba(255, 255, 255, 0.35);
+    border-bottom-color: rgba(255, 255, 255, 0.35);
+}
+
+.battle-message {
+    margin-top: 0;
+    margin-bottom: 0;
+    color: rgb(245, 245, 245);
+    -unity-text-align: middle-center;
+    font-size: 18px;
+    -unity-font-style: bold;
+    padding-left: 12px;
+    padding-right: 12px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+}
+
+.target-panel {
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.menu-button {
+    min-width: 120px;
+    height: 34px;
+    color: rgb(255, 255, 255);
+    -unity-font-style: bold;
+    background-color: rgb(53, 100, 173);
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+    border-left-color: rgba(255, 255, 255, 0.2);
+    border-right-color: rgba(255, 255, 255, 0.2);
+    border-top-color: rgba(255, 255, 255, 0.2);
+    border-bottom-color: rgba(255, 255, 255, 0.2);
+}
+
+.menu-button:hover {
+    background-color: rgb(64, 122, 212);
+}
+
+.menu-button:active {
+    background-color: rgb(45, 87, 150);
+}
+
+.menu-button:disabled {
+    opacity: 0.45;
+}
+
+.menu-button--has-icon {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.menu-button-icon {
+    width: 22px;
+    height: 22px;
+    min-width: 22px;
+    min-height: 22px;
+    margin-right: 8px;
+    flex-shrink: 0;
+}
+
+/* ── Run HUD ──────────────────────────────────────────────────────────── */
+
+.run-hud {
+    position: absolute;
+    top: 52px;
+    left: 12px;
+    right: 12px;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.run-hud-label {
+    color: rgb(255, 255, 255);
+    font-size: 13px;
+    -unity-font-style: bold;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+    padding-left: 8px;
+    padding-right: 8px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+.gold-label {
+    color: rgb(255, 220, 50);
+}
+
+/* ── Run rewards strip ────────────────────────────────────────────────── */
+
+.run-rewards {
+    position: absolute;
+    top: 88px;
+    left: 12px;
+    right: 12px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    z-index: 9999;
+    justify-content: center;
+}
+
+.reward-pill {
+    color: rgba(210, 230, 255, 1);
+    font-size: 11px;
+    -unity-font-style: bold;
+    background-color: rgba(20, 45, 90, 0.8);
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+    border-left-color: rgba(100, 160, 255, 0.35);
+    border-right-color: rgba(100, 160, 255, 0.35);
+    border-top-color: rgba(100, 160, 255, 0.35);
+    border-bottom-color: rgba(100, 160, 255, 0.35);
+    padding-left: 7px;
+    padding-right: 7px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    margin-left: 3px;
+    margin-right: 3px;
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+
+/* stat upgrade — blue (default look, matches base .reward-pill) */
+.reward-pill--stat {
+    background-color: rgba(20, 45, 90, 0.85);
+    border-left-color: rgba(100, 160, 255, 0.45);
+    border-right-color: rgba(100, 160, 255, 0.45);
+    border-top-color: rgba(100, 160, 255, 0.45);
+    border-bottom-color: rgba(100, 160, 255, 0.45);
+    color: rgba(180, 215, 255, 1);
+}
+
+/* attack upgrade — amber */
+.reward-pill--attack {
+    background-color: rgba(90, 52, 8, 0.9);
+    border-left-color: rgba(240, 165, 55, 0.55);
+    border-right-color: rgba(240, 165, 55, 0.55);
+    border-top-color: rgba(240, 165, 55, 0.55);
+    border-bottom-color: rgba(240, 165, 55, 0.55);
+    color: rgba(255, 205, 100, 1);
+}
+
+/* legendary trait — purple */
+.reward-pill--trait {
+    background-color: rgba(70, 18, 90, 0.9);
+    border-left-color: rgba(210, 110, 255, 0.55);
+    border-right-color: rgba(210, 110, 255, 0.55);
+    border-top-color: rgba(210, 110, 255, 0.55);
+    border-bottom-color: rgba(210, 110, 255, 0.55);
+    color: rgba(235, 175, 255, 1);
+}
+
+/* legendary relic — gold */
+.reward-pill--relic {
+    background-color: rgba(80, 54, 5, 0.95);
+    border-left-color: rgba(255, 195, 40, 0.75);
+    border-right-color: rgba(255, 195, 40, 0.75);
+    border-top-color: rgba(255, 195, 40, 0.75);
+    border-bottom-color: rgba(255, 195, 40, 0.75);
+    border-left-width: 2px;
+    border-right-width: 2px;
+    border-top-width: 2px;
+    border-bottom-width: 2px;
+    color: rgba(255, 222, 100, 1);
+    -unity-font-style: bold;
+}
+
+/* curse upgrade — red */
+.reward-pill--curse {
+    background-color: rgba(80, 8, 8, 0.95);
+    border-left-color: rgba(220, 55, 55, 0.70);
+    border-right-color: rgba(220, 55, 55, 0.70);
+    border-top-color: rgba(220, 55, 55, 0.70);
+    border-bottom-color: rgba(220, 55, 55, 0.70);
+    color: rgba(255, 140, 140, 1);
+}
+
+.gold-display {
+    flex-direction: row;
+    align-items: center;
+}
+
+.run-hud-icon {
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    min-height: 18px;
+    margin-right: 4px;
+    flex-shrink: 0;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+/* ── Overlay panels ───────────────────────────────────────────────────── */
+
+.overlay-panel {
+    display: none;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 10000;
+    background-color: rgba(0, 0, 0, 0.65);
+    justify-content: center;
+    align-items: center;
+}
+
+.overlay-card {
+    min-width: 300px;
+    max-width: 420px;
+    background-color: rgb(28, 32, 42);
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    border-left-width: 2px;
+    border-right-width: 2px;
+    border-top-width: 2px;
+    border-bottom-width: 2px;
+    border-left-color: rgba(255, 255, 255, 0.15);
+    border-right-color: rgba(255, 255, 255, 0.15);
+    border-top-color: rgba(255, 255, 255, 0.15);
+    border-bottom-color: rgba(255, 255, 255, 0.15);
+    padding-left: 28px;
+    padding-right: 28px;
+    padding-top: 24px;
+    padding-bottom: 24px;
+    align-items: center;
+}
+
+.intermission-layout {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-top: 32px;
+    padding-bottom: 32px;
+    padding-left: 24px;
+    padding-right: 24px;
+}
+
+.overlay-title {
+    color: rgb(212, 175, 55);
+    font-size: 28px;
+    -unity-font-style: bold;
+    margin-bottom: 4px;
+    -unity-text-align: upper-center;
+}
+
+.overlay-subtitle {
+    color: rgb(240, 220, 140);
+    font-size: 16px;
+    margin-bottom: 20px;
+    -unity-text-align: upper-center;
+}
+
+.overlay-instruction {
+    color: rgb(190, 190, 190);
+    font-size: 13px;
+    margin-bottom: 10px;
+}
+
+.upgrade-choices {
+    flex-direction: row;
+    justify-content: center;
+    align-items: stretch;
+    gap: 20px;
+    margin-top: 8px;
+}
+
+/* ── Reward Cards ──────────────────────────────────────────────────────────── */
+.reward-card {
+    width: 195px;
+    flex-direction: column;
+    align-items: stretch;
+    background-color: rgba(26, 22, 16, 0.97);
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+    border-left-width: 2px;
+    border-right-width: 2px;
+    border-top-width: 2px;
+    border-bottom-width: 2px;
+    border-left-color: rgba(212, 175, 55, 0.8);
+    border-right-color: rgba(212, 175, 55, 0.8);
+    border-top-color: rgba(212, 175, 55, 0.8);
+    border-bottom-color: rgba(212, 175, 55, 0.8);
+    overflow: hidden;
+}
+
+.reward-card:hover {
+    border-left-color: rgb(212, 175, 55);
+    border-right-color: rgb(212, 175, 55);
+    border-top-color: rgb(212, 175, 55);
+    border-bottom-color: rgb(212, 175, 55);
+    background-color: rgba(40, 34, 20, 0.99);
+}
+
+.reward-card:active {
+    background-color: rgba(16, 12, 6, 0.99);
+}
+
+/* Category header strip at top of each card */
+.reward-card-type {
+    background-color: rgba(50, 42, 24, 0.98);
+    padding-top: 10px;
+    padding-bottom: 10px;
+    align-items: center;
+    border-bottom-width: 1px;
+    border-bottom-color: rgba(212, 175, 55, 0.4);
+}
+
+.reward-card-type-label {
+    color: rgb(212, 175, 55);
+    font-size: 11px;
+    -unity-font-style: bold;
+    -unity-text-align: upper-center;
+}
+
+/* Body wrapper (icon + name + desc) */
+.reward-card-body {
+    flex-direction: column;
+    align-items: center;
+    flex-grow: 1;
+    padding-top: 14px;
+    padding-left: 12px;
+    padding-right: 12px;
+    padding-bottom: 10px;
+}
+
+.reward-card-icon {
+    width: 110px;
+    height: 110px;
+    margin-bottom: 12px;
+    background-color: rgba(60, 50, 30, 0.5);
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+    border-left-color: rgba(212, 175, 55, 0.3);
+    border-right-color: rgba(212, 175, 55, 0.3);
+    border-top-color: rgba(212, 175, 55, 0.3);
+    border-bottom-color: rgba(212, 175, 55, 0.3);
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.reward-card-name {
+    color: rgb(240, 235, 220);
+    -unity-font-style: bold;
+    font-size: 16px;
+    -unity-text-align: upper-center;
+    white-space: normal;
+    margin-bottom: 6px;
+}
+
+.reward-card-desc {
+    color: rgba(190, 185, 170, 0.9);
+    font-size: 11px;
+    -unity-text-align: upper-center;
+    white-space: normal;
+    flex-grow: 1;
+}
+
+/* SELECT button at the bottom of each card */
+.reward-button {
+    height: 40px;
+    color: rgb(255, 255, 255);
+    -unity-font-style: bold;
+    font-size: 14px;
+    background-color: rgb(56, 142, 60);
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    border-left-width: 0;
+    border-right-width: 0;
+    border-top-width: 1px;
+    border-bottom-width: 0;
+    border-top-color: rgba(212, 175, 55, 0.4);
+    margin-top: 10px;
+}
+
+.reward-button:hover {
+    background-color: rgb(76, 175, 80);
+}
+
+.reward-button:active {
+    background-color: rgb(40, 110, 44);
+}
+
+/* Leave / skip button on merchant overlay */
+.merchant-leave-btn {
+    height: 36px;
+    color: rgb(200, 200, 200);
+    -unity-font-style: bold;
+    font-size: 13px;
+    background-color: rgba(60, 60, 60, 0.7);
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+    border-width: 1px;
+    border-color: rgba(180, 180, 180, 0.3);
+    margin-top: 12px;
+    align-self: center;
+    width: 160px;
+}
+
+.merchant-leave-btn:hover {
+    background-color: rgba(90, 60, 60, 0.85);
+    color: rgb(255, 180, 180);
+    border-color: rgba(255, 120, 120, 0.5);
+}
+
+.merchant-leave-btn:active {
+    background-color: rgba(120, 40, 40, 0.9);
+}
+
+/* ── Legendary passive-trait cards ────────────────────────────────────────── */
+.reward-card--legendary {
+    border-left-color: rgba(180, 100, 255, 0.9);
+    border-right-color: rgba(180, 100, 255, 0.9);
+    border-top-color: rgba(180, 100, 255, 0.9);
+    border-bottom-color: rgba(180, 100, 255, 0.9);
+    background-color: rgba(30, 15, 50, 0.97);
+}
+
+.reward-card--legendary:hover {
+    background-color: rgba(50, 25, 80, 0.99);
+    border-left-color: rgb(210, 150, 255);
+    border-right-color: rgb(210, 150, 255);
+    border-top-color: rgb(210, 150, 255);
+    border-bottom-color: rgb(210, 150, 255);
+}
+
+.reward-card--legendary .reward-card-type {
+    background-color: rgba(50, 20, 80, 0.98);
+    border-bottom-color: rgba(180, 100, 255, 0.5);
+}
+
+.reward-card--legendary .reward-card-type-label {
+    color: rgb(210, 150, 255);
+}
+
+.reward-card--legendary .reward-card-name {
+    color: rgb(220, 170, 255);
+}
+
+/* ── Curse reward cards ───────────────────────────────────────────────────── */
+.reward-card--curse {
+    border-left-color: rgba(200, 40, 40, 0.9);
+    border-right-color: rgba(200, 40, 40, 0.9);
+    border-top-color: rgba(200, 40, 40, 0.9);
+    border-bottom-color: rgba(200, 40, 40, 0.9);
+    background-color: rgba(40, 5, 5, 0.97);
+}
+
+.reward-card--curse:hover {
+    background-color: rgba(65, 10, 10, 0.99);
+    border-left-color: rgba(255, 80, 80, 1);
+    border-right-color: rgba(255, 80, 80, 1);
+    border-top-color: rgba(255, 80, 80, 1);
+    border-bottom-color: rgba(255, 80, 80, 1);
+}
+
+.reward-card--curse .reward-card-type {
+    background-color: rgba(60, 10, 10, 0.98);
+    border-bottom-color: rgba(200, 40, 40, 0.5);
+}
+
+.reward-card--curse .reward-card-type-label {
+    color: rgb(255, 120, 120);
+}
+
+.reward-card--curse .reward-card-name {
+    color: rgb(255, 140, 140);
+}
+
+/* ── Legendary relic cards ───────────────────────────────────────────────── */
+.reward-card--relic {
+    border-left-color: rgba(255, 195, 40, 0.9);
+    border-right-color: rgba(255, 195, 40, 0.9);
+    border-top-color: rgba(255, 195, 40, 0.9);
+    border-bottom-color: rgba(255, 195, 40, 0.9);
+    background-color: rgba(40, 28, 4, 0.97);
+}
+
+.reward-card--relic:hover {
+    background-color: rgba(60, 42, 6, 0.99);
+    border-left-color: rgba(255, 230, 110, 1);
+    border-right-color: rgba(255, 230, 110, 1);
+    border-top-color: rgba(255, 230, 110, 1);
+    border-bottom-color: rgba(255, 230, 110, 1);
+}
+
+.reward-card--relic .reward-card-type {
+    background-color: rgba(60, 42, 6, 0.98);
+    border-bottom-color: rgba(255, 195, 40, 0.5);
+}
+
+.reward-card--relic .reward-card-type-label {
+    color: rgb(255, 210, 60);
+}
+
+.reward-card--relic .reward-card-name {
+    color: rgb(255, 215, 60);
+}
+
+/* Character tag shown below description on relic cards (e.g. "★ For: Knight") */
+.reward-card-for {
+    color: rgba(255, 195, 40, 0.9);
+    font-size: 11px;
+    -unity-font-style: bold-and-italic;
+    margin-top: 8px;
+    -unity-text-align: upper-center;
+}
+
+/* ── Reroll button ─────────────────────────────────────────────────────────── */
+.reroll-container {
+    width: 100%;
+    align-items: center;
+    margin-top: 16px;
+}
+
+.reroll-button {
+    align-self: center;
+    width: 200px;
+    background-color: rgba(30, 60, 100, 0.92);
+    border-left-color: rgba(80, 150, 230, 0.8);
+    border-right-color: rgba(80, 150, 230, 0.8);
+    border-top-color: rgba(80, 150, 230, 0.8);
+    border-bottom-color: rgba(80, 150, 230, 0.8);
+    color: rgb(160, 210, 255);
+}
+
+.reroll-button:hover {
+    background-color: rgba(40, 80, 140, 0.97);
+}
+
+/* ── Affix pills on enemy unit cards ───────────────────────────────────────── */
+.affix-row {
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 3px;
+    margin-left: 2px;
+    margin-right: 2px;
+}
+
+.affix-pill {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+    background-color: rgba(60, 60, 60, 0.9);
+    color: rgb(255, 255, 255);
+    -unity-font-style: bold;
+    font-size: 9px;
+    padding-top: 1px;
+    padding-bottom: 1px;
+    padding-left: 5px;
+    padding-right: 5px;
+    margin-left: 2px;
+    margin-right: 2px;
+    margin-top: 1px;
+    margin-bottom: 1px;
+    -unity-text-align: middle-center;
+}
+
+.affix-pill--berserker    { background-color: rgba(200,  60,  40, 0.95); }
+.affix-pill--armored      { background-color: rgba(110, 125, 140, 0.95); }
+.affix-pill--swift        { background-color: rgba( 40, 170, 200, 0.95); }
+.affix-pill--bulwark      { background-color: rgba(190, 155,  30, 0.95); }
+.affix-pill--regenerating { background-color: rgba( 60, 170,  80, 0.95); }
+.affix-pill--thorns       { background-color: rgba( 80, 140,  50, 0.95); }
+.affix-pill--vampiric     { background-color: rgba(140,  40, 160, 0.95); }
+.affix-pill--enraged      { background-color: rgba(220, 100,  20, 0.95); }
+
+.restart-button {
+    background-color: rgb(160, 50, 45);
+    margin-top: 20px;
+}
+
+.restart-button:hover {
+    background-color: rgb(190, 65, 55);
+}
+
+.restart-button:active {
+    background-color: rgb(130, 40, 35);
+}
+
+/* ── Bottom HUD ────────────────────────────────────────────────────────────── */
+
+.bottom-hud {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 96px;
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: space-between;
+    background-color: rgba(10, 10, 20, 0.82);
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    gap: 10px;
+}
+
+.bottom-message-zone {
+    position: absolute;
+    bottom: 96px;
+    left: 0;
+    right: 0;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(10, 10, 20, 0.78);
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.action-zone {
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.target-panel-zone {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    padding-left: 8px;
+    padding-right: 8px;
+    flex-shrink: 0;
+}
+
+.action-btn {
+    width: 80px;
+    height: 80px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    padding-left: 4px;
+    padding-right: 4px;
+    background-color: rgba(15, 15, 35, 0.92);
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+    border-left-width: 2px;
+    border-right-width: 2px;
+    border-top-width: 2px;
+    border-bottom-width: 2px;
+    border-left-color: rgba(200, 160, 40, 0.85);
+    border-right-color: rgba(200, 160, 40, 0.85);
+    border-top-color: rgba(200, 160, 40, 0.85);
+    border-bottom-color: rgba(200, 160, 40, 0.85);
+}
+
+.action-btn:hover {
+    background-color: rgba(30, 30, 60, 0.95);
+    border-left-color: rgba(235, 195, 60, 1);
+    border-right-color: rgba(235, 195, 60, 1);
+    border-top-color: rgba(235, 195, 60, 1);
+    border-bottom-color: rgba(235, 195, 60, 1);
+}
+
+.action-btn:active {
+    background-color: rgba(10, 10, 25, 0.97);
+}
+
+.action-btn:disabled {
+    opacity: 0.35;
+}
+
+.action-btn-icon {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    min-height: 42px;
+    -unity-background-scale-mode: scale-to-fit;
+    flex-shrink: 0;
+}
+
+.action-btn-label {
+    color: rgba(220, 200, 110, 1);
+    font-size: 9px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+}
+
+/* ── Left Stats Panel ───────────────────────────────────────────────────── */
+
+.stats-panel-left {
+    position: absolute;
+    left: 8px;
+    top: 30%;
+    width: 120px;
+    flex-direction: column;
+    align-items: stretch;
+    background-color: rgba(10, 10, 20, 0.82);
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+    border-left-color: rgba(200, 160, 40, 0.4);
+    border-right-color: rgba(200, 160, 40, 0.4);
+    border-top-color: rgba(200, 160, 40, 0.4);
+    border-bottom-color: rgba(200, 160, 40, 0.4);
+    padding-left: 6px;
+    padding-right: 6px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+.stats-panel-portrait {
+    width: 108px;
+    height: 108px;
+    min-width: 108px;
+    min-height: 108px;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+    background-color: rgba(80, 80, 80, 0.6);
+    -unity-background-scale-mode: scale-and-crop;
+    margin-bottom: 5px;
+    flex-shrink: 0;
+}
+
+.stats-panel-name {
+    color: rgb(240, 240, 240);
+    font-size: 12px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    margin-bottom: 3px;
+}
+
+.stats-panel-hp {
+    height: 14px;
+    margin-bottom: 2px;
+}
+
+.stats-panel-mp {
+    height: 9px;
+    margin-bottom: 2px;
+}
+
+.stats-panel-mp .unity-progress-bar__progress {
+    background-color: rgb(52, 152, 219);
+}
+
+.stats-panel-rows {
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 4px;
+}
+
+.stats-panel-row {
+    flex-direction: row;
+    align-items: center;
+    gap: 4px;
+    padding-left: 4px;
+    padding-right: 4px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    background-color: rgba(30, 30, 50, 0.6);
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+}
+
+.stats-panel-row-icon {
+    width: 16px;
+    height: 16px;
+    min-width: 16px;
+    min-height: 16px;
+    -unity-background-scale-mode: scale-to-fit;
+    flex-shrink: 0;
+}
+
+.stats-panel-row-label {
+    color: rgba(170, 170, 200, 0.9);
+    font-size: 9px;
+    -unity-font-style: bold;
+    flex-grow: 1;
+}
+
+.stats-panel-row-value {
+    color: rgb(240, 230, 180);
+    font-size: 11px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-right;
+}
+
+/* ── Battle Log ─────────────────────────────────────────────────────────── */
+
+.battle-log-scroll {
+    position: absolute;
+    right: 8px;
+    bottom: 104px;
+    width: 190px;
+    height: 260px;
+    background-color: rgba(5, 5, 15, 0.78);
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+    border-left-color: rgba(255, 255, 255, 0.10);
+    border-right-color: rgba(255, 255, 255, 0.10);
+    border-top-color: rgba(255, 255, 255, 0.10);
+    border-bottom-color: rgba(255, 255, 255, 0.10);
+    overflow-y: hidden;
+    --vertical-scroller-visibility: hidden;
+    --horizontal-scroller-visibility: hidden;
+}
+
+.battle-log-content {
+    flex-direction: column;
+    padding-left: 4px;
+    padding-right: 4px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+
+.battle-log-entry {
+    font-size: 10px;
+    color: rgba(220, 220, 220, 0.90);
+    white-space: normal;
+    padding-top: 1px;
+    padding-bottom: 1px;
+    padding-left: 4px;
+    padding-right: 4px;
+}
+
+.log-crit {
+    color: rgb(255, 216, 0);
+    -unity-font-style: bold;
+}
+
+.log-heal {
+    color: rgb(46, 210, 112);
+}
+
+.log-death {
+    color: rgb(220, 60, 60);
+    -unity-font-style: bold;
+}
+
+.log-system {
+    color: rgba(160, 160, 180, 0.75);
+    -unity-font-style: italic;
+}

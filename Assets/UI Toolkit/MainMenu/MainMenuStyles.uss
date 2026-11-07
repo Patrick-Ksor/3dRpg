@@ -1,0 +1,97 @@
+.main-container {
+    flex-grow: 1;
+    background-color: rgb(30, 30, 35);
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+}
+
+.main-title {
+    font-size: 48px;
+    -unity-font-style: bold;
+    color: rgb(240, 240, 240);
+    margin-bottom: 40px;
+}
+
+.selection-area {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 40px;
+}
+
+.nav-btn {
+    width: 60px;
+    height: 60px;
+    font-size: 32px;
+    -unity-font-style: bold;
+    background-color: rgb(60, 60, 70);
+    color: white;
+    border-radius: 30px;
+    border-width: 0;
+    margin: 0 30px;
+    transition-property: background-color;
+    transition-duration: 0.2s;
+}
+
+.nav-btn:hover {
+    background-color: rgb(90, 90, 105);
+}
+
+.character-card {
+    width: 320px;
+    height: 450px;
+    background-color: rgb(45, 45, 55);
+    border-radius: 15px;
+    padding: 20px;
+    align-items: center;
+    border-width: 2px;
+    border-color: rgb(80, 80, 95);
+}
+
+.character-preview {
+    width: 240px;
+    height: 240px;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    margin-bottom: 20px;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.character-name {
+    font-size: 28px;
+    -unity-font-style: bold;
+    color: rgb(220, 180, 50);
+    margin-bottom: 10px;
+    -unity-text-align: middle-center;
+}
+
+.character-desc {
+    font-size: 16px;
+    color: rgb(180, 180, 190);
+    white-space: normal;
+    -unity-text-align: upper-center;
+}
+
+.start-btn {
+    width: 250px;
+    height: 60px;
+    font-size: 24px;
+    -unity-font-style: bold;
+    background-color: rgb(40, 150, 70);
+    color: white;
+    border-radius: 10px;
+    border-width: 0;
+    transition-property: background-color, scale;
+    transition-duration: 0.2s, 0.1s;
+}
+
+.start-btn:hover {
+    background-color: rgb(50, 180, 85);
+    scale: 1.05 1.05;
+}
+
+.start-btn:active {
+    background-color: rgb(30, 120, 50);
+    scale: 0.95 0.95;
+}
