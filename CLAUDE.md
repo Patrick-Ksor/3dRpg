@@ -15,6 +15,13 @@ Unity 6 (URP 17, Input System, UI Toolkit + uGUI hybrid) 3D turn-based roguelike
 - ScriptableObjects: `AttackAction` (`Assets/Attacks`), `LegendaryRelicSO` (`Resources/Relics`), `CharacterDefinitionSO` (`Resources/Characters`), `BattleItem`, `StatusIconConfig`. `AttackUpgrade`/`RewardChoice` are plain classes.
 - Editor tools: `Assets/Editor/RelicAssetGenerator.cs`, `Assets/Scripts/Editor/BattleEnvironmentGenerator.cs`.
 
+## Battle arena
+- Built at runtime by `Arena/ArenaBuilder` (called from `GameBootstrapper`), driven by the `ArenaThemeSO` asset at `Resources/Arenas/DungeonArena.asset`: tiled floor, walls on the +X and +Z sides (the camera looks toward +X/+Z, so the camera side is left open), columns, torches with real flickering point lights, and props scattered outside the fighting area. Prefab sizes/pivots are measured from renderer bounds at runtime, so no dimensions are hard-coded.
+- `Arena/ArenaController` re-tints torches, fog and sun per encounter (tier 1 warm, tier 2 ember, tier 3 violet, mini-boss fiery, boss red); `BaseBattleManager.SetupBattle` calls `ArenaController.Instance.Apply(...)`.
+- If the theme is missing or invalid the bootstrapper falls back to a plain floor plane.
+- With `disableLegacySceneDecor` on, the hand-placed `Dungeon` root and the scene's `Directional Light` in `BattleScene` are deactivated at runtime (not deleted). If walls face the wrong way, adjust `wallYawOffset` on the theme.
+- `Editor/BattleEnvironmentGenerator` (village scatter) is legacy and points at `Assets/OccaSoftware`, which is git-ignored.
+
 ## Conventions and gotchas
 - Units are re-instantiated every encounter; upgrades are re-applied from `RunManager` lists. Anything stored only on a `Unit` is lost between encounters.
 - Attack enhancements work by cloning the `AttackAction` asset (`Instantiate`) and replacing the reference on the unit; attacks are matched by `actionName`, so names must be unique per hero.

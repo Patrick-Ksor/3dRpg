@@ -467,8 +467,8 @@ public class RunManager : MonoBehaviour
             {
                 pool.Add(RewardChoice.FromAttack(new AttackUpgrade(
                     $"Barrage: {atk.actionName}",
-                    $"+{dmgBoost} projectiles fired by {atk.actionName} and +15 projectile speed.",
-                    AttackUpgradeType.ProjectileCountBoost, atk.actionName, dmgBoost)));
+                    $"+1 projectile fired by {atk.actionName} and +15 projectile speed.",
+                    AttackUpgradeType.ProjectileCountBoost, atk.actionName, 1)));
 
                 pool.Add(RewardChoice.FromAttack(new AttackUpgrade(
                     $"Enlarge: {atk.actionName}",

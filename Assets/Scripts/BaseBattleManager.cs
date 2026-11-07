@@ -145,6 +145,12 @@ public class BaseBattleManager : MonoBehaviour
         int encounterTier = (rm != null && rm.IsRunActive) ? RunManager.GetEncounterTier(rm.CurrentEncounter) : 1;
         bool isBossEncounter = rm != null && rm.IsRunActive && rm.CurrentEncounter % 10 == 0;
 
+        // Re-tint the arena (torches, fog, sun) for this encounter's tier / boss status
+        ArenaController.Instance?.Apply(
+            rm != null && rm.IsRunActive ? rm.CurrentEncounter : 1,
+            isBossEncounter,
+            rm != null && rm.IsMiniBossEncounter);
+
         // Decide which prefabs to use
         var activePlayerPrefabs = new List<GameObject>();
         if (rm != null && rm.SelectedCharacterPrefab != null)
@@ -870,15 +876,6 @@ public class BaseBattleManager : MonoBehaviour
                 _uiManager.UpdateHealth(u);
                 u.GetComponent<TraitAuraController>()?.RefreshDynamicAuras();
 
-                // Thorns player returning damage
-                if (u.hasThorns && !_activeUnit.isDead)
-                {
-                    int reflectDmg = Mathf.Max(1, damage - playerDamage);
-                    _activeUnit.TakeDamage(reflectDmg, true);
-                    RunManager.Instance?.CurrentRunStats?.AddPlayerDamageDealt(reflectDmg);
-                    if (_activeUnit.isDead) RunManager.Instance?.CurrentRunStats?.AddEnemyDefeated();
-                }
-
                 // Vampiric affix: heal the attacker for 25% of damage dealt
                 if (vampAffix != null)
                 {
@@ -894,6 +891,8 @@ public class BaseBattleManager : MonoBehaviour
                 {
                     int reflectDmg = Mathf.Max(1, damage - playerDamage);
                     _activeUnit.TakeDamage(reflectDmg, silent: true);
+                    RunManager.Instance?.CurrentRunStats?.AddPlayerDamageDealt(reflectDmg);
+                    if (_activeUnit.isDead) RunManager.Instance?.CurrentRunStats?.AddEnemyDefeated();
                     DamagePopSpawner.Show(_activeUnit.transform, reflectDmg, PopType.Thorns);
                     _uiManager.UpdateHealth(_activeUnit);
                     _activeUnit.GetComponent<TraitAuraController>()?.RefreshDynamicAuras();

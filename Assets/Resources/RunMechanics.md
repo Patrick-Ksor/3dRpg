@@ -224,7 +224,7 @@ Each attack the player owns generates its own set of cards. Upgrades stack.
 | **Empower**            | Any attack                      | +8 / +15 / +22 min & max damage (T1/T2/T3)                          |
 | **Efficiency**         | Attack has a mana cost          | −3 mana cost                                                        |
 | **Cleave**             | Not already AoE                 | Attack hits all living enemies                                      |
-| **Barrage**            | Ranged, not a summon            | +N projectiles and +15 projectile speed, N = 8 / 15 / 22 (**see Known Issues**) |
+| **Barrage**            | Ranged, not a summon            | +1 projectile and +15 projectile speed                              |
 | **Enlarge / Colossal** | Ranged, not a summon            | +0.5 projectile scale and ×1.5 damage per pick                      |
 | **Fusillade**          | Ranged with more than 1 projectile | +3 damage × current projectile count                             |
 | **Double Strike**      | Melee or summon, T1–T2          | Hits per swing ×2 (named *Frenzy Minions* for summons)              |
@@ -329,11 +329,9 @@ The run ends when all player units reach 0 HP. The run summary shows the encount
 
 ## Known Issues (found while documenting)
 
-1. **Barrage scaling looks wrong.** The reward passes `dmgBoost` (8 / 15 / 22) as the projectile bonus, so one pick adds up to 22 projectiles, but earlier docs described +1. Likely should be `1`.
-2. **Dark Staff's "+10 Summons" does nothing.** `ApplyRelicToUnit` has no `BonusSummons` case. (If it were added as-is, `summonCount << 10` would spawn ×1024 minions, so the shift needs a cap.)
-3. **Shrine heal is moot** because each encounter restores full HP.
-4. **Second trait copy has no mechanical effect**, only extra auras.
-5. **Relic grants:** Dark Staff (Necromancer) and Crown of the Undying both grant *Undying Wrath*, a melee ×3 attack. Verify that is intended for the Necromancer.
-6. **Boss affix comment mismatch:** a code comment says "3 forced affixes" but `RollAffixes` gives 2.
-7. **Thorns (player) double-reflects.** In the enemy attack handler the player's Thorns reflect is applied twice (two `TakeDamage(reflectDmg)` calls in `EnemyTurn`), so attackers take double the intended reflected damage.
-8. **Footstep SFX and BGM only play in the Editor** (loaded via `AssetDatabase` under `#if UNITY_EDITOR`).
+1. **Dark Staff's "+10 Summons" does nothing.** `ApplyRelicToUnit` has no `BonusSummons` case. (If it were added as-is, `summonCount << 10` would spawn ×1024 minions, so the shift needs a cap.)
+2. **Shrine heal is moot** because each encounter restores full HP.
+3. **Second trait copy has no mechanical effect**, only extra auras.
+4. **Relic grants:** Dark Staff (Necromancer) and Crown of the Undying both grant *Undying Wrath*, a melee ×3 attack. Verify that is intended for the Necromancer.
+5. **Boss affix comment mismatch:** a code comment says "3 forced affixes" but `RollAffixes` gives 2.
+6. **Footstep SFX and BGM only play in the Editor** (loaded via `AssetDatabase` under `#if UNITY_EDITOR`).

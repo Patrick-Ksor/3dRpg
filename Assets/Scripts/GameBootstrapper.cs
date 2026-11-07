@@ -60,12 +60,16 @@ public static class GameBootstrapper
         l.type = LightType.Directional;
         lightObj.transform.rotation = Quaternion.Euler(50, -30, 0);
 
-        // Floor
-        GameObject floor = GameObject.CreatePrimitive(PrimitiveType.Plane);
-        floor.name = "Floor";
-        floor.transform.SetParent(world.transform);
-        floor.transform.position = Vector3.zero;
-        floor.GetComponent<Renderer>().material.color = new Color(0.25f, 0.35f, 0.25f);
+        // Arena: dungeon built from Resources/Arenas/DungeonArena. If the theme asset is missing
+        // or invalid, fall back to a plain floor so the battle is still playable.
+        if (ArenaBuilder.Build(world.transform, l, c) == null)
+        {
+            GameObject floor = GameObject.CreatePrimitive(PrimitiveType.Plane);
+            floor.name = "Floor";
+            floor.transform.SetParent(world.transform);
+            floor.transform.position = Vector3.zero;
+            floor.GetComponent<Renderer>().material.color = new Color(0.25f, 0.35f, 0.25f);
+        }
 
         // Remove any default main camera so they don't clash
         Camera[] cams = GameObject.FindObjectsOfType<Camera>();
