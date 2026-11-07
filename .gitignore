@@ -84,13 +84,12 @@ Thumbs.db
 /SampleScene.bin
 /SampleScene.gltf
 /Meshy_AI_*
-# Unused third-party demo packs (re-import from Asset Store if needed)
+# Unused third-party demo packs (re-import from Asset Store if needed).
+# NOTE: LowPolyDungeonsLite is used by BattleScene and the arena builder - keep it tracked.
 /Assets/SlimUI/
 /Assets/SlimUI.meta
 /Assets/OccaSoftware/
 /Assets/OccaSoftware.meta
-/Assets/LowPolyDungeonsLite/
-/Assets/LowPolyDungeonsLite.meta
 # Unreferenced raw Meshy imports (~660 MB); only imports used by prefabs are tracked
 /Assets/MeshyImports/Attack_20260402_164153/
 /Assets/MeshyImports/Attack_20260402_164153.meta
