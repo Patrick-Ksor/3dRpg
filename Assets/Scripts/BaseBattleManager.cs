@@ -408,6 +408,9 @@ public class BaseBattleManager : MonoBehaviour
             return;
         }
 
+        _uiManager?.UpdateTurnOrder(_activeUnit, _turnQueue,
+            playerTeam.Concat(enemyTeam).Where(u => !u.isDead).OrderByDescending(u => u.speed).ToList());
+
         if (_activeUnit.isPlayer)
         {
             state = BattleState.PLAYERTURN;

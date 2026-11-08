@@ -1,97 +1,332 @@
+/* Main menu — same dungeon palette as Resources/UI/GameUi.uss (keep the variables in sync). */
+
+:root {
+    --stone-0: rgb(16, 13, 15);
+    --stone-1: rgb(27, 23, 26);
+    --stone-2: rgb(42, 36, 40);
+    --stone-3: rgb(60, 53, 58);
+    --iron: rgb(96, 88, 94);
+    --iron-dark: rgb(52, 47, 52);
+    --iron-light: rgb(138, 128, 134);
+    --torch: rgb(255, 160, 70);
+    --torch-dim: rgb(178, 100, 36);
+    --parchment: rgb(236, 224, 200);
+    --muted: rgb(160, 150, 142);
+    --hp: rgb(78, 168, 96);
+    --mp: rgb(70, 110, 215);
+}
+
 .main-container {
     flex-grow: 1;
-    background-color: rgb(30, 30, 35);
+    background-color: var(--stone-0);
     align-items: center;
     justify-content: center;
-    padding: 40px;
+    padding: 16px;
+    color: var(--parchment);
+}
+
+/* ── Title ──────────────────────────────────────────────────────────────── */
+
+.title-block {
+    flex-shrink: 0;
+    align-items: center;
+    margin-bottom: 10px;
 }
 
 .main-title {
-    font-size: 48px;
+    font-size: 38px;
     -unity-font-style: bold;
-    color: rgb(240, 240, 240);
-    margin-bottom: 40px;
+    letter-spacing: 4px;
+    color: var(--torch);
 }
 
+.main-subtitle {
+    margin-top: 4px;
+    font-size: 15px;
+    color: var(--muted);
+}
+
+/* ── Carousel ───────────────────────────────────────────────────────────── */
+
 .selection-area {
+    flex-shrink: 0;
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    margin-bottom: 40px;
 }
 
 .nav-btn {
-    width: 60px;
-    height: 60px;
-    font-size: 32px;
+    width: 54px;
+    height: 54px;
+    margin: 0 22px;
+    font-size: 28px;
     -unity-font-style: bold;
-    background-color: rgb(60, 60, 70);
-    color: white;
-    border-radius: 30px;
-    border-width: 0;
-    margin: 0 30px;
-    transition-property: background-color;
-    transition-duration: 0.2s;
+    color: var(--parchment);
+    background-color: var(--stone-2);
+    border-radius: 27px;
+    border-width: 2px;
+    border-top-color: var(--iron-light);
+    border-left-color: var(--iron-light);
+    border-bottom-color: var(--iron-dark);
+    border-right-color: var(--iron-dark);
+    transition-property: background-color, border-color, scale;
+    transition-duration: 0.12s;
 }
 
 .nav-btn:hover {
-    background-color: rgb(90, 90, 105);
+    background-color: var(--stone-3);
+    border-color: var(--torch);
+    scale: 1.1 1.1;
+}
+
+.nav-btn:active {
+    scale: 0.95 0.95;
+}
+
+.character-card,
+.details-panel {
+    background-color: var(--stone-1);
+    border-radius: 6px;
+    border-width: 3px;
+    border-top-color: var(--iron-light);
+    border-left-color: var(--iron-light);
+    border-bottom-color: var(--iron-dark);
+    border-right-color: var(--iron-dark);
+    transition-property: opacity, translate;
+    transition-duration: 0.14s;
 }
 
 .character-card {
-    width: 320px;
-    height: 450px;
-    background-color: rgb(45, 45, 55);
-    border-radius: 15px;
-    padding: 20px;
+    width: 280px;
+    min-height: 330px;
+    align-self: stretch;
+    padding: 12px;
     align-items: center;
-    border-width: 2px;
-    border-color: rgb(80, 80, 95);
+}
+
+.details-panel {
+    width: 330px;
+    min-height: 330px;
+    align-self: stretch;
+    margin-left: 14px;
+    padding: 12px;
+}
+
+.swapping {
+    opacity: 0;
+    translate: 0 10px;
 }
 
 .character-preview {
-    width: 240px;
-    height: 240px;
-    background-color: rgba(0, 0, 0, 0.3);
-    border-radius: 10px;
-    margin-bottom: 20px;
+    width: 150px;
+    height: 150px;
+    margin-bottom: 8px;
+    background-color: rgba(0, 0, 0, 0.35);
+    border-radius: 4px;
+    border-width: 1px;
+    border-color: var(--iron-dark);
     -unity-background-scale-mode: scale-to-fit;
 }
 
 .character-name {
-    font-size: 28px;
+    margin-bottom: 8px;
+    font-size: 24px;
     -unity-font-style: bold;
-    color: rgb(220, 180, 50);
-    margin-bottom: 10px;
     -unity-text-align: middle-center;
+    color: var(--torch);
 }
 
 .character-desc {
-    font-size: 16px;
-    color: rgb(180, 180, 190);
+    font-size: 14px;
     white-space: normal;
     -unity-text-align: upper-center;
+    color: var(--muted);
+}
+
+/* ── Details: stat bars + skills ────────────────────────────────────────── */
+
+.section-title {
+    font-size: 12px;
+    -unity-font-style: bold;
+    letter-spacing: 2px;
+    color: var(--torch);
+}
+
+.section-title--spaced {
+    margin-top: 8px;
+}
+
+.stat-bars {
+    flex-shrink: 0;
+    margin-top: 8px;
+}
+
+.stat-row {
+    flex-shrink: 0;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 2px;
+}
+
+.stat-icon {
+    width: 18px;
+    height: 18px;
+    margin-right: 8px;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.stat-name {
+    width: 38px;
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.stat-track {
+    flex-grow: 1;
+    height: 10px;
+    margin: 0 8px;
+    background-color: rgb(8, 6, 8);
+    border-radius: 3px;
+    border-width: 1px;
+    border-color: var(--iron-dark);
+}
+
+.stat-fill {
+    height: 100%;
+    width: 0;
+    border-radius: 2px;
+    background-color: var(--torch);
+    transition-property: width;
+    transition-duration: 0.35s;
+}
+
+.stat-fill--hp { background-color: var(--hp); }
+.stat-fill--mp { background-color: var(--mp); }
+
+.stat-value {
+    width: 34px;
+    font-size: 13px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-right;
+    color: var(--parchment);
+}
+
+.icon-heart  { background-image: url("/Assets/Violet Theme Ui/Colored Icons/Heart.png"); }
+.icon-star   { background-image: url("/Assets/Violet Theme Ui/Colored Icons/Star.png"); }
+.icon-sword  { background-image: url("/Assets/Violet Theme Ui/Colored Icons/Sword.png"); }
+.icon-shield { background-image: url("/Assets/Violet Theme Ui/Colored Icons/Shield.png"); }
+.icon-energy { background-image: url("/Assets/Violet Theme Ui/Colored Icons/Energy.png"); }
+.icon-clover { background-image: url("/Assets/Violet Theme Ui/Colored Icons/Clover.png"); }
+
+.skill-list {
+    flex-shrink: 0;
+    margin-top: 8px;
+}
+
+.skill {
+    flex-shrink: 0;
+    margin-bottom: 6px;
+    padding: 6px 8px;
+    background-color: var(--stone-2);
+    border-radius: 3px;
+    border-left-width: 3px;
+    border-left-color: var(--torch-dim);
+}
+
+.skill-name {
+    font-size: 13px;
+    -unity-font-style: bold;
+    color: var(--parchment);
+}
+
+.skill-desc {
+    flex-shrink: 0;
+    margin-top: 1px;
+    font-size: 11px;
+    white-space: normal;
+    color: var(--muted);
+}
+
+.skill-note {
+    font-size: 11px;
+    -unity-font-style: italic;
+    white-space: normal;
+    color: var(--muted);
+}
+
+/* ── Dots ───────────────────────────────────────────────────────────────── */
+
+.carousel-dots {
+    flex-shrink: 0;
+    flex-direction: row;
+    justify-content: center;
+    margin-top: 14px;
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    margin: 0 5px;
+    border-radius: 5px;
+    background-color: var(--iron-dark);
+    transition-property: background-color, scale;
+    transition-duration: 0.15s;
+}
+
+.dot--active {
+    background-color: var(--torch);
+    scale: 1.4 1.4;
+}
+
+/* ── Footer buttons ─────────────────────────────────────────────────────── */
+
+.footer {
+    flex-shrink: 0;
+    flex-direction: row;
+    align-items: center;
+    margin-top: 14px;
 }
 
 .start-btn {
-    width: 250px;
-    height: 60px;
-    font-size: 24px;
+    width: 240px;
+    height: 48px;
+    margin-right: 12px;
+    font-size: 20px;
     -unity-font-style: bold;
-    background-color: rgb(40, 150, 70);
-    color: white;
-    border-radius: 10px;
+    letter-spacing: 2px;
+    color: var(--stone-0);
+    background-color: var(--torch);
     border-width: 0;
+    border-radius: 5px;
     transition-property: background-color, scale;
-    transition-duration: 0.2s, 0.1s;
+    transition-duration: 0.12s;
 }
 
 .start-btn:hover {
-    background-color: rgb(50, 180, 85);
-    scale: 1.05 1.05;
+    background-color: rgb(255, 190, 110);
+    scale: 1.04 1.04;
 }
 
 .start-btn:active {
-    background-color: rgb(30, 120, 50);
-    scale: 0.95 0.95;
+    background-color: var(--torch-dim);
+    scale: 0.97 0.97;
+}
+
+.quit-btn {
+    width: 100px;
+    height: 48px;
+    font-size: 16px;
+    -unity-font-style: bold;
+    color: var(--parchment);
+    background-color: var(--stone-2);
+    border-radius: 5px;
+    border-width: 2px;
+    border-color: var(--iron);
+    transition-property: background-color, border-color;
+    transition-duration: 0.12s;
+}
+
+.quit-btn:hover {
+    background-color: var(--stone-3);
+    border-color: var(--torch);
 }

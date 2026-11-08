@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Text;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
@@ -8,6 +8,10 @@ using UnityEngine.UIElements;
 using UnityEditor;
 #endif
 
+/// <summary>
+/// Battle HUD built with UI Toolkit. Layout lives in Resources/UI/GameUi.uxml, all styling in GameUi.uss
+/// (dungeon theme variables at the top of that file). Reward/room cards are built by <see cref="RewardCardBuilder"/>.
+/// </summary>
 public class BattleUIManager : MonoBehaviour
 {
     private BaseBattleManager _battleManager;
@@ -19,9 +23,9 @@ public class BattleUIManager : MonoBehaviour
     private UIDocument _uiDocument;
     private VisualElement _root;
     private Label _messageLabel;
-    private Camera _mainCam;
+    private bool _loggedMissingUxml;
 
-    // Bottom HUD — fixed action zone
+    // Bottom HUD
     private VisualElement _actionZone;
     private VisualElement _targetPanelZone;
     private Button _attackBtn;
@@ -30,111 +34,551 @@ public class BattleUIManager : MonoBehaviour
     private Button _defendBtn;
     private bool _buttonsWired;
 
-    // Left stats panel
-    private VisualElement _statsPanel;
+    // Hero card (left)
     private VisualElement _statsPanelPortrait;
     private Label _statsPanelName;
     private ProgressBar _statsPanelHpBar;
     private ProgressBar _statsPanelMpBar;
     private VisualElement _statsPanelRows;
+    private readonly Dictionary<string, Label> _statValueLabels = new Dictionary<string, Label>();
+    private readonly Dictionary<string, VisualElement> _statRowElements = new Dictionary<string, VisualElement>();
+    private readonly Dictionary<string, int> _lastStatValues = new Dictionary<string, int>();
 
     // Run HUD
-    private VisualElement _runHud;
     private Label _encounterLabel;
     private Label _goldLabel;
-    private VisualElement _goldIcon;
-
-    // Run rewards strip
+    private Label _roomBadge;
+    private int _lastGold = -1;
     private VisualElement _runRewards;
 
-    // Intermission overlay
+    // Turn order bar
+    private VisualElement _turnOrder;
+    private readonly List<TurnChip> _turnChips = new List<TurnChip>();
+    private const int MaxTurnChips = 10;
+
+    private struct TurnChip
+    {
+        public Unit unit;
+        public VisualElement chip;
+        public VisualElement hpFill;
+    }
+
+    // Smooth bar animation
+    private readonly Dictionary<ProgressBar, float> _barTargets = new Dictionary<ProgressBar, float>();
+    private readonly List<ProgressBar> _barScratch = new List<ProgressBar>();
+    private bool _barTickScheduled;
+
+    // Tooltip
+    private VisualElement _tooltip;
+    private Label _tooltipTitle;
+    private Label _tooltipBody;
+
+    // Overlays
     private VisualElement _intermissionPanel;
     private Label _intermissionTitle;
     private Label _intermissionGold;
+    private Label _intermissionInstruction;
     private VisualElement _upgradeChoices;
     private VisualElement _rerollContainer;
-
-    // Run-summary overlay
     private VisualElement _summaryPanel;
     private Label _summaryTitle;
     private Label _summaryStats;
+    private VisualElement _summaryGrid;
+    private VisualElement _summaryRelics;
+    private Label _summaryRelicsTitle;
 
     // Battle log
+    private VisualElement _battleLog;
+    private Label _battleLogHeader;
     private ScrollView _battleLogScroll;
     private VisualElement _battleLogContent;
     private const int MaxLogEntries = 25;
 
     public enum LogEntryType { Normal, Crit, Heal, Death, System }
 
-    private const string MessageLabelName = "battle-message";
-    private const string ActionZoneName = "action-zone";
-    private const string TargetZoneName = "target-panel-zone";
-    private const string RunHudName = "run-hud";
-    private const string EncounterLabelName = "encounter-label";
-    private const string GoldLabelName = "gold-label";
-    private const string IntermissionPanelName = "intermission-panel";
-    private const string IntermissionTitleName = "intermission-title";
-    private const string IntermissionGoldName = "intermission-gold";
-    private const string UpgradeChoicesName = "upgrade-choices";
-    private const string RunRewardsName = "run-rewards";
-    private const string SummaryPanelName = "run-summary-panel";
-    private const string SummaryTitleName = "summary-title";
-    private const string SummaryStatsName = "summary-stats";
+    // ─── SETUP ─────────────────────────────────────────────────────────────
 
     public void Initialize(BaseBattleManager battleManager)
     {
         _battleManager = battleManager;
-        _mainCam = Camera.main;
-
         EnsureDocument();
         CacheUiReferences();
     }
 
+    private bool EnsureUiReady()
+    {
+        if (_uiDocument == null) EnsureDocument();
+        if (_root == null || _actionZone == null || _messageLabel == null) CacheUiReferences();
+        return _root != null && _actionZone != null && _messageLabel != null;
+    }
+
+    private void EnsureDocument()
+    {
+        _uiDocument = GetComponent<UIDocument>();
+        if (_uiDocument == null) _uiDocument = gameObject.AddComponent<UIDocument>();
+
+        if (_uiDocument.panelSettings == null)
+        {
+            _uiDocument.panelSettings = _panelSettings != null
+                ? _panelSettings
+                : Resources.Load<PanelSettings>("UI/PanelSettings");
+
+#if UNITY_EDITOR
+            if (_uiDocument.panelSettings == null)
+                _uiDocument.panelSettings = AssetDatabase.LoadAssetAtPath<PanelSettings>("Assets/UI Toolkit/PanelSettings.asset");
+#endif
+            if (_uiDocument.panelSettings == null)
+                _uiDocument.panelSettings = ScriptableObject.CreateInstance<PanelSettings>();
+        }
+
+        if (_uiDocument.visualTreeAsset == null)
+        {
+            _uiDocument.visualTreeAsset = _gameUiAsset != null
+                ? _gameUiAsset
+                : Resources.Load<VisualTreeAsset>("UI/GameUi");
+
+            if (_uiDocument.visualTreeAsset == null && !_loggedMissingUxml)
+            {
+                _loggedMissingUxml = true;
+                Debug.LogError("[BattleUIManager] Resources/UI/GameUi.uxml could not be loaded; the battle HUD will be empty.");
+            }
+        }
+    }
+
+    private void CacheUiReferences()
+    {
+        _root = _uiDocument != null ? _uiDocument.rootVisualElement : null;
+        if (_root == null) return;
+
+        _actionZone = _root.Q<VisualElement>("action-zone");
+        _targetPanelZone = _root.Q<VisualElement>("target-panel-zone");
+        _messageLabel = _root.Q<Label>("battle-message");
+
+        // The UIDocument builds its tree a frame after creation; EnsureUiReady retries on the next call.
+        if (_actionZone == null || _messageLabel == null) return;
+
+        // Hero card
+        _statsPanelPortrait = _root.Q<VisualElement>("stats-panel-portrait");
+        _statsPanelName = _root.Q<Label>("stats-panel-name");
+        _statsPanelHpBar = _root.Q<ProgressBar>("stats-panel-hp");
+        _statsPanelMpBar = _root.Q<ProgressBar>("stats-panel-mp");
+        _statsPanelRows = _root.Q<VisualElement>("stats-panel-rows");
+        BuildStatRows();
+
+        // Action buttons
+        _attackBtn = _root.Q<Button>("attack-btn");
+        _specialBtn = _root.Q<Button>("special-btn");
+        _defendBtn = _root.Q<Button>("defend-btn");
+        _itemBtn = _root.Q<Button>("item-btn");
+
+        // Tooltip
+        _tooltip = _root.Q<VisualElement>("tooltip");
+        _tooltipTitle = _root.Q<Label>("tooltip-title");
+        _tooltipBody = _root.Q<Label>("tooltip-body");
+        if (_tooltip != null) _tooltip.pickingMode = PickingMode.Ignore;
+
+        if (!_buttonsWired)
+        {
+            if (_attackBtn != null) _attackBtn.clicked += HandleAttackClicked;
+            if (_specialBtn != null) _specialBtn.clicked += HandleSpecialClicked;
+            if (_defendBtn != null) _defendBtn.clicked += HandleDefendClicked;
+            if (_itemBtn != null) _itemBtn.clicked += HandleItemClicked;
+
+            RegisterTooltip(_attackBtn, DescribeAttackButton);
+            RegisterTooltip(_specialBtn, DescribeSpecialButton);
+            RegisterTooltip(_itemBtn, DescribeItemButton);
+            RegisterTooltip(_defendBtn, () => ("Defend", "Take half damage until your next turn."));
+
+            Button restartBtn = _root.Q<Button>("summary-restart");
+            if (restartBtn != null) restartBtn.clicked += OnRestartClicked;
+
+            _buttonsWired = true;
+        }
+
+        if (_targetPanelZone != null) _targetPanelZone.style.display = DisplayStyle.None;
+
+        // Run HUD
+        _encounterLabel = _root.Q<Label>("encounter-label");
+        _goldLabel = _root.Q<Label>("gold-label");
+        _roomBadge = _root.Q<Label>("room-badge");
+        _runRewards = _root.Q<VisualElement>("run-rewards");
+        _turnOrder = _root.Q<VisualElement>("turn-order");
+
+        // Battle log
+        _battleLog = _root.Q<VisualElement>("battle-log");
+        _battleLogHeader = _root.Q<Label>("battle-log-header");
+        _battleLogScroll = _root.Q<ScrollView>("battle-log-scroll");
+        _battleLogContent = _root.Q<VisualElement>("battle-log-content");
+        if (_battleLogHeader != null)
+            _battleLogHeader.RegisterCallback<ClickEvent>(_ => ToggleBattleLog());
+
+        // Overlays
+        _rerollContainer = _root.Q<VisualElement>("reroll-container");
+        _intermissionPanel = _root.Q<VisualElement>("intermission-panel");
+        _intermissionTitle = _root.Q<Label>("intermission-title");
+        _intermissionGold = _root.Q<Label>("intermission-gold");
+        _intermissionInstruction = _root.Q<Label>("intermission-instruction");
+        _upgradeChoices = _root.Q<VisualElement>("upgrade-choices");
+        _summaryPanel = _root.Q<VisualElement>("run-summary-panel");
+        _summaryTitle = _root.Q<Label>("summary-title");
+        _summaryStats = _root.Q<Label>("summary-stats");
+        _summaryGrid = _root.Q<VisualElement>("summary-grid");
+        _summaryRelics = _root.Q<VisualElement>("summary-relics");
+        _summaryRelicsTitle = _root.Q<Label>("summary-relics-title");
+        HideOverlays();
+
+        if (!_barTickScheduled)
+        {
+            _root.schedule.Execute(TickBars).Every(16);
+            _barTickScheduled = true;
+        }
+    }
+
+    // ─── PUBLIC HUD API ────────────────────────────────────────────────────
+
     public void SetupHealthBars(List<Unit> allUnits)
     {
-        // Health display is handled by FloatingHealthBar components on each unit's GameObject.
-        // Refresh the player card immediately so it shows correct values from the new encounter.
+        // World-space bars are FloatingHealthBar components on each unit; only the hero card lives here.
         Unit player = allUnits?.Find(u => u.isPlayer);
         if (player != null) UpdatePlayerCard(player);
     }
 
     public void UpdateHealth(Unit unit)
     {
-        if (!EnsureUiReady() || !unit.isPlayer) return;
-        UpdatePlayerCard(unit);
+        if (!EnsureUiReady() || unit == null) return;
+        RefreshTurnChip(unit);
+        if (unit.isPlayer) UpdatePlayerCard(unit);
     }
 
     public void UpdateStats(Unit unit)
     {
-        // Stat display is handled by the intermission rewards strip; no in-battle chips.
+        // Stat display is handled by the hero card and the run-rewards strip.
     }
 
-    // ─── PLAYER CARD ──────────────────────────────────────────────────
+    public void ShowRestartMenu() => ShowRunSummary(false, 1, 0);
+
+    public void UpdateRunHud(int current, int gold)
+    {
+        if (!EnsureUiReady()) return;
+
+        if (_encounterLabel != null) _encounterLabel.text = $"Encounter {current}";
+
+        if (_roomBadge != null)
+        {
+            _roomBadge.RemoveFromClassList("room-badge--boss");
+            _roomBadge.RemoveFromClassList("room-badge--mini");
+            if (current > 0 && current % 10 == 0)
+            {
+                _roomBadge.text = "BOSS";
+                _roomBadge.AddToClassList("room-badge--boss");
+            }
+            else if (current > 0 && current % 5 == 0)
+            {
+                _roomBadge.text = "MINI-BOSS";
+                _roomBadge.AddToClassList("room-badge--mini");
+            }
+        }
+
+        if (_goldLabel != null)
+        {
+            _goldLabel.text = $"{gold} Gold";
+            if (_lastGold >= 0 && gold != _lastGold) Pulse(_goldLabel, "gold-label--pulse");
+        }
+        _lastGold = gold;
+
+        RefreshRunRewards();
+    }
+
+    // ─── HERO CARD ─────────────────────────────────────────────────────────
+
+    private static readonly (string key, string label, string iconClass)[] StatRowDefs =
+    {
+        ("atk", "ATK", "icon-sword"),
+        ("def", "DEF", "icon-shield"),
+        ("spd", "SPD", "icon-energy"),
+        ("lck", "LCK", "icon-clover"),
+    };
+
+    private void BuildStatRows()
+    {
+        if (_statsPanelRows == null || _statValueLabels.Count > 0) return;
+
+        foreach (var def in StatRowDefs)
+        {
+            var row = new VisualElement();
+            row.AddToClassList("stats-panel-row");
+
+            var icon = new VisualElement();
+            icon.AddToClassList("stats-panel-row-icon");
+            icon.AddToClassList(def.iconClass);
+            row.Add(icon);
+
+            var label = new Label(def.label);
+            label.AddToClassList("stats-panel-row-label");
+            row.Add(label);
+
+            var value = new Label("-");
+            value.AddToClassList("stats-panel-row-value");
+            row.Add(value);
+
+            _statsPanelRows.Add(row);
+            _statValueLabels[def.key] = value;
+            _statRowElements[def.key] = row;
+        }
+    }
+
     private void UpdatePlayerCard(Unit u)
     {
         if (u == null) return;
 
-        // Left stats panel
         if (_statsPanelName != null) _statsPanelName.text = u.unitName;
         if (_statsPanelPortrait != null && u.portrait != null)
             _statsPanelPortrait.style.backgroundImage = new StyleBackground(u.portrait);
-        if (_statsPanelHpBar != null) SetProgressBar(_statsPanelHpBar, u.currentHealth, u.maxHealth);
+
+        SetProgressBar(_statsPanelHpBar, u.currentHealth, u.maxHealth);
         if (_statsPanelMpBar != null)
         {
             _statsPanelMpBar.style.display = u.maxMana > 0 ? DisplayStyle.Flex : DisplayStyle.None;
             if (u.maxMana > 0) SetProgressBar(_statsPanelMpBar, u.currentMana, u.maxMana);
         }
-        if (_statsPanelRows != null)
+
+        SetStat("atk", u.attack);
+        SetStat("def", u.defense);
+        SetStat("spd", u.speed);
+        SetStat("lck", u.luck);
+    }
+
+    private void SetStat(string key, int value)
+    {
+        if (!_statValueLabels.TryGetValue(key, out Label label)) return;
+        label.text = value.ToString();
+
+        if (_lastStatValues.TryGetValue(key, out int previous) && previous != value)
         {
-            _statsPanelRows.Clear();
-            _statsPanelRows.Add(CreateStatRow("Sword.png", "ATK", u.attack.ToString()));
-            _statsPanelRows.Add(CreateStatRow("Shield.png", "DEF", u.defense.ToString()));
-            _statsPanelRows.Add(CreateStatRow("Energy.png", "SPD", u.speed.ToString()));
-            _statsPanelRows.Add(CreateStatRow("Clover.png", "LCK", u.luck.ToString()));
+            VisualElement row = _statRowElements[key];
+            string cls = value > previous ? "stats-panel-row--up" : "stats-panel-row--down";
+            row.AddToClassList(cls);
+            row.schedule.Execute(() => row.RemoveFromClassList(cls)).StartingIn(700);
+        }
+        _lastStatValues[key] = value;
+    }
+
+    // ─── SMOOTH PROGRESS BARS ──────────────────────────────────────────────
+
+    private void SetProgressBar(ProgressBar bar, float current, float max)
+    {
+        if (bar == null) return;
+
+        float safeMax = Mathf.Max(1f, max);
+        float clamped = Mathf.Clamp(current, 0f, safeMax);
+        float target = clamped / safeMax * 100f;
+
+        bar.lowValue = 0f;
+        bar.highValue = 100f;
+        bar.title = $"{Mathf.RoundToInt(clamped)}/{Mathf.RoundToInt(safeMax)}";
+
+        if (_barTargets.ContainsKey(bar))
+        {
+            _barTargets[bar] = target;   // TickBars eases towards it
+        }
+        else
+        {
+            _barTargets[bar] = target;
+            bar.value = target;
+            ApplyFillVisibility(bar);
         }
     }
 
-    // ─── COMMAND MENU (fixed 4-button bar) ────────────────────────────────────
+    private void TickBars()
+    {
+        if (_barTargets.Count == 0) return;
+        _barScratch.Clear();
+        _barScratch.AddRange(_barTargets.Keys);
+
+        foreach (ProgressBar bar in _barScratch)
+        {
+            float target = _barTargets[bar];
+            float diff = target - bar.value;
+            if (Mathf.Abs(diff) < 0.05f) continue;
+
+            bar.value = Mathf.Abs(diff) < 0.4f ? target : Mathf.Lerp(bar.value, target, 0.16f);
+            ApplyFillVisibility(bar);
+        }
+    }
+
+    private static void ApplyFillVisibility(ProgressBar bar)
+    {
+        VisualElement fill = bar.Q(className: "unity-progress-bar__progress");
+        if (fill != null) fill.style.opacity = bar.value > 0.05f ? 1f : 0f;
+    }
+
+    // ─── TURN ORDER ────────────────────────────────────────────────────────
+
+    /// <summary>Rebuilds the turn bar: the active unit, the rest of this round, then a divider and next round.</summary>
+    public void UpdateTurnOrder(Unit active, IReadOnlyList<Unit> remaining, IReadOnlyList<Unit> nextRound)
+    {
+        if (!EnsureUiReady() || _turnOrder == null) return;
+
+        _turnOrder.Clear();
+        _turnChips.Clear();
+
+        if (active != null) AddTurnChip(active, true);
+        if (remaining != null)
+            foreach (Unit u in remaining)
+                if (u != null && !u.isDead && _turnChips.Count < MaxTurnChips) AddTurnChip(u, false);
+
+        if (nextRound != null && _turnChips.Count < MaxTurnChips)
+        {
+            var divider = new VisualElement();
+            divider.AddToClassList("turn-divider");
+            _turnOrder.Add(divider);
+            foreach (Unit u in nextRound)
+                if (u != null && !u.isDead && _turnChips.Count < MaxTurnChips) AddTurnChip(u, false);
+        }
+    }
+
+    public void ClearTurnOrder()
+    {
+        _turnOrder?.Clear();
+        _turnChips.Clear();
+    }
+
+    private void AddTurnChip(Unit u, bool active)
+    {
+        var chip = new VisualElement();
+        chip.AddToClassList("turn-chip");
+        chip.AddToClassList(u.isPlayer ? "turn-chip--player" : "turn-chip--enemy");
+
+        if (u.portrait != null)
+        {
+            chip.style.backgroundImage = new StyleBackground(u.portrait);
+        }
+        else
+        {
+            string initial = string.IsNullOrEmpty(u.unitName) ? "?" : u.unitName.Substring(0, 1).ToUpperInvariant();
+            var letter = new Label(initial);
+            letter.AddToClassList("turn-chip-letter");
+            chip.Add(letter);
+        }
+
+        var hpBar = new VisualElement();
+        hpBar.AddToClassList("turn-chip-hp");
+        var hpFill = new VisualElement();
+        hpFill.AddToClassList("turn-chip-hp-fill");
+        hpFill.style.width = Length.Percent(HealthPercent(u));
+        hpBar.Add(hpFill);
+        chip.Add(hpBar);
+
+        RegisterTooltip(chip, () => u == null ? ("", "") :
+            (u.unitName, $"HP {u.currentHealth}/{u.maxHealth}   SPD {u.speed}"));
+
+        _turnOrder.Add(chip);
+        _turnChips.Add(new TurnChip { unit = u, chip = chip, hpFill = hpFill });
+
+        if (active)
+            chip.schedule.Execute(() => chip.AddToClassList("turn-chip--active")).StartingIn(30);
+    }
+
+    private void RefreshTurnChip(Unit u)
+    {
+        foreach (TurnChip tc in _turnChips)
+        {
+            if (tc.unit != u) continue;
+            tc.hpFill.style.width = Length.Percent(HealthPercent(u));
+            if (u.isDead) tc.chip.AddToClassList("turn-chip--dead");
+        }
+    }
+
+    private static float HealthPercent(Unit u) =>
+        Mathf.Clamp01(u.currentHealth / Mathf.Max(1f, u.maxHealth)) * 100f;
+
+    // ─── TOOLTIPS ──────────────────────────────────────────────────────────
+
+    private void RegisterTooltip(VisualElement target, Func<(string title, string body)> getter)
+    {
+        if (target == null) return;
+        target.RegisterCallback<PointerEnterEvent>(_ => ShowTooltip(target, getter()));
+        target.RegisterCallback<PointerLeaveEvent>(_ => HideTooltip());
+        target.RegisterCallback<DetachFromPanelEvent>(_ => HideTooltip());
+    }
+
+    private void ShowTooltip(VisualElement anchor, (string title, string body) content)
+    {
+        if (_tooltip == null || _root == null) return;
+        if (string.IsNullOrEmpty(content.title) && string.IsNullOrEmpty(content.body)) return;
+
+        _tooltipTitle.text = content.title;
+        _tooltipTitle.style.display = string.IsNullOrEmpty(content.title) ? DisplayStyle.None : DisplayStyle.Flex;
+        _tooltipBody.text = content.body;
+        _tooltipBody.style.display = string.IsNullOrEmpty(content.body) ? DisplayStyle.None : DisplayStyle.Flex;
+
+        Rect rootRect = _root.worldBound;
+        Rect a = anchor.worldBound;
+        float left = Mathf.Clamp(a.xMin - rootRect.xMin, 8f, Mathf.Max(8f, rootRect.width - 280f));
+        _tooltip.style.left = left;
+
+        bool below = a.center.y < rootRect.center.y;   // top-of-screen anchors get the tooltip underneath
+        if (below)
+        {
+            _tooltip.style.top = a.yMax - rootRect.yMin + 8f;
+            _tooltip.style.bottom = StyleKeyword.Auto;
+        }
+        else
+        {
+            _tooltip.style.bottom = rootRect.yMax - a.yMin + 8f;
+            _tooltip.style.top = StyleKeyword.Auto;
+        }
+        _tooltip.style.display = DisplayStyle.Flex;
+    }
+
+    private void HideTooltip()
+    {
+        if (_tooltip != null) _tooltip.style.display = DisplayStyle.None;
+    }
+
+    private (string, string) DescribeAttackButton()
+    {
+        AttackAction atk = _battleManager?.GetActiveUnit()?.basicAttack;
+        return atk == null ? ("Attack", "Strike an enemy.") : (atk.actionName, DescribeAttack(atk));
+    }
+
+    private (string, string) DescribeSpecialButton()
+    {
+        Unit u = _battleManager?.GetActiveUnit();
+        int count = u?.specialAttacks?.Count ?? 0;
+        string mana = u != null && u.maxMana > 0 ? $"\nMana: {u.currentMana}/{u.maxMana}" : "";
+        return ("Special", $"Spend mana on a powerful skill. {count} available.{mana}");
+    }
+
+    private (string, string) DescribeItemButton()
+    {
+        int count = _battleManager?.GetActiveUnit()?.inventory?.Count ?? 0;
+        return ("Items", count > 0 ? $"Use a consumable. {count} in your bag." : "Your bag is empty.");
+    }
+
+    public static string DescribeAttack(AttackAction a)
+    {
+        var sb = new StringBuilder();
+        if (a.isSummon)
+        {
+            sb.Append($"Summons {a.summonCount} minion{(a.summonCount == 1 ? "" : "s")}.");
+        }
+        else
+        {
+            sb.Append($"{a.minDamage}-{a.maxDamage} base damage");
+            if (a.hitCount > 1) sb.Append($" x{a.hitCount} hits");
+            if (a.projectileCount > 1) sb.Append($" x{a.projectileCount} projectiles");
+            sb.Append(a.isAoE ? "\nHits all enemies." : "\nSingle target.");
+        }
+        if (a.manaCost > 0) sb.Append($"\nCosts {a.manaCost} MP.");
+        if (a.appliesStatus != StatusEffectType.None)
+            sb.Append($"\n{Mathf.RoundToInt(a.statusChance * 100f)}% to inflict {a.appliesStatus} for {a.statusDuration} turns.");
+        if (a.lifeStealPercent > 0f) sb.Append("\nDrains life from the target.");
+        return sb.ToString();
+    }
+
+    // ─── COMMAND MENU ──────────────────────────────────────────────────────
+
     public void ShowCommandMenu()
     {
         if (!EnsureUiReady() || _battleManager == null) return;
@@ -151,153 +595,151 @@ public class BattleUIManager : MonoBehaviour
         bool hasSpecials = activeUnit.specialAttacks != null && activeUnit.specialAttacks.Count > 0;
         bool hasItems = activeUnit.inventory != null && activeUnit.inventory.Count > 0;
 
-        if (_attackBtn != null) _attackBtn.SetEnabled(true);
-        if (_specialBtn != null) _specialBtn.SetEnabled(hasSpecials);
-        if (_itemBtn != null) _itemBtn.SetEnabled(hasItems);
-        if (_defendBtn != null) _defendBtn.SetEnabled(true);
+        _attackBtn?.SetEnabled(true);
+        _specialBtn?.SetEnabled(hasSpecials);
+        _itemBtn?.SetEnabled(hasItems);
+        _defendBtn?.SetEnabled(true);
     }
 
     public void HideCommandMenu()
     {
         if (!EnsureUiReady()) return;
+        HideTooltip();
         _targetPanelZone?.Clear();
         if (_targetPanelZone != null) _targetPanelZone.style.display = DisplayStyle.None;
         if (_actionZone != null) _actionZone.style.display = DisplayStyle.None;
     }
 
-    // ─── PERSISTENT ACTION BUTTON HANDLERS ───────────────────────────────────
+    public void EnableAttackButton(bool enable)
+    {
+        if (!EnsureUiReady()) return;
+
+        if (enable)
+        {
+            ShowCommandMenu();
+            return;
+        }
+
+        _targetPanelZone?.Clear();
+        if (_targetPanelZone != null) _targetPanelZone.style.display = DisplayStyle.None;
+        if (_actionZone != null) _actionZone.style.display = DisplayStyle.Flex;
+        _attackBtn?.SetEnabled(false);
+        _specialBtn?.SetEnabled(false);
+        _itemBtn?.SetEnabled(false);
+        _defendBtn?.SetEnabled(false);
+    }
+
     private void HandleAttackClicked()
     {
         if (_battleManager == null) return;
         Unit activeUnit = _battleManager.GetActiveUnit();
         if (activeUnit == null) return;
-        if (activeUnit.basicAttack != null)
+
+        if (activeUnit.basicAttack == null)
         {
-            if (activeUnit.basicAttack.isAoE)
-            {
-                var aliveEnemies = _battleManager.GetAliveEnemies();
-                if (aliveEnemies.Count > 0)
-                    _battleManager.PlayerSelectTarget(aliveEnemies[0], activeUnit.basicAttack);
-            }
-            else
-                ShowTargetSelection(activeUnit.basicAttack, _battleManager.GetAliveEnemies());
-        }
-        else
             SetMessage("No basic attack assigned!");
+            return;
+        }
+        SelectTargetFor(activeUnit.basicAttack);
     }
 
     private void HandleSpecialClicked()
     {
-        if (_battleManager == null) return;
-        Unit activeUnit = _battleManager.GetActiveUnit();
+        Unit activeUnit = _battleManager?.GetActiveUnit();
         if (activeUnit != null) ShowSpecialSelection(activeUnit);
     }
 
     private void HandleItemClicked()
     {
-        if (_battleManager == null) return;
-        Unit activeUnit = _battleManager.GetActiveUnit();
+        Unit activeUnit = _battleManager?.GetActiveUnit();
         if (activeUnit != null) ShowItemSelection(activeUnit);
     }
 
     private void HandleDefendClicked() => _battleManager?.PlayerDefend();
 
-    // ─── SUB-MENU HELPERS ──────────────────────────────────────────────────
-    private void OpenSubMenu(System.Action populate)
+    /// <summary>AoE attacks fire immediately; single-target attacks open the target list.</summary>
+    private void SelectTargetFor(AttackAction action)
+    {
+        var enemies = _battleManager.GetAliveEnemies();
+        if (action.isAoE)
+        {
+            if (enemies.Count > 0) _battleManager.PlayerSelectTarget(enemies[0], action);
+        }
+        else
+        {
+            ShowTargetSelection(action, enemies);
+        }
+    }
+
+    // ─── SUB-MENUS ─────────────────────────────────────────────────────────
+
+    private void OpenSubMenu(Action populate)
     {
         if (_actionZone != null) _actionZone.style.display = DisplayStyle.None;
         if (_targetPanelZone != null) _targetPanelZone.style.display = DisplayStyle.Flex;
+        HideTooltip();
         _targetPanelZone?.Clear();
         populate();
     }
 
-    private void SpawnMenuButton(string label, bool interactable, Action onClick, string iconFile = null)
+    private void SpawnMenuButton(string label, bool interactable, Action onClick,
+                                 string tooltipTitle = null, string tooltipBody = null)
     {
         if (!EnsureUiReady() || _targetPanelZone == null) return;
 
-        Button btn = new Button(() => onClick?.Invoke());
+        var btn = new Button(() => onClick?.Invoke()) { text = label };
         btn.SetEnabled(interactable);
         btn.AddToClassList("menu-button");
-
-        Sprite icon = iconFile != null ? LoadColoredIcon(iconFile) : null;
-        if (icon != null)
-        {
-            btn.AddToClassList("menu-button--has-icon");
-            Image img = new Image { sprite = icon };
-            img.AddToClassList("menu-button-icon");
-            btn.Add(img);
-            btn.Add(new Label(label));
-        }
-        else
-        {
-            btn.text = label;
-        }
+        if (tooltipTitle != null || tooltipBody != null)
+            RegisterTooltip(btn, () => (tooltipTitle ?? "", tooltipBody ?? ""));
         _targetPanelZone.Add(btn);
     }
 
-    // ─── SPECIAL ATTACK SUBMENU ───
     private void ShowSpecialSelection(Unit activeUnit)
     {
         OpenSubMenu(() =>
         {
-            foreach (var attack in activeUnit.specialAttacks)
+            foreach (AttackAction attack in activeUnit.specialAttacks)
             {
                 if (attack == null) continue;
                 bool canAfford = activeUnit.currentMana >= attack.manaCost;
                 string costStr = attack.manaCost > 0 ? $" ({attack.manaCost} MP)" : "";
-                AttackAction capturedAttack = attack;
+                AttackAction captured = attack;
 
                 SpawnMenuButton(attack.actionName + costStr, canAfford, () =>
                 {
                     _targetPanelZone?.Clear();
-                    if (capturedAttack.isAoE)
-                    {
-                        var aliveEnemies = _battleManager.GetAliveEnemies();
-                        if (aliveEnemies.Count > 0)
-                            _battleManager.PlayerSelectTarget(aliveEnemies[0], capturedAttack);
-                    }
-                    else
-                        ShowTargetSelection(capturedAttack, _battleManager.GetAliveEnemies());
-                });
+                    SelectTargetFor(captured);
+                }, attack.actionName, DescribeAttack(attack));
             }
-            SpawnMenuButton("Back", true, () => ShowCommandMenu());
+            SpawnMenuButton("Back", true, ShowCommandMenu);
         });
     }
 
-    // ─── ITEM SUBMENU ───
     private void ShowItemSelection(Unit activeUnit)
     {
         OpenSubMenu(() =>
         {
             var grouped = new Dictionary<BattleItem, int>();
-            foreach (var item in activeUnit.inventory)
+            foreach (BattleItem item in activeUnit.inventory)
             {
                 if (item == null) continue;
-                if (!grouped.ContainsKey(item)) grouped[item] = 0;
-                grouped[item]++;
+                grouped[item] = grouped.TryGetValue(item, out int n) ? n + 1 : 1;
             }
 
             foreach (var kvp in grouped)
             {
-                BattleItem capturedItem = kvp.Key;
-                SpawnMenuButton($"{capturedItem.itemName} x{kvp.Value}", true, () =>
+                BattleItem captured = kvp.Key;
+                SpawnMenuButton($"{captured.itemName} x{kvp.Value}", true, () =>
                 {
                     _targetPanelZone?.Clear();
-                    _battleManager.PlayerUseItem(capturedItem);
+                    _battleManager.PlayerUseItem(captured);
                 });
             }
 
-            if (grouped.Count == 0)
-                SpawnMenuButton("No items!", false, null);
-
-            SpawnMenuButton("Back", true, () => ShowCommandMenu());
+            if (grouped.Count == 0) SpawnMenuButton("No items!", false, null);
+            SpawnMenuButton("Back", true, ShowCommandMenu);
         });
-    }
-
-    // ─── TARGET SELECTION ───
-    private void ShowAttackSelection(Unit activeUnit)
-    {
-        ShowCommandMenu();
     }
 
     private void ShowTargetSelection(AttackAction selectedAction, List<Unit> enemies)
@@ -305,25 +747,28 @@ public class BattleUIManager : MonoBehaviour
         OpenSubMenu(() =>
         {
             SetMessage($"Select target for {selectedAction.actionName}");
-            foreach (var enemy in enemies)
+            foreach (Unit enemy in enemies)
             {
-                Unit capturedTarget = enemy;
+                Unit captured = enemy;
                 SpawnMenuButton(enemy.unitName, true, () =>
                 {
                     _targetPanelZone?.Clear();
-                    _battleManager.PlayerSelectTarget(capturedTarget, selectedAction);
-                });
+                    _battleManager.PlayerSelectTarget(captured, selectedAction);
+                }, enemy.unitName, $"HP {enemy.currentHealth}/{enemy.maxHealth}");
             }
-            SpawnMenuButton("Back", true, () => ShowCommandMenu());
+            SpawnMenuButton("Back", true, ShowCommandMenu);
         });
     }
 
     public void ClearTargetButtons()
     {
         if (!EnsureUiReady()) return;
+        HideTooltip();
         _targetPanelZone?.Clear();
         if (_targetPanelZone != null) _targetPanelZone.style.display = DisplayStyle.None;
     }
+
+    // ─── MESSAGE + LOG ─────────────────────────────────────────────────────
 
     public void SetMessage(string msg)
     {
@@ -335,26 +780,21 @@ public class BattleUIManager : MonoBehaviour
             _messageLabel.style.display = string.IsNullOrEmpty(msg) ? DisplayStyle.None : DisplayStyle.Flex;
         }
 
-        if (!string.IsNullOrEmpty(msg))
-        {
-            LogEntryType logType = LogEntryType.Normal;
-            string lower = msg.ToLowerInvariant();
-            if (lower.Contains("critical")) logType = LogEntryType.Crit;
-            else if (lower.Contains("dies") || lower.Contains("defeated") || lower.Contains("dead")) logType = LogEntryType.Death;
-            else if (lower.Contains("regenerates") || lower.Contains("heals") || lower.Contains("restored") || lower.Contains("burns for")) logType = LogEntryType.Heal;
-            else if (lower.Contains("encounter") || lower.Contains("fight!") || lower.Contains("battle")) logType = LogEntryType.System;
-            if (lower.Contains("burns for")) logType = LogEntryType.Death;
-            AddLogEntry(msg, logType);
-        }
+        if (string.IsNullOrEmpty(msg)) return;
+
+        LogEntryType logType = LogEntryType.Normal;
+        string lower = msg.ToLowerInvariant();
+        if (lower.Contains("critical")) logType = LogEntryType.Crit;
+        else if (lower.Contains("dies") || lower.Contains("defeated") || lower.Contains("dead")) logType = LogEntryType.Death;
+        else if (lower.Contains("regenerates") || lower.Contains("heals") || lower.Contains("restored") || lower.Contains("burns for")) logType = LogEntryType.Heal;
+        else if (lower.Contains("encounter") || lower.Contains("fight!") || lower.Contains("battle")) logType = LogEntryType.System;
+        if (lower.Contains("burns for")) logType = LogEntryType.Death;
+        AddLogEntry(msg, logType);
     }
 
-    /// <summary>Clears all entries from the battle log.</summary>
-    public void ClearBattleLog()
-    {
-        _battleLogContent?.Clear();
-    }
+    public void ClearBattleLog() => _battleLogContent?.Clear();
 
-    /// <summary>Adds an entry to the battle log panel (newest at top).</summary>
+    /// <summary>Adds an entry to the battle log (newest at top, older entries fade).</summary>
     public void AddLogEntry(string msg, LogEntryType type = LogEntryType.Normal)
     {
         if (_battleLogContent == null) return;
@@ -370,519 +810,27 @@ public class BattleUIManager : MonoBehaviour
         }
 
         _battleLogContent.Insert(0, entry);
-
-        // Cap entries
         while (_battleLogContent.childCount > MaxLogEntries)
             _battleLogContent.RemoveAt(_battleLogContent.childCount - 1);
+
+        int count = _battleLogContent.childCount;
+        for (int i = 0; i < count; i++)
+            _battleLogContent[i].style.opacity = Mathf.Lerp(1f, 0.45f, count <= 1 ? 0f : (float)i / (count - 1));
     }
 
-    public void EnableAttackButton(bool enable)
+    private void ToggleBattleLog()
     {
-        if (!EnsureUiReady()) return;
-
-        if (enable)
-        {
-            ShowCommandMenu();
-        }
-        else
-        {
-            _targetPanelZone?.Clear();
-            if (_targetPanelZone != null) _targetPanelZone.style.display = DisplayStyle.None;
-            if (_actionZone != null) _actionZone.style.display = DisplayStyle.Flex;
-            if (_attackBtn != null) _attackBtn.SetEnabled(false);
-            if (_specialBtn != null) _specialBtn.SetEnabled(false);
-            if (_itemBtn != null) _itemBtn.SetEnabled(false);
-            if (_defendBtn != null) _defendBtn.SetEnabled(false);
-        }
+        if (_battleLogScroll == null) return;
+        bool show = _battleLogScroll.resolvedStyle.display == DisplayStyle.None;
+        _battleLogScroll.style.display = show ? DisplayStyle.Flex : DisplayStyle.None;
+        if (_battleLogHeader != null) _battleLogHeader.text = show ? "BATTLE LOG  -" : "BATTLE LOG  +";
     }
 
-    private bool EnsureUiReady()
-    {
-        if (_uiDocument == null)
-        {
-            EnsureDocument();
-        }
+    // ─── RUN REWARDS STRIP ─────────────────────────────────────────────────
 
-        if (_root == null || _actionZone == null || _messageLabel == null)
-        {
-            CacheUiReferences();
-        }
-
-        return _root != null && _actionZone != null && _messageLabel != null;
-    }
-
-    private void EnsureDocument()
-    {
-        _uiDocument = GetComponent<UIDocument>();
-        if (_uiDocument == null)
-        {
-            _uiDocument = gameObject.AddComponent<UIDocument>();
-        }
-
-        if (_uiDocument.panelSettings == null)
-        {
-            _uiDocument.panelSettings = _panelSettings != null
-                ? _panelSettings
-                : Resources.Load<PanelSettings>("UI/PanelSettings");
-
-#if UNITY_EDITOR
-            if (_uiDocument.panelSettings == null)
-            {
-                _uiDocument.panelSettings = AssetDatabase.LoadAssetAtPath<PanelSettings>("Assets/UI Toolkit/PanelSettings.asset");
-            }
-#endif
-
-            if (_uiDocument.panelSettings == null)
-            {
-                _uiDocument.panelSettings = ScriptableObject.CreateInstance<PanelSettings>();
-            }
-        }
-
-        if (_uiDocument.visualTreeAsset == null)
-        {
-            if (_gameUiAsset != null)
-            {
-                _uiDocument.visualTreeAsset = _gameUiAsset;
-            }
-            else
-            {
-                _uiDocument.visualTreeAsset = Resources.Load<VisualTreeAsset>("UI/GameUi");
-#if UNITY_EDITOR
-                if (_uiDocument.visualTreeAsset == null)
-                {
-                    _uiDocument.visualTreeAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/UI/GameUi.uxml");
-                }
-#endif
-            }
-        }
-    }
-
-    private void CacheUiReferences()
-    {
-        _root = _uiDocument != null ? _uiDocument.rootVisualElement : null;
-        if (_root == null) return;
-
-        _actionZone = _root.Q<VisualElement>(ActionZoneName);
-        _targetPanelZone = _root.Q<VisualElement>(TargetZoneName);
-        _messageLabel = _root.Q<Label>(MessageLabelName);
-
-        if (_actionZone == null || _messageLabel == null)
-        {
-            // If root has no children the UIDocument hasn't built its tree yet —
-            // don't overwrite with the fallback; EnsureUiReady will retry on the next call.
-            if (_root.childCount == 0) return;
-            BuildFallbackTree();
-            return;
-        }
-
-        // Left stats panel
-        _statsPanel = _root.Q<VisualElement>("stats-panel-left");
-        _statsPanelPortrait = _root.Q<VisualElement>("stats-panel-portrait");
-        _statsPanelName = _root.Q<Label>("stats-panel-name");
-        _statsPanelHpBar = _root.Q<ProgressBar>("stats-panel-hp");
-        _statsPanelMpBar = _root.Q<ProgressBar>("stats-panel-mp");
-        _statsPanelRows = _root.Q<VisualElement>("stats-panel-rows");
-
-        // Action buttons
-        _attackBtn = _root.Q<Button>("attack-btn");
-        _specialBtn = _root.Q<Button>("special-btn");
-        _defendBtn = _root.Q<Button>("defend-btn");
-        _itemBtn = _root.Q<Button>("item-btn");
-
-        // Wire icons once
-        if (!_buttonsWired)
-        {
-            WireActionButtonIcon(_attackBtn, "AttackButton.png");
-            WireActionButtonIcon(_specialBtn, "Energy.png");
-            WireActionButtonIcon(_defendBtn, "shield blue.png");
-            WireActionButtonIcon(_itemBtn, "Bag.png");
-
-            if (_attackBtn != null) _attackBtn.clicked += HandleAttackClicked;
-            if (_specialBtn != null) _specialBtn.clicked += HandleSpecialClicked;
-            if (_defendBtn != null) _defendBtn.clicked += HandleDefendClicked;
-            if (_itemBtn != null) _itemBtn.clicked += HandleItemClicked;
-            _buttonsWired = true;
-        }
-
-        // Start with target zone hidden
-        if (_targetPanelZone != null) _targetPanelZone.style.display = DisplayStyle.None;
-
-        // Optional run-HUD elements (present in UXML)
-        _runHud = _root.Q<VisualElement>(RunHudName);
-        _encounterLabel = _root.Q<Label>(EncounterLabelName);
-        _goldLabel = _root.Q<Label>(GoldLabelName);
-        _goldIcon = _root.Q<VisualElement>("gold-icon");
-        if (_goldIcon != null) { Sprite s = LoadColoredIcon("Coin.png"); if (s != null) _goldIcon.style.backgroundImage = new StyleBackground(s); }
-
-        // Run rewards strip
-        _runRewards = _root.Q<VisualElement>(RunRewardsName);
-
-        // Reroll container (inside intermission)
-        _rerollContainer = _root.Q<VisualElement>("reroll-container");
-
-        // Battle log
-        _battleLogScroll = _root.Q<ScrollView>("battle-log-scroll");
-        _battleLogContent = _root.Q<VisualElement>("battle-log-content");
-
-        // Overlay elements
-        _intermissionPanel = _root.Q<VisualElement>(IntermissionPanelName);
-        _intermissionTitle = _root.Q<Label>(IntermissionTitleName);
-        _intermissionGold = _root.Q<Label>(IntermissionGoldName);
-        _upgradeChoices = _root.Q<VisualElement>(UpgradeChoicesName);
-        _summaryPanel = _root.Q<VisualElement>(SummaryPanelName);
-        _summaryTitle = _root.Q<Label>(SummaryTitleName);
-        _summaryStats = _root.Q<Label>(SummaryStatsName);
-
-        // Ensure overlays start hidden
-        if (_intermissionPanel != null) _intermissionPanel.style.display = DisplayStyle.None;
-        if (_summaryPanel != null) _summaryPanel.style.display = DisplayStyle.None;
-    }
-
-    private void WireActionButtonIcon(Button btn, string iconFile)
-    {
-        if (btn == null) return;
-        Sprite icon = LoadColoredIcon(iconFile);
-        if (icon == null) return;
-        var img = btn.Q<VisualElement>(className: "action-btn-icon");
-        if (img != null) img.style.backgroundImage = new StyleBackground(icon);
-    }
-
-    private void BuildFallbackTree()
-    {
-        if (_root == null) return;
-        _root.Clear();
-
-        // Run HUD (top)
-        _runHud = new VisualElement { name = RunHudName };
-        _runHud.AddToClassList("run-hud");
-        _encounterLabel = new Label("Encounter 1") { name = EncounterLabelName };
-        _encounterLabel.AddToClassList("run-hud-label");
-        _goldLabel = new Label("0 Gold") { name = GoldLabelName };
-        _goldLabel.AddToClassList("run-hud-label");
-        _goldLabel.AddToClassList("gold-label");
-        _runHud.Add(_encounterLabel);
-        _runHud.Add(_goldLabel);
-        _root.Add(_runHud);
-
-        // Run rewards strip
-        _runRewards = new VisualElement { name = RunRewardsName };
-        _runRewards.AddToClassList("run-rewards");
-        _root.Add(_runRewards);
-
-        // Left stats panel
-        _statsPanel = new VisualElement { name = "stats-panel-left" };
-        _statsPanel.AddToClassList("stats-panel-left");
-        _statsPanelPortrait = new VisualElement { name = "stats-panel-portrait" };
-        _statsPanelPortrait.AddToClassList("stats-panel-portrait");
-        _statsPanel.Add(_statsPanelPortrait);
-        _statsPanelName = new Label("") { name = "stats-panel-name" };
-        _statsPanelName.AddToClassList("stats-panel-name");
-        _statsPanel.Add(_statsPanelName);
-        _statsPanelHpBar = new ProgressBar { name = "stats-panel-hp" };
-        _statsPanelHpBar.AddToClassList("stats-panel-hp");
-        _statsPanelHpBar.AddToClassList("health-player");
-        _statsPanel.Add(_statsPanelHpBar);
-        _statsPanelMpBar = new ProgressBar { name = "stats-panel-mp" };
-        _statsPanelMpBar.AddToClassList("stats-panel-mp");
-        _statsPanelMpBar.style.display = DisplayStyle.None;
-        _statsPanel.Add(_statsPanelMpBar);
-        _statsPanelRows = new VisualElement { name = "stats-panel-rows" };
-        _statsPanelRows.AddToClassList("stats-panel-rows");
-        _statsPanel.Add(_statsPanelRows);
-        _root.Add(_statsPanel);
-
-        // Bottom HUD: action-zone | target-panel-zone
-        VisualElement bottomHud = new VisualElement();
-        bottomHud.AddToClassList("bottom-hud");
-
-        // Action zone (4 fixed buttons)
-        _actionZone = new VisualElement { name = ActionZoneName };
-        _actionZone.AddToClassList("action-zone");
-        _actionZone.style.flexDirection = FlexDirection.Row;
-        _attackBtn = CreateActionButton("attack-btn", "Attack");
-        _specialBtn = CreateActionButton("special-btn", "Special");
-        _defendBtn = CreateActionButton("defend-btn", "Defend");
-        _itemBtn = CreateActionButton("item-btn", "Items");
-        _actionZone.Add(_attackBtn);
-        _actionZone.Add(_specialBtn);
-        _actionZone.Add(_defendBtn);
-        _actionZone.Add(_itemBtn);
-        bottomHud.Add(_actionZone);
-
-        // Target panel zone (sub-menu overlay)
-        _targetPanelZone = new VisualElement { name = TargetZoneName };
-        _targetPanelZone.AddToClassList("target-panel-zone");
-        _targetPanelZone.style.display = DisplayStyle.None;
-        bottomHud.Add(_targetPanelZone);
-
-        _root.Add(bottomHud);
-
-        // Message zone — absolutely positioned above the bottom HUD
-        VisualElement msgZone = new VisualElement { name = "bottom-message-zone" };
-        msgZone.AddToClassList("bottom-message-zone");
-        _messageLabel = new Label("") { name = MessageLabelName };
-        _messageLabel.AddToClassList("battle-message");
-        _messageLabel.style.display = DisplayStyle.None;
-        msgZone.Add(_messageLabel);
-        _root.Add(msgZone);
-
-        // Battle log — absolute, right side
-        _battleLogScroll = new ScrollView { name = "battle-log-scroll" };
-        _battleLogScroll.AddToClassList("battle-log-scroll");
-        _battleLogContent = new VisualElement { name = "battle-log-content" };
-        _battleLogContent.AddToClassList("battle-log-content");
-        _battleLogScroll.Add(_battleLogContent);
-        _root.Add(_battleLogScroll);
-
-        // Wire buttons
-        if (!_buttonsWired)
-        {
-            WireActionButtonIcon(_attackBtn, "AttackButton.png");
-            WireActionButtonIcon(_specialBtn, "Energy.png");
-            WireActionButtonIcon(_defendBtn, "shield blue.png");
-            WireActionButtonIcon(_itemBtn, "Bag.png");
-
-            _attackBtn.clicked += HandleAttackClicked;
-            _specialBtn.clicked += HandleSpecialClicked;
-            _defendBtn.clicked += HandleDefendClicked;
-            _itemBtn.clicked += HandleItemClicked;
-            _buttonsWired = true;
-        }
-
-        // Intermission overlay
-        _intermissionPanel = new VisualElement { name = IntermissionPanelName };
-        _intermissionPanel.AddToClassList("overlay-panel");
-        _intermissionPanel.style.display = DisplayStyle.None;
-        var intermCard = new VisualElement();
-        intermCard.AddToClassList("intermission-layout");
-        _intermissionTitle = new Label("Victory!") { name = IntermissionTitleName };
-        _intermissionTitle.AddToClassList("overlay-title");
-        _intermissionGold = new Label("+0 Gold") { name = IntermissionGoldName };
-        _intermissionGold.AddToClassList("overlay-subtitle");
-        var chooseLabel = new Label("Choose an upgrade:");
-        chooseLabel.AddToClassList("overlay-instruction");
-        _upgradeChoices = new VisualElement { name = UpgradeChoicesName };
-        _upgradeChoices.AddToClassList("upgrade-choices");
-        _rerollContainer = new VisualElement();
-        _rerollContainer.AddToClassList("reroll-container");
-        intermCard.Add(_intermissionTitle);
-        intermCard.Add(_intermissionGold);
-        intermCard.Add(chooseLabel);
-        intermCard.Add(_upgradeChoices);
-        intermCard.Add(_rerollContainer);
-        _intermissionPanel.Add(intermCard);
-        _root.Add(_intermissionPanel);
-
-        // Run-summary overlay
-        _summaryPanel = new VisualElement { name = SummaryPanelName };
-        _summaryPanel.AddToClassList("overlay-panel");
-        _summaryPanel.style.display = DisplayStyle.None;
-        var summaryCard = new VisualElement();
-        summaryCard.AddToClassList("overlay-card");
-        _summaryTitle = new Label("Run Complete!") { name = SummaryTitleName };
-        _summaryTitle.AddToClassList("overlay-title");
-        _summaryStats = new Label("") { name = SummaryStatsName };
-        _summaryStats.AddToClassList("overlay-subtitle");
-        var restartBtn = new Button { name = "summary-restart", text = "New Run" };
-        restartBtn.AddToClassList("menu-button");
-        restartBtn.AddToClassList("restart-button");
-        restartBtn.clicked += OnRestartClicked;
-        summaryCard.Add(_summaryTitle);
-        summaryCard.Add(_summaryStats);
-        summaryCard.Add(restartBtn);
-        _summaryPanel.Add(summaryCard);
-        _root.Add(_summaryPanel);
-    }
-
-    private static Button CreateActionButton(string name, string label)
-    {
-        var btn = new Button { name = name };
-        btn.AddToClassList("action-btn");
-        var icon = new VisualElement();
-        icon.AddToClassList("action-btn-icon");
-        var lbl = new Label(label);
-        lbl.AddToClassList("action-btn-label");
-        btn.Add(icon);
-        btn.Add(lbl);
-        return btn;
-    }
-
-    private static void SetProgressBar(ProgressBar progressBar, float current, float max)
-    {
-        if (progressBar == null) return;
-
-        float safeMax = Mathf.Max(1f, max);
-        float clampedCurrent = Mathf.Clamp(current, 0f, safeMax);
-        float normalized = clampedCurrent / safeMax;
-
-        progressBar.lowValue = 0f;
-        progressBar.highValue = 100f;
-        progressBar.value = normalized * 100f;
-        progressBar.title = $"{Mathf.RoundToInt(clampedCurrent)}/{Mathf.RoundToInt(safeMax)}";
-
-        VisualElement fill = progressBar.Q(className: "unity-progress-bar__progress");
-        if (fill != null)
-        {
-            fill.style.opacity = normalized > 0.0001f ? 1f : 0f;
-        }
-    }
-
-    private static string SanitizeName(string value)
-    {
-        if (string.IsNullOrWhiteSpace(value)) return "unit";
-        return value.Replace(" ", "-").ToLowerInvariant();
-    }
-
-#if UNITY_EDITOR
-    private static Sprite LoadColoredIcon(string fileName) =>
-        AssetDatabase.LoadAssetAtPath<Sprite>($"Assets/Violet Theme Ui/Colored Icons/{fileName}");
-#else
-    private static Sprite LoadColoredIcon(string fileName) => null;
-#endif
-
-    private static Sprite LoadRewardIcon(string resourceName) =>
-        Resources.Load<Sprite>($"Rewards/{resourceName}");
-
-    private static string GetChoiceTypeLabel(RewardChoice choice)
-    {
-        if (choice.curseEffect != null) return "CURSE";
-        if (choice.legendaryRelic != null) return "RELIC";
-        if (choice.statUpgrade != null)
-            return choice.statUpgrade.upgradeType switch
-            {
-                UpgradeType.Vampiric => "TRAIT",
-                UpgradeType.Thorns => "TRAIT",
-                UpgradeType.Regenerating => "TRAIT",
-                UpgradeType.Enraged => "TRAIT",
-                _ => "UPGRADE",
-            };
-        if (choice.attackUpgrade != null)
-            return choice.attackUpgrade.upgradeType == AttackUpgradeType.UnlockNewAttack
-                ? "NEW SKILL" : "ATTACK UP";
-        return "REWARD";
-    }
-
-    private static Sprite GetRewardIcon(RewardChoice choice)
-    {
-        // Relic icon from the SO asset itself
-        if (choice.legendaryRelic != null && choice.legendaryRelic.icon != null)
-            return choice.legendaryRelic.icon;
-
-        // Step 1: attack-specific icon (attack name, spaces stripped)
-        if (choice.attackUpgrade != null && !string.IsNullOrEmpty(choice.attackUpgrade.targetAttackName))
-        {
-            Sprite s = LoadRewardIcon(choice.attackUpgrade.targetAttackName.Replace(" ", ""));
-            if (s != null) return s;
-        }
-
-        // Step 2: type fallback
-        if (choice.statUpgrade != null)
-        {
-            string key = choice.statUpgrade.upgradeType switch
-            {
-                UpgradeType.MaxHealth => "MaxHealth",
-                UpgradeType.Attack => "Attack",
-                UpgradeType.Defense => "Defense",
-                UpgradeType.Speed => "Speed",
-                UpgradeType.MaxMana => "MaxMana",
-                UpgradeType.Luck => "Luck",
-                UpgradeType.Vampiric => "Vampiric",
-                UpgradeType.Thorns => "Thorns",
-                UpgradeType.Regenerating => "Regenerating",
-                UpgradeType.Enraged => "Enraged",
-                _ => null,
-            };
-            if (key != null) return LoadRewardIcon(key);
-        }
-
-        if (choice.attackUpgrade != null)
-        {
-            string key = choice.attackUpgrade.upgradeType switch
-            {
-                AttackUpgradeType.DamageBoost => "Damage",
-                AttackUpgradeType.ManaCostReduce => "ManaCost",
-                AttackUpgradeType.AoEUnlock => "AoE",
-                AttackUpgradeType.ProjectileCountBoost => "Projectile",
-                AttackUpgradeType.SpreadAngleBoost => "Spread",
-                AttackUpgradeType.UnlockNewAttack => "NewAttack",
-                AttackUpgradeType.HitCountBoost => "MultiHit",
-                _ => null,
-            };
-            if (key != null) return LoadRewardIcon(key);
-        }
-
-        return null;
-    }
-
-    private static VisualElement CreateStatRow(string iconFile, string labelText, string value)
-    {
-        VisualElement row = new VisualElement();
-        row.AddToClassList("stats-panel-row");
-        Sprite icon = LoadColoredIcon(iconFile);
-        if (icon != null)
-        {
-            Image img = new Image { sprite = icon };
-            img.AddToClassList("stats-panel-row-icon");
-            row.Add(img);
-        }
-        Label lbl = new Label(labelText);
-        lbl.AddToClassList("stats-panel-row-label");
-        row.Add(lbl);
-        Label val = new Label(value);
-        val.AddToClassList("stats-panel-row-value");
-        row.Add(val);
-        return row;
-    }
-
-    private static VisualElement CreateStatChip(string iconFile, string value, string chipName)
-    {
-        VisualElement chip = new VisualElement();
-        chip.name = chipName;
-        chip.AddToClassList("stat-chip");
-        Sprite icon = LoadColoredIcon(iconFile);
-        if (icon != null)
-        {
-            Image img = new Image { sprite = icon };
-            img.AddToClassList("stat-chip-icon");
-            chip.Add(img);
-        }
-        Label lbl = new Label(value);
-        lbl.AddToClassList("stat-chip-value");
-        chip.Add(lbl);
-        return chip;
-    }
-
-    private static Label GetChipLabel(VisualElement chip) =>
-        chip.Q<Label>(className: "stat-chip-value") ?? chip as Label;
-
-    private static string AffixTypeToModifierClass(EnemyAffixType type) => type switch
-    {
-        EnemyAffixType.Berserker => "berserker",
-        EnemyAffixType.Armored => "armored",
-        EnemyAffixType.Swift => "swift",
-        EnemyAffixType.Bulwark => "bulwark",
-        EnemyAffixType.Regenerating => "regenerating",
-        EnemyAffixType.Thorns => "thorns",
-        EnemyAffixType.Vampiric => "vampiric",
-        EnemyAffixType.Enraged => "enraged",
-        _ => "berserker",
-    };
-
-    public void ShowRestartMenu()
-    {
-        // Fallback path: show a generic run summary
-        ShowRunSummary(false, 1, 0);
-    }
-
-    // ─── RUN HUD & OVERLAYS ───────────────────────────────────────────────────
-
-    public void UpdateRunHud(int current, int gold)
-    {
-        if (!EnsureUiReady()) return;
-        if (_encounterLabel != null) _encounterLabel.text = $"Encounter {current}";
-        if (_goldLabel != null) _goldLabel.text = $"{gold} Gold";
-        RefreshRunRewards();
-    }
+    private static bool IsTrait(UpgradeType t) =>
+        t == UpgradeType.Vampiric || t == UpgradeType.Thorns ||
+        t == UpgradeType.Regenerating || t == UpgradeType.Enraged;
 
     public void RefreshRunRewards()
     {
@@ -890,49 +838,33 @@ public class BattleUIManager : MonoBehaviour
         RunManager rm = RunManager.Instance;
         if (rm == null) { _runRewards.Clear(); return; }
 
-        // Tally all chosen upgrades by display name, preserving category for coloring
+        // Tally chosen upgrades by display name, remembering the category for colouring.
         var entries = new Dictionary<string, (int count, string css)>();
+        void Tally(string name, string css)
+        {
+            entries[name] = entries.TryGetValue(name, out var e) ? (e.count + 1, css) : (1, css);
+        }
 
         foreach (var u in rm.AppliedUpgrades)
-        {
-            bool isTrait = u.upgradeType == UpgradeType.Vampiric ||
-                           u.upgradeType == UpgradeType.Thorns ||
-                           u.upgradeType == UpgradeType.Regenerating ||
-                           u.upgradeType == UpgradeType.Enraged;
-            string css = isTrait ? "reward-pill--trait" : "reward-pill--stat";
-            if (!entries.ContainsKey(u.name)) entries[u.name] = (0, css);
-            entries[u.name] = (entries[u.name].count + 1, css);
-        }
+            Tally(u.name, IsTrait(u.upgradeType) ? "reward-pill--trait" : "reward-pill--stat");
         foreach (var u in rm.AppliedAttackUpgrades)
-        {
-            if (!entries.ContainsKey(u.name)) entries[u.name] = (0, "reward-pill--attack");
-            entries[u.name] = (entries[u.name].count + 1, "reward-pill--attack");
-        }
+            Tally(u.name, "reward-pill--attack");
 
         _runRewards.Clear();
-        // Relic pills — shown first with a distinct gold style,
-        // followed by individual trait/stat pills for each relic's boosts.
+
+        // Relics first (gold), then the stat/trait boosts each relic grants.
         foreach (var kvp in rm.EquippedRelics)
         {
-            var pill = new Label($"\u2605 {kvp.Value.relicName}");
+            var pill = new Label(kvp.Value.relicName);
             pill.AddToClassList("reward-pill");
             pill.AddToClassList("reward-pill--relic");
             _runRewards.Add(pill);
 
-            // Show each stat/trait boost granted by this relic as its own pill
             foreach (var boost in kvp.Value.statBoosts)
-            {
                 if (!entries.ContainsKey(boost.name))
-                {
-                    bool isTrait = boost.upgradeType == UpgradeType.Vampiric ||
-                                   boost.upgradeType == UpgradeType.Thorns ||
-                                   boost.upgradeType == UpgradeType.Regenerating ||
-                                   boost.upgradeType == UpgradeType.Enraged;
-                    string css = isTrait ? "reward-pill--trait" : "reward-pill--stat";
-                    entries[boost.name] = (1, css);
-                }
-            }
+                    entries[boost.name] = (1, IsTrait(boost.upgradeType) ? "reward-pill--trait" : "reward-pill--stat");
         }
+
         foreach (var kvp in entries)
         {
             string text = kvp.Value.count > 1 ? $"{kvp.Key} x{kvp.Value.count}" : kvp.Key;
@@ -943,249 +875,138 @@ public class BattleUIManager : MonoBehaviour
         }
     }
 
+    // ─── OVERLAYS ──────────────────────────────────────────────────────────
+
     public void HideOverlays()
     {
-        if (_intermissionPanel != null) _intermissionPanel.style.display = DisplayStyle.None;
-        if (_summaryPanel != null) _summaryPanel.style.display = DisplayStyle.None;
+        HidePanel(_intermissionPanel);
+        HidePanel(_summaryPanel);
     }
 
-    public void ShowIntermission(int clearedEncounter, int goldEarned, List<RewardChoice> choices, Action<RewardChoice> onChoose, Action onReroll = null)
+    private static void HidePanel(VisualElement panel)
     {
-        if (!EnsureUiReady()) return;
+        if (panel == null) return;
+        panel.RemoveFromClassList("overlay-panel--shown");
+        panel.style.display = DisplayStyle.None;
+    }
+
+    private static void ShowPanel(VisualElement panel)
+    {
+        if (panel == null) return;
+        panel.style.display = DisplayStyle.Flex;
+        panel.schedule.Execute(() => panel.AddToClassList("overlay-panel--shown")).StartingIn(10);
+    }
+
+    /// <summary>Slides a container's children in one after another.</summary>
+    private static void AnimateIn(VisualElement container)
+    {
+        if (container == null) return;
+        for (int i = 0; i < container.childCount; i++)
+        {
+            VisualElement child = container[i];
+            child.AddToClassList("anim-hidden");
+            child.schedule.Execute(() => child.RemoveFromClassList("anim-hidden")).StartingIn(80 + i * 90);
+        }
+    }
+
+    private static void Pulse(VisualElement element, string cssClass)
+    {
+        element.AddToClassList(cssClass);
+        element.schedule.Execute(() => element.RemoveFromClassList(cssClass)).StartingIn(220);
+    }
+
+    /// <summary>Resets the shared choice panel for a new screen.</summary>
+    private void BeginChoiceScreen(string title, string subtitle, string instruction)
+    {
         HideOverlays();
         ClearTargetButtons();
+        ClearTurnOrder();
 
-        if (_intermissionTitle != null)
-            _intermissionTitle.text = $"Encounter {clearedEncounter} Clear!";
-        if (_intermissionGold != null)
-            _intermissionGold.text = $"+{goldEarned} Gold";
+        if (_intermissionTitle != null) _intermissionTitle.text = title;
+        if (_intermissionGold != null) _intermissionGold.text = subtitle;
+        if (_intermissionInstruction != null)
+        {
+            _intermissionInstruction.text = instruction ?? "";
+            _intermissionInstruction.style.display = string.IsNullOrEmpty(instruction) ? DisplayStyle.None : DisplayStyle.Flex;
+        }
+        _upgradeChoices?.Clear();
+        _rerollContainer?.Clear();
+    }
+
+    private void EndChoiceScreen()
+    {
+        AnimateIn(_upgradeChoices);
+        ShowPanel(_intermissionPanel);
+    }
+
+    public void ShowIntermission(int clearedEncounter, int goldEarned, List<RewardChoice> choices,
+                                 Action<RewardChoice> onChoose, Action onReroll = null)
+    {
+        if (!EnsureUiReady()) return;
+        BeginChoiceScreen($"Encounter {clearedEncounter} Clear!", $"+{goldEarned} Gold", "Choose an upgrade:");
 
         if (_upgradeChoices != null)
         {
-            _upgradeChoices.Clear();
-            foreach (var choice in choices)
+            foreach (RewardChoice choice in choices)
+                _upgradeChoices.Add(RewardCardBuilder.CreateRewardCard(choice, onChoose));
+
+            if (onReroll != null && _rerollContainer != null)
             {
-                var captured = choice;
-                var card = new VisualElement();
-                card.AddToClassList("reward-card");
-
-                if (captured.legendaryRelic != null)
-                    card.AddToClassList("reward-card--relic");
-
-                bool isLegendary = captured.statUpgrade != null &&
-                    (captured.statUpgrade.upgradeType == UpgradeType.Vampiric ||
-                     captured.statUpgrade.upgradeType == UpgradeType.Thorns ||
-                     captured.statUpgrade.upgradeType == UpgradeType.Regenerating ||
-                     captured.statUpgrade.upgradeType == UpgradeType.Enraged);
-                if (isLegendary)
-                    card.AddToClassList("reward-card--legendary");
-
-                if (captured.curseEffect != null)
-                    card.AddToClassList("reward-card--curse");
-
-                // Category header strip
-                var typeHeader = new VisualElement();
-                typeHeader.AddToClassList("reward-card-type");
-                var typeLabel = new Label(GetChoiceTypeLabel(captured));
-                typeLabel.AddToClassList("reward-card-type-label");
-                typeHeader.Add(typeLabel);
-                card.Add(typeHeader);
-
-                // Body (icon + name + desc)
-                var body = new VisualElement();
-                body.AddToClassList("reward-card-body");
-
-                Sprite icon = GetRewardIcon(captured);
-                if (icon != null)
-                {
-                    var img = new Image { sprite = icon };
-                    img.AddToClassList("reward-card-icon");
-                    body.Add(img);
-                }
-
-                var nameLabel = new Label(captured.name);
-                nameLabel.AddToClassList("reward-card-name");
-                body.Add(nameLabel);
-
-                var descLabel = new Label(captured.description);
-                descLabel.AddToClassList("reward-card-desc");
-                body.Add(descLabel);
-
-                if (captured.legendaryRelic != null && !string.IsNullOrEmpty(captured.targetUnitName))
-                {
-                    var forLabel = new Label($"\u2605 For: {captured.targetUnitName}");
-                    forLabel.AddToClassList("reward-card-for");
-                    body.Add(forLabel);
-                }
-
-                card.Add(body);
-
-                var selectBtn = new Button(() => onChoose?.Invoke(captured)) { text = "SELECT" };
-                selectBtn.AddToClassList("reward-button");
-                card.Add(selectBtn);
-
-                _upgradeChoices.Add(card);
-            }
-
-            // Reroll button — sits below the cards row
-            _rerollContainer?.Clear();
-            if (onReroll != null)
-            {
-                var rerollBtn = new Button();
-                rerollBtn.text = "\ud83d\udd00 Reroll (1 left)";
+                var rerollBtn = new Button { text = "Reroll" };
                 rerollBtn.AddToClassList("menu-button");
                 rerollBtn.AddToClassList("reroll-button");
-                rerollBtn.RegisterCallback<ClickEvent>(_ =>
+                rerollBtn.clicked += () =>
                 {
                     onReroll.Invoke();
                     rerollBtn.SetEnabled(false);
                     rerollBtn.text = "Rerolled";
-                });
-                _rerollContainer?.Add(rerollBtn);
+                };
+                _rerollContainer.Add(rerollBtn);
             }
         }
-
-        if (_intermissionPanel != null)
-            _intermissionPanel.style.display = DisplayStyle.Flex;
+        EndChoiceScreen();
     }
 
-    /// <summary>Shows the intermission panel pre-populated for a non-combat event encounter.</summary>
-    public void ShowEventOverlay(string title, string subtitle, List<RewardChoice> choices, Action<RewardChoice> onChoose, int currentGold = -1, Action onSkip = null)
+    /// <summary>Shows the choice panel for a non-combat event or merchant.</summary>
+    public void ShowEventOverlay(string title, string subtitle, List<RewardChoice> choices,
+                                 Action<RewardChoice> onChoose, int currentGold = -1, Action onSkip = null)
     {
         if (!EnsureUiReady()) return;
-        HideOverlays();
-        ClearTargetButtons();
-
-        if (_intermissionTitle != null) _intermissionTitle.text = title;
-        if (_intermissionGold != null) _intermissionGold.text = subtitle;
+        BeginChoiceScreen(title, subtitle, null);
 
         bool isMerchant = choices != null && choices.Count > 0 && choices[0].goldCost > 0;
 
         if (_upgradeChoices != null)
         {
-            _upgradeChoices.Clear();
-            _rerollContainer?.Clear(); // prevent stale reroll button from prior intermission
-            foreach (var choice in choices)
+            if (choices != null)
             {
-                var captured = choice;
-                var card = new VisualElement();
-                card.AddToClassList("reward-card");
-
-                if (captured.legendaryRelic != null)
-                    card.AddToClassList("reward-card--relic");
-
-                if (captured.curseEffect != null)
-                    card.AddToClassList("reward-card--curse");
-
-                // Category header strip
-                var typeHeader = new VisualElement();
-                typeHeader.AddToClassList("reward-card-type");
-                var typeLabel = new Label(GetChoiceTypeLabel(captured));
-                typeLabel.AddToClassList("reward-card-type-label");
-                typeHeader.Add(typeLabel);
-                card.Add(typeHeader);
-
-                // Body (icon + name + desc)
-                var body = new VisualElement();
-                body.AddToClassList("reward-card-body");
-
-                Sprite icon = GetRewardIcon(captured);
-                if (icon != null)
+                foreach (RewardChoice choice in choices)
                 {
-                    var img = new Image { sprite = icon };
-                    img.AddToClassList("reward-card-icon");
-                    body.Add(img);
+                    _upgradeChoices.Add(RewardCardBuilder.CreateRewardCard(
+                        choice, onChoose, isMerchant ? choice.goldCost : 0, currentGold));
                 }
+            }
 
-                var nameLabel = new Label(captured.name);
-                nameLabel.AddToClassList("reward-card-name");
-                body.Add(nameLabel);
-
-                var descLabel = new Label(captured.description);
-                descLabel.AddToClassList("reward-card-desc");
-                body.Add(descLabel);
-
-                if (captured.legendaryRelic != null && !string.IsNullOrEmpty(captured.targetUnitName))
-                {
-                    var forLabel = new Label($"\u2605 For: {captured.targetUnitName}");
-                    forLabel.AddToClassList("reward-card-for");
-                    body.Add(forLabel);
-                }
-
-                card.Add(body);
-
-                string btnText = isMerchant ? $"Buy: {captured.goldCost}g" : "SELECT";
-                bool canAfford = !isMerchant || currentGold < 0 || currentGold >= captured.goldCost;
-                var selectBtn = new Button(() => onChoose?.Invoke(captured)) { text = btnText };
-                selectBtn.AddToClassList("reward-button");
-                selectBtn.SetEnabled(canAfford);
-                if (!canAfford) card.style.opacity = new StyleFloat(0.45f);
-                card.Add(selectBtn);
-
-                _upgradeChoices.Add(card);
+            if (onSkip != null)
+            {
+                var leaveBtn = new Button(() => onSkip.Invoke()) { text = "Leave" };
+                leaveBtn.AddToClassList("merchant-leave-btn");
+                _upgradeChoices.Add(leaveBtn);
             }
         }
-
-        // Leave button for merchant (always shown so the player can exit without buying)
-        if (onSkip != null && _upgradeChoices != null)
-        {
-            var leaveBtn = new Button(() => onSkip.Invoke()) { text = "\u21A9  Leave" };
-            leaveBtn.AddToClassList("merchant-leave-btn");
-            _upgradeChoices.Add(leaveBtn);
-        }
-
-        if (_intermissionPanel != null)
-            _intermissionPanel.style.display = DisplayStyle.Flex;
+        EndChoiceScreen();
     }
 
     public void ShowRoomChoices(int clearedEncounter, List<RoomChoice> choices, Action<RoomChoice> onChoose)
     {
         if (!EnsureUiReady()) return;
-        HideOverlays();
-        ClearTargetButtons();
-
-        if (_intermissionTitle != null) _intermissionTitle.text = "Choose Your Path";
-        if (_intermissionGold != null) _intermissionGold.text = $"Encounter {clearedEncounter} cleared.";
+        BeginChoiceScreen("Choose Your Path", $"Encounter {clearedEncounter} cleared.", "Choose where to go next:");
 
         if (_upgradeChoices != null)
-        {
-            _upgradeChoices.Clear();
-            _rerollContainer?.Clear();
-            foreach (var choice in choices)
-            {
-                var captured = choice;
-                var card = new VisualElement();
-                card.AddToClassList("reward-card");
+            foreach (RoomChoice choice in choices)
+                _upgradeChoices.Add(RewardCardBuilder.CreateRoomCard(choice, onChoose));
 
-                var typeHeader = new VisualElement();
-                typeHeader.AddToClassList("reward-card-type");
-                var typeLabel = new Label(captured.encounterType.ToString());
-                typeLabel.AddToClassList("reward-card-type-label");
-                typeHeader.Add(typeLabel);
-                card.Add(typeHeader);
-
-                var body = new VisualElement();
-                body.AddToClassList("reward-card-body");
-
-                var titleLabel = new Label(captured.title);
-                titleLabel.AddToClassList("reward-card-title");
-                body.Add(titleLabel);
-
-                var descLabel = new Label(captured.description);
-                descLabel.AddToClassList("reward-card-desc");
-                body.Add(descLabel);
-
-                card.Add(body);
-
-                var selectBtn = new Button(() => onChoose?.Invoke(captured)) { text = "ENTER" };
-                selectBtn.AddToClassList("reward-button");
-                card.Add(selectBtn);
-
-                _upgradeChoices.Add(card);
-            }
-        }
-        if (_intermissionPanel != null)
-            _intermissionPanel.style.display = DisplayStyle.Flex;
+        EndChoiceScreen();
     }
 
     public void ShowRunSummary(bool won, int reachedEncounter, int gold)
@@ -1193,37 +1014,81 @@ public class BattleUIManager : MonoBehaviour
         if (!EnsureUiReady()) return;
         HideOverlays();
         ClearTargetButtons();
+        ClearTurnOrder();
 
-        if (_summaryTitle != null)
-            _summaryTitle.text = won ? "Run Complete!" : "Defeated!";
+        if (_summaryTitle != null) _summaryTitle.text = won ? "Run Complete!" : "Defeated!";
 
         if (_summaryStats != null)
+            _summaryStats.text = $"Reached Encounter {reachedEncounter}   |   {gold} Gold";
+
+        RunManager rm = RunManager.Instance;
+        var stats = rm?.CurrentRunStats;
+        if (_summaryGrid != null)
         {
-            string statsText = $"Reached Encounter {reachedEncounter}  •  ☴ {gold} Gold";
-            var runStats = RunManager.Instance?.CurrentRunStats;
-            if (runStats != null)
+            _summaryGrid.Clear();
+            if (stats != null)
             {
-                statsText += $"\n\n--- Combat Statistics ---\n" +
-                             $"Damage Dealt: {runStats.totalDamageDealt}\n" +
-                             $"Damage Taken: {runStats.totalDamageTaken}\n" +
-                             $"Healing Done: {runStats.healingDone}\n" +
-                             $"Critical Hits: {runStats.criticalHitsLanded}\n" +
-                             $"Enemies Defeated: {runStats.enemiesDefeated}\n" +
-                             $"Turns Survived: {runStats.turnsSurvived}";
+                AddSummaryStat("Damage Dealt", stats.totalDamageDealt);
+                AddSummaryStat("Damage Taken", stats.totalDamageTaken);
+                AddSummaryStat("Healing Done", stats.healingDone);
+                AddSummaryStat("Critical Hits", stats.criticalHitsLanded);
+                AddSummaryStat("Enemies Defeated", stats.enemiesDefeated);
+                AddSummaryStat("Turns Survived", stats.turnsSurvived);
             }
-            _summaryStats.text = statsText;
+            AnimateIn(_summaryGrid);
         }
 
-        if (_summaryPanel != null)
+        // Relics and upgrades collected this run (same pills as the HUD strip).
+        bool hasLoot = false;
+        if (_summaryRelics != null)
         {
-            Button restartBtn = _summaryPanel.Q<Button>("summary-restart");
-            if (restartBtn != null)
+            _summaryRelics.Clear();
+            if (rm != null)
             {
-                restartBtn.clicked -= OnRestartClicked;
-                restartBtn.clicked += OnRestartClicked;
+                foreach (var kvp in rm.EquippedRelics)
+                {
+                    AddSummaryPill(kvp.Value.relicName, "reward-pill--relic");
+                    hasLoot = true;
+                }
+                foreach (var u in rm.AppliedUpgrades)
+                {
+                    AddSummaryPill(u.name, IsTrait(u.upgradeType) ? "reward-pill--trait" : "reward-pill--stat");
+                    hasLoot = true;
+                }
+                foreach (var u in rm.AppliedAttackUpgrades)
+                {
+                    AddSummaryPill(u.name, "reward-pill--attack");
+                    hasLoot = true;
+                }
             }
-            _summaryPanel.style.display = DisplayStyle.Flex;
         }
+        if (_summaryRelicsTitle != null)
+            _summaryRelicsTitle.style.display = hasLoot ? DisplayStyle.Flex : DisplayStyle.None;
+        if (_summaryRelics != null)
+            _summaryRelics.style.display = hasLoot ? DisplayStyle.Flex : DisplayStyle.None;
+
+        ShowPanel(_summaryPanel);
+    }
+
+    private void AddSummaryStat(string label, int value)
+    {
+        var cell = new VisualElement();
+        cell.AddToClassList("summary-stat");
+        var name = new Label(label);
+        name.AddToClassList("summary-stat-label");
+        var val = new Label(value.ToString());
+        val.AddToClassList("summary-stat-value");
+        cell.Add(name);
+        cell.Add(val);
+        _summaryGrid.Add(cell);
+    }
+
+    private void AddSummaryPill(string text, string cssClass)
+    {
+        var pill = new Label(text);
+        pill.AddToClassList("reward-pill");
+        pill.AddToClassList(cssClass);
+        _summaryRelics.Add(pill);
     }
 
     private void OnRestartClicked()

@@ -8,50 +8,72 @@
     <ui:Style src="GameUi.uss" />
 
     <ui:VisualElement name="battle-root" class="battle-root">
+
+        <!-- Top centre: turn order -->
+        <ui:VisualElement name="turn-order" class="turn-order"/>
+
+        <!-- Top left: run info -->
         <ui:VisualElement name="run-hud" class="run-hud">
-            <ui:Label name="encounter-label" text="Encounter 1" class="run-hud-label"/>
-            <ui:Label name="gold-label" text="0 Gold" class="run-hud-label gold-label"/>
+            <ui:VisualElement class="run-hud-row">
+                <ui:Label name="encounter-label" text="Encounter 1" class="run-hud-label"/>
+                <ui:Label name="room-badge" text="" class="room-badge"/>
+            </ui:VisualElement>
+            <ui:VisualElement class="run-hud-row">
+                <ui:VisualElement name="gold-icon" class="gold-icon"/>
+                <ui:Label name="gold-label" text="0 Gold" class="run-hud-label gold-label"/>
+            </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="run-rewards" class="run-rewards"/>
+
+        <!-- Left: hero card -->
         <ui:VisualElement name="stats-panel-left" class="stats-panel-left">
             <ui:VisualElement name="stats-panel-portrait" class="stats-panel-portrait"/>
             <ui:Label name="stats-panel-name" class="stats-panel-name" text=""/>
-            <ui:ProgressBar name="stats-panel-hp" class="stats-panel-hp health-player"/>
+            <ui:ProgressBar name="stats-panel-hp" class="stats-panel-hp"/>
             <ui:ProgressBar name="stats-panel-mp" class="stats-panel-mp" style="display: none;"/>
             <ui:VisualElement name="stats-panel-rows" class="stats-panel-rows"/>
         </ui:VisualElement>
+
+        <!-- Right: battle log -->
+        <ui:VisualElement name="battle-log" class="battle-log">
+            <ui:Label name="battle-log-header" text="BATTLE LOG  -" class="battle-log-header"/>
+            <ui:ScrollView name="battle-log-scroll" class="battle-log-scroll">
+                <ui:VisualElement name="battle-log-content" class="battle-log-content"/>
+            </ui:ScrollView>
+        </ui:VisualElement>
+
+        <!-- Bottom: commands -->
         <ui:VisualElement name="bottom-hud" class="bottom-hud">
             <ui:VisualElement name="action-zone" class="action-zone">
                 <ui:Button name="attack-btn" class="action-btn">
-                    <ui:VisualElement name="attack-btn-icon" class="action-btn-icon"/>
+                    <ui:VisualElement name="attack-btn-icon" class="action-btn-icon icon-attack"/>
                     <ui:Label text="ATTACK" class="action-btn-label"/>
                 </ui:Button>
                 <ui:Button name="special-btn" class="action-btn">
-                    <ui:VisualElement name="special-btn-icon" class="action-btn-icon"/>
+                    <ui:VisualElement name="special-btn-icon" class="action-btn-icon icon-special"/>
                     <ui:Label text="SPECIAL" class="action-btn-label"/>
                 </ui:Button>
                 <ui:Button name="item-btn" class="action-btn">
-                    <ui:VisualElement name="item-btn-icon" class="action-btn-icon"/>
+                    <ui:VisualElement name="item-btn-icon" class="action-btn-icon icon-item"/>
                     <ui:Label text="ITEM" class="action-btn-label"/>
                 </ui:Button>
                 <ui:Button name="defend-btn" class="action-btn">
-                    <ui:VisualElement name="defend-btn-icon" class="action-btn-icon"/>
+                    <ui:VisualElement name="defend-btn-icon" class="action-btn-icon icon-defend"/>
                     <ui:Label text="DEFEND" class="action-btn-label"/>
                 </ui:Button>
             </ui:VisualElement>
             <ui:VisualElement name="target-panel-zone" class="target-panel-zone" style="display: none;"/>
         </ui:VisualElement>
-        <ui:ScrollView name="battle-log-scroll" class="battle-log-scroll">
-            <ui:VisualElement name="battle-log-content" class="battle-log-content"/>
-        </ui:ScrollView>
         <ui:VisualElement name="bottom-message-zone" class="bottom-message-zone">
             <ui:Label name="battle-message" text="" class="battle-message" style="display: none;"/>
         </ui:VisualElement>
+
+        <!-- Overlays -->
         <ui:VisualElement name="intermission-panel" class="overlay-panel">
             <ui:VisualElement class="intermission-layout">
                 <ui:Label name="intermission-title" text="Victory!" class="overlay-title"/>
                 <ui:Label name="intermission-gold" text="+0 Gold" class="overlay-subtitle"/>
-                <ui:Label text="Choose an upgrade:" class="overlay-instruction"/>
+                <ui:Label name="intermission-instruction" text="Choose an upgrade:" class="overlay-instruction"/>
                 <ui:VisualElement name="upgrade-choices" class="upgrade-choices"/>
                 <ui:VisualElement name="reroll-container" class="reroll-container"/>
             </ui:VisualElement>
@@ -60,9 +82,17 @@
             <ui:VisualElement class="overlay-card">
                 <ui:Label name="summary-title" text="Run Complete!" class="overlay-title"/>
                 <ui:Label name="summary-stats" text="" class="overlay-subtitle"/>
+                <ui:VisualElement name="summary-grid" class="summary-grid"/>
+                <ui:Label name="summary-relics-title" text="RELICS &amp; UPGRADES" class="summary-section-title"/>
+                <ui:VisualElement name="summary-relics" class="summary-relics"/>
                 <ui:Button name="summary-restart" text="New Run" class="menu-button restart-button"/>
             </ui:VisualElement>
         </ui:VisualElement>
+
+        <!-- Tooltip (positioned by code) -->
+        <ui:VisualElement name="tooltip" class="tooltip">
+            <ui:Label name="tooltip-title" class="tooltip-title"/>
+            <ui:Label name="tooltip-body" class="tooltip-body"/>
+        </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>
-

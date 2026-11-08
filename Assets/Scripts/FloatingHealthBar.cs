@@ -99,8 +99,8 @@ public class FloatingHealthBar : MonoBehaviour
         _fill = fillGO.AddComponent<Image>();
         _fill.sprite = WhiteSprite;
         _fill.color = isPlayer
-            ? new Color(0.18f, 0.82f, 0.44f)   // green
-            : new Color(0.90f, 0.28f, 0.22f);   // red
+            ? new Color(0.31f, 0.66f, 0.38f)   // green (matches hero card in GameUi.uss)
+            : new Color(0.75f, 0.19f, 0.19f);   // red (matches --hp)
         _fill.type = Image.Type.Filled;
         _fill.fillMethod = Image.FillMethod.Horizontal;
         _fill.fillOrigin = 0;
@@ -133,7 +133,7 @@ public class FloatingHealthBar : MonoBehaviour
             manaFillGO.transform.SetParent(container.transform, false);
             _manaFill = manaFillGO.AddComponent<Image>();
             _manaFill.sprite = WhiteSprite;
-            _manaFill.color = new Color(0.2f, 0.6f, 1f); // bright blue
+            _manaFill.color = new Color(0.27f, 0.43f, 0.84f); // matches --mp
             _manaFill.type = Image.Type.Filled;
             _manaFill.fillMethod = Image.FillMethod.Horizontal;
             _manaFill.fillOrigin = 0;
@@ -426,7 +426,8 @@ public class FloatingHealthBar : MonoBehaviour
         DontDestroyOnLoad(go);
         s_Canvas = go.AddComponent<Canvas>();
         s_Canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        s_Canvas.sortingOrder = 100;
+        // Below the UI Toolkit HUD panel (sorting order 0) so overlays and menus draw over world-space bars.
+        s_Canvas.sortingOrder = -10;
         go.AddComponent<GraphicRaycaster>();
         s_CanvasRect = s_Canvas.GetComponent<RectTransform>();
     }
