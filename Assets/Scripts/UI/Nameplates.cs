@@ -62,6 +62,24 @@ public static class Nameplates
             start = end + 1;
         }
 
+        // Final pass: re-centring one cluster can slide it under its neighbour, so enforce the spacing between
+        // all plates again (pushing right), then keep the whole row on screen (pulling back left).
+        float panelWidth = s_Layer != null && s_Layer.resolvedStyle.width > 100f ? s_Layer.resolvedStyle.width : 1280f;
+        for (int i = 0; i < visible.Count; i++)
+        {
+            x[i] = Mathf.Max(x[i], visible[i].Width * 0.5f + gap);
+            if (i > 0)
+                x[i] = Mathf.Max(x[i], x[i - 1] + visible[i - 1].Width * 0.5f + visible[i].Width * 0.5f + gap);
+        }
+        int last = visible.Count - 1;
+        float maxX = panelWidth - visible[last].Width * 0.5f - gap;
+        if (x[last] > maxX)
+        {
+            x[last] = maxX;
+            for (int i = last - 1; i >= 0; i--)
+                x[i] = Mathf.Min(x[i], x[i + 1] - visible[i].Width * 0.5f - visible[i + 1].Width * 0.5f - gap);
+        }
+
         for (int i = 0; i < visible.Count; i++) visible[i].SetLeft(x[i]);
     }
 

@@ -52,6 +52,7 @@ public static class GameBootstrapper
         // Side-angled view: lower and further back, roughly 18° tilt
         camObj.transform.position = new Vector3(-4f, 1.5f, -4.5f);
         camObj.transform.rotation = Quaternion.Euler(14, 47, 0);
+        camObj.AddComponent<BattleCamera>();   // presets (press C to cycle); applies the saved choice on Start
 
         // Light
         GameObject lightObj = new GameObject("Directional Light");
