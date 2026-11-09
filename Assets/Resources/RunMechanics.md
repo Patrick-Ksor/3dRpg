@@ -81,13 +81,13 @@ Event rooms grant no gold and no Victory reward screen.
 
 ## Enemy Scaling
 
-Scaling is **linear** in the encounter number `E` (not compounding):
+Scaling **compounds** per encounter number `E` (it was linear before; player upgrades multiply, so linear enemies could never keep up):
 
 | Stat    | Formula                                       |
 | ------- | --------------------------------------------- |
-| Max HP  | `base × (1 + 0.15 × (E−1))`                   |
-| Attack  | `base × (1 + 0.15 × (E−1))`                   |
-| Defense | `base × (1 + 0.11 × (E−1))`                   |
+| Max HP  | `base × 1.12^(E−1)`                           |
+| Attack  | `base × 1.12^(E−1)`                           |
+| Defense | `base × 1.09^(E−1)`                           |
 | Speed   | `base + round(1.5 × (E−1))` (additive)        |
 
 Base stats come from each enemy prefab's `Unit` component (e.g. Skeleton 80 HP / 10 ATK / 10 DEF / 12 SPD).
@@ -163,7 +163,7 @@ Multi-hit, multi-projectile and AoE attacks apply this formula **per hit / per t
 | **Evasion**    | `Luck`% chance to fully dodge a hit ("MISS") | 70% |
 | Lucky Find     | Average team Luck = % chance the card appears | – |
 
-Evasion applies to both sides, rolled per hit. High Luck is very strong (Barbarian starts at 70 Luck).
+Evasion applies to both sides, rolled per hit. High Luck is very strong (the Barbarian starts at 40 Luck; it was 70, which meant a 70% dodge from the first fight).
 
 ### Status Effects
 
@@ -221,7 +221,7 @@ Each attack the player owns generates its own set of cards. Upgrades stack.
 
 | Upgrade                | Condition                       | Effect                                                              |
 | ---------------------- | ------------------------------- | ------------------------------------------------------------------- |
-| **Empower**            | Any attack                      | +8 / +15 / +22 min & max damage (T1/T2/T3)                          |
+| **Empower**            | Any attack                      | +8 / +15 / +22 min & max damage (T1/T2/T3), divided by √(hits × projectiles) for multi-hit attacks so heroes stay comparable |
 | **Efficiency**         | Attack has a mana cost          | −3 mana cost                                                        |
 | **Cleave**             | Not already AoE                 | Attack hits all living enemies                                      |
 | **Barrage**            | Ranged, not a summon            | +1 projectile and +15 projectile speed                              |
@@ -289,7 +289,7 @@ Bonus card granting Luck (+3 / +4 / +5 by tier). Appears with probability equal 
 
 | Hero        | HP  | Mana | ATK | DEF | SPD | Luck |
 | ----------- | --- | ---- | --- | --- | --- | ---- |
-| Barbarian   | 100 | 20   | 30  | 10  | 10  | 70   |
+| Barbarian   | 100 | 20   | 30  | 10  | 10  | 40   |
 | Knight      | 100 | 20   | 15  | 15  | 15  | 5    |
 | Wizard      | 100 | 20   | 30  | 5   | 15  | 0    |
 | Ninja       | 100 | 20   | 15  | 5   | 15  | 15   |

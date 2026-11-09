@@ -159,10 +159,12 @@ public class RunManager : MonoBehaviour
 
     public int GetGoldReward() => 20 + ((CurrentEncounter - 1) * 5);
 
-    private float GetEncounterScalar(float multiplier) => 1f + ((CurrentEncounter - 1) * multiplier);
-    public float GetEnemyHpScalar() => GetEncounterScalar(0.15f);
-    public float GetEnemyAtkScalar() => GetEncounterScalar(0.15f);
-    public float GetEnemyDefScalar() => GetEncounterScalar(0.11f);
+    // Enemy stats compound per encounter. (Linear +15% was outpaced by player upgrades, which multiply:
+    // ATK x damage both grow, so runs never ended. 12%/9% puts a typical run's end around encounter 20-30.)
+    private float GetEncounterScalar(float rate) => Mathf.Pow(1f + rate, CurrentEncounter - 1);
+    public float GetEnemyHpScalar() => GetEncounterScalar(0.12f);
+    public float GetEnemyAtkScalar() => GetEncounterScalar(0.12f);
+    public float GetEnemyDefScalar() => GetEncounterScalar(0.09f);
 
     // Speed grows linearly by a flat rate
     public int GetEnemySpeedBonus() => Mathf.RoundToInt((CurrentEncounter - 1) * 1.5f);
@@ -437,15 +439,18 @@ public class RunManager : MonoBehaviour
             }
         }
 
-        // Damage boost scales with tier: T1=+8, T2=+15, T3=+22
-        int dmgBoost = tier == 1 ? 8 : tier == 2 ? 15 : 22;
+        // Damage boost scales with tier: T1=+8, T2=+15, T3=+22 for a single-hit attack. It is added to EVERY hit,
+        // so multi-hit / multi-projectile attacks get the bonus divided by sqrt(hits) to keep heroes comparable.
+        int tierBoost = tier == 1 ? 8 : tier == 2 ? 15 : 22;
 
         foreach (var (atk, _) in allAttacks)
         {
             // Damage boost — always applicable
+            int hits = Mathf.Max(1, atk.hitCount) * Mathf.Max(1, atk.projectileCount);
+            int dmgBoost = Mathf.Max(1, Mathf.RoundToInt(tierBoost / Mathf.Sqrt(hits)));
             pool.Add(RewardChoice.FromAttack(new AttackUpgrade(
                 $"Empower: {atk.actionName}",
-                $"+{dmgBoost} damage on {atk.actionName}.",
+                hits > 1 ? $"+{dmgBoost} damage per hit on {atk.actionName}." : $"+{dmgBoost} damage on {atk.actionName}.",
                 AttackUpgradeType.DamageBoost, atk.actionName, dmgBoost)));
 
             // Mana cost reduce — only if it costs mana
