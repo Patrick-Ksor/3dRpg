@@ -736,7 +736,7 @@ public class BaseBattleManager : MonoBehaviour
             yield return new WaitForSeconds(0.5f);
         }
 
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.3f);   // brief beat after an action, then the next turn (was 0.5s)
 
         ProcessNextTurn();
     }
@@ -745,7 +745,7 @@ public class BaseBattleManager : MonoBehaviour
     {
         _uiManager.SetMessage($"{_activeUnit.unitName}'s turn...");
 
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.3f);
 
         // Tick status effects at the start of this unit's turn
         var ticks = _activeUnit.TickStatusEffects();
@@ -785,7 +785,7 @@ public class BaseBattleManager : MonoBehaviour
         {
             _activeUnit.isDefending = true;
             _uiManager.SetMessage($"{_activeUnit.unitName} takes a defensive stance!");
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(0.7f);
             ProcessNextTurn();
             yield break;
         }
@@ -949,7 +949,7 @@ public class BaseBattleManager : MonoBehaviour
             }
         }
 
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.3f);   // brief beat after an action, then the next turn (was 0.5s)
 
         ProcessNextTurn();
     }

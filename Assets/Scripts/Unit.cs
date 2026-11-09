@@ -179,6 +179,31 @@ public class Unit : MonoBehaviour
         _recoilRoutine = StartCoroutine(RecoilRoutine(distance));
     }
 
+    /// <summary>The killing blow shoves the body back and lets it stay there (no return).</summary>
+    public void PlayDeathKnockback(float distance)
+    {
+        if (_recoilRoutine != null) StopCoroutine(_recoilRoutine);
+        _recoilRoutine = StartCoroutine(DeathKnockbackRoutine(distance));
+    }
+
+    private IEnumerator DeathKnockbackRoutine(float distance)
+    {
+        Vector3 back = -(_homeRotation * Vector3.forward);
+        back.y = 0f;
+        back.Normalize();
+        Vector3 start = transform.position;
+        const float duration = 0.4f;
+        float t = 0f;
+        while (t < duration)
+        {
+            t += Time.deltaTime;
+            float k = 1f - Mathf.Pow(1f - Mathf.Clamp01(t / duration), 3f);   // fast out, long settle
+            transform.position = start + back * (distance * k);
+            yield return null;
+        }
+        _recoilRoutine = null;
+    }
+
     private IEnumerator RecoilRoutine(float distance)
     {
         Vector3 back = -(_homeRotation * Vector3.forward);   // units face their opponent, so "back" is away from the fight
@@ -593,8 +618,9 @@ public class Unit : MonoBehaviour
         {
             if (proj == null) break;
 
-            // Move projectile root linearly
-            proj.transform.position = Vector3.Lerp(startPos, targetPos, elapsed / duration);
+            // Ease-in so the projectile launches instead of appearing at full speed (same total flight time)
+            float k = Mathf.Clamp01(elapsed / duration);
+            proj.transform.position = Vector3.Lerp(startPos, targetPos, Mathf.Lerp(k, k * k, 0.55f));
 
             if (action.spinProjectile)
             {
@@ -616,8 +642,8 @@ public class Unit : MonoBehaviour
             {
                 if (proj == null) break;
 
-                // Move projectile root linearly back to startPos
-                proj.transform.position = Vector3.Lerp(targetPos, startPos, elapsed / duration);
+                // Ease the return trip so it does not whip around at the turn
+                proj.transform.position = Vector3.Lerp(targetPos, startPos, Mathf.SmoothStep(0f, 1f, elapsed / duration));
 
                 if (action.spinProjectile)
                 {
@@ -630,10 +656,19 @@ public class Unit : MonoBehaviour
             }
         }
 
-        if (proj != null)
-        {
-            Destroy(proj);
-        }
+        if (proj != null) RetireProjectile(proj);
+    }
+
+    /// <summary>
+    /// Hides the projectile body but lets its particles and trails fade out, instead of vanishing mid-trail.
+    /// </summary>
+    private static void RetireProjectile(GameObject proj)
+    {
+        foreach (var r in proj.GetComponentsInChildren<Renderer>())
+            if (!(r is ParticleSystemRenderer) && !(r is TrailRenderer)) r.enabled = false;
+        foreach (var ps in proj.GetComponentsInChildren<ParticleSystem>())
+            ps.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+        Destroy(proj, 1.2f);
     }
 
     private IEnumerator PlayGruntDelayed(AudioClip clip, float delay)

@@ -14,7 +14,8 @@ public static class HitFeedback
         bool kill = target.isDead;
         float weight = Mathf.Clamp01(damage / Mathf.Max(1f, target.maxHealth) * 2f);   // 0..1, a half-health hit is a full-weight hit
 
-        target.PlayRecoil(0.10f + 0.22f * weight + (crit ? 0.10f : 0f));
+        if (kill) target.PlayDeathKnockback(0.35f + (crit ? 0.2f : 0f));
+        else target.PlayRecoil(0.10f + 0.22f * weight + (crit ? 0.10f : 0f));
 
         float trauma = 0.10f + 0.30f * weight + (crit ? 0.25f : 0f) + (kill ? 0.20f : 0f);
         CameraShake.Add(trauma);
