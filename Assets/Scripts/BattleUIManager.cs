@@ -32,6 +32,10 @@ public class BattleUIManager : MonoBehaviour
     private Button _specialBtn;
     private Button _itemBtn;
     private Button _defendBtn;
+    private Label _attackSub;
+    private Label _specialSub;
+    private Label _itemSub;
+    private Label _commandTitle;
     private bool _buttonsWired;
 
     // Hero card (left)
@@ -170,6 +174,10 @@ public class BattleUIManager : MonoBehaviour
         _specialBtn = _root.Q<Button>("special-btn");
         _defendBtn = _root.Q<Button>("defend-btn");
         _itemBtn = _root.Q<Button>("item-btn");
+        _attackSub = _root.Q<Label>("attack-btn-sub");
+        _specialSub = _root.Q<Label>("special-btn-sub");
+        _itemSub = _root.Q<Label>("item-btn-sub");
+        _commandTitle = _root.Q<Label>("command-title");
 
         // Tooltip
         _tooltip = _root.Q<VisualElement>("tooltip");
@@ -421,6 +429,7 @@ public class BattleUIManager : MonoBehaviour
 
         _turnOrder.Clear();
         _turnChips.Clear();
+        if (_turnOrder.parent != null) _turnOrder.parent.style.display = DisplayStyle.Flex;
 
         if (active != null) AddTurnChip(active, true);
         if (remaining != null)
@@ -441,6 +450,7 @@ public class BattleUIManager : MonoBehaviour
     {
         _turnOrder?.Clear();
         _turnChips.Clear();
+        if (_turnOrder?.parent != null) _turnOrder.parent.style.display = DisplayStyle.None;   // hide the empty panel
     }
 
     private void AddTurnChip(Unit u, bool active)
@@ -594,6 +604,15 @@ public class BattleUIManager : MonoBehaviour
 
         bool hasSpecials = activeUnit.specialAttacks != null && activeUnit.specialAttacks.Count > 0;
         bool hasItems = activeUnit.inventory != null && activeUnit.inventory.Count > 0;
+
+        if (_commandTitle != null) _commandTitle.text = $"{activeUnit.unitName} - your turn";
+        AttackAction basic = activeUnit.basicAttack;
+        if (_attackSub != null)
+            _attackSub.text = basic == null ? "" : basic.isSummon ? "summon" : $"{basic.minDamage}-{basic.maxDamage} dmg";
+        if (_specialSub != null)
+            _specialSub.text = hasSpecials ? $"{activeUnit.specialAttacks.Count} known" : "none";
+        if (_itemSub != null)
+            _itemSub.text = hasItems ? $"{activeUnit.inventory.Count} in pack" : "empty";
 
         _attackBtn?.SetEnabled(true);
         _specialBtn?.SetEnabled(hasSpecials);

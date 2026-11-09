@@ -78,10 +78,35 @@ public class FloatingHealthBar : MonoBehaviour
         _barRect.anchorMin = new Vector2(0.5f, 0.5f);
         _barRect.anchorMax = new Vector2(0.5f, 0.5f);
 
+        // Thin brown frame (matches the UI Toolkit panels' --line colour)
+        Color frame = new Color(0.29f, 0.23f, 0.17f);
+        MakeImage(container.transform, "Frame", frame,
+            Vector2.zero, Vector2.one, new Vector2(-2f, -2f), new Vector2(2f, 2f));
+
         // Dark background
         MakeImage(container.transform, "BG",
-            new Color(0.05f, 0.05f, 0.05f, 0.85f),
+            new Color(0.05f, 0.04f, 0.04f, 0.95f),
             Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+
+        // Name plate stacked above the bar
+        var nameGO = new GameObject("NamePlate");
+        nameGO.transform.SetParent(container.transform, false);
+        var nameRect = nameGO.AddComponent<RectTransform>();
+        SetRect(nameRect, new Vector2(0f, 1f), new Vector2(1f, 1f),
+            new Vector2(-2f, 2f), new Vector2(2f, 28f));
+        var nameBg = nameGO.AddComponent<Image>();
+        nameBg.color = new Color(0.05f, 0.04f, 0.04f, 0.95f);
+        var nameText = new GameObject("Text");
+        nameText.transform.SetParent(nameGO.transform, false);
+        var nameLabel = nameText.AddComponent<TextMeshProUGUI>();
+        nameLabel.text = System.Text.RegularExpressions.Regex.Replace(unit.unitName, "(?<=[a-z])(?=[A-Z])", " ");
+        nameLabel.fontSize = 17f;
+        nameLabel.fontStyle = FontStyles.SmallCaps | FontStyles.Bold;
+        nameLabel.alignment = TextAlignmentOptions.Center;
+        nameLabel.color = isPlayer ? new Color(0.62f, 0.78f, 0.95f) : new Color(0.93f, 0.89f, 0.81f);
+        nameLabel.enableWordWrapping = false;
+        nameLabel.overflowMode = TextOverflowModes.Ellipsis;
+        SetRect(nameLabel.rectTransform, Vector2.zero, Vector2.one, new Vector2(6f, 0f), new Vector2(-6f, 0f));
 
         float hpBottomAnchor = hasMana ? 0.35f : 0f;
         float hpTargetMinY = hpBottomAnchor + (hasMana ? 0.05f : 0.15f);

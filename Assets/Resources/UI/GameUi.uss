@@ -5,18 +5,19 @@
    ═══════════════════════════════════════════════════════════════════════ */
 
 :root {
-    --stone-0: rgb(16, 13, 15);
-    --stone-1: rgb(27, 23, 26);
-    --stone-2: rgb(42, 36, 40);
-    --stone-3: rgb(60, 53, 58);
-    --iron: rgb(96, 88, 94);
-    --iron-dark: rgb(52, 47, 52);
-    --iron-light: rgb(138, 128, 134);
+    --stone-0: rgb(14, 12, 12);
+    --stone-1: rgb(22, 17, 14);
+    --stone-2: rgb(36, 29, 23);
+    --stone-3: rgb(54, 43, 32);
+    --iron: rgb(92, 74, 54);
+    --iron-dark: rgb(58, 46, 34);
+    --iron-light: rgb(120, 98, 70);
+    --line: rgb(74, 59, 44);
 
-    --torch: rgb(255, 160, 70);
-    --torch-dim: rgb(178, 100, 36);
-    --parchment: rgb(236, 224, 200);
-    --muted: rgb(160, 150, 142);
+    --torch: rgb(224, 178, 86);
+    --torch-dim: rgb(150, 115, 52);
+    --parchment: rgb(238, 228, 208);
+    --muted: rgb(166, 154, 138);
 
     --hp: rgb(190, 48, 48);
     --mp: rgb(70, 110, 215);
@@ -29,6 +30,8 @@
 }
 
 .battle-root {
+    -unity-font-definition: url("/Assets/Fonts/BarlowCondensed-Regular.ttf");
+    font-size: 16px;
     position: absolute;
     left: 0;
     right: 0;
@@ -54,20 +57,14 @@
     background-color: var(--stone-2);
     border-radius: 4px;
     border-width: 2px;
-    border-top-color: var(--iron-light);
-    border-left-color: var(--iron-light);
-    border-bottom-color: var(--iron-dark);
-    border-right-color: var(--iron-dark);
+    border-color: var(--line);
     transition-property: background-color, border-color, scale;
     transition-duration: 0.12s;
 }
 
 .menu-button:hover {
     background-color: var(--stone-3);
-    border-top-color: var(--torch);
-    border-left-color: var(--torch);
-    border-bottom-color: var(--torch-dim);
-    border-right-color: var(--torch-dim);
+    border-color: var(--torch);
     scale: 1.04 1.04;
 }
 
@@ -94,24 +91,42 @@
 
 /* ── Turn order (top centre) ────────────────────────────────────────────── */
 
-.turn-order {
+.turn-order-wrap {
     position: absolute;
     top: 10px;
     left: 0;
     right: 0;
+    align-items: center;
+}
+
+.turn-order-panel {
     flex-direction: row;
     align-items: center;
-    justify-content: center;
+    padding: 6px 12px;
+    background-color: rgba(12, 10, 10, 0.95);
+    border-width: 2px;
+    border-color: var(--line);
+}
+
+.turn-order-title {
+    margin-right: 12px;
+    font-size: 12px;
+    letter-spacing: 3px;
+    color: var(--muted);
+}
+
+.turn-order {
+    flex-direction: row;
+    align-items: center;
 }
 
 .turn-chip {
-    width: 44px;
-    height: 44px;
+    width: 40px;
+    height: 40px;
     margin: 0 3px;
     background-color: var(--stone-1);
     background-size: cover;
     -unity-background-scale-mode: scale-and-crop;
-    border-radius: 4px;
     border-width: 2px;
     border-color: var(--iron-dark);
     align-items: center;
@@ -122,14 +137,15 @@
     transition-duration: 0.2s;
 }
 
-.turn-chip--player { border-color: var(--good); }
-.turn-chip--enemy  { border-color: var(--bad); }
+.turn-chip--player { border-color: rgb(78, 120, 190); }
+.turn-chip--enemy  { border-color: rgb(150, 64, 58); }
 
 .turn-chip--active {
-    scale: 1.28 1.28;
+    scale: 1.2 1.2;
     opacity: 1;
-    margin: 0 9px;
+    margin: 0 7px;
     border-color: var(--torch);
+    background-color: rgb(60, 46, 24);
 }
 
 .turn-chip--dead {
@@ -137,8 +153,9 @@
 }
 
 .turn-chip-letter {
+    -unity-font-definition: url("/Assets/Fonts/Cinzel.ttf");
     color: var(--parchment);
-    font-size: 18px;
+    font-size: 16px;
     -unity-font-style: bold;
 }
 
@@ -170,13 +187,14 @@
     top: 10px;
     left: 10px;
     padding: 8px 12px;
-    background-color: rgba(16, 13, 15, 0.82);
-    border-radius: 4px;
+    background-color: rgba(12, 10, 10, 0.95);
     border-width: 2px;
-    border-top-color: var(--iron);
-    border-left-color: var(--iron);
-    border-bottom-color: var(--iron-dark);
-    border-right-color: var(--iron-dark);
+    border-color: var(--line);
+}
+
+.run-hud-title {
+    -unity-font-definition: url("/Assets/Fonts/Cinzel.ttf");
+    font-size: 18px;
 }
 
 .run-hud-row {
@@ -185,7 +203,7 @@
 }
 
 .run-hud-label {
-    font-size: 15px;
+    font-size: 17px;
     -unity-font-style: bold;
     color: var(--parchment);
 }
@@ -261,46 +279,52 @@
 .reward-pill--trait  { border-color: var(--violet); }
 .reward-pill--relic  { border-color: var(--gold); color: var(--gold); }
 
-/* ── Hero card (left) ───────────────────────────────────────────────────── */
+/* ── Hero card (bottom left) ────────────────────────────────────────────── */
 
 .stats-panel-left {
     position: absolute;
     left: 10px;
-    bottom: 114px;
-    width: 150px;
-    padding: 6px 8px;
-    background-color: rgba(16, 13, 15, 0.86);
-    border-radius: 4px;
+    bottom: 10px;
+    width: 300px;
+    padding: 10px 12px;
+    background-color: rgba(12, 10, 10, 0.95);
     border-width: 2px;
-    border-top-color: var(--iron);
-    border-left-color: var(--iron);
-    border-bottom-color: var(--iron-dark);
-    border-right-color: var(--iron-dark);
+    border-color: var(--line);
+}
+
+.stats-panel-head {
+    flex-direction: row;
+    align-items: center;
 }
 
 .stats-panel-portrait {
-    width: 100%;
-    height: 64px;
-    margin-bottom: 4px;
+    width: 58px;
+    height: 58px;
+    flex-shrink: 0;
+    margin-right: 12px;
     background-color: var(--stone-1);
     -unity-background-scale-mode: scale-to-fit;
-    border-radius: 3px;
-    border-width: 1px;
-    border-color: var(--iron-dark);
+    border-width: 2px;
+    border-color: var(--iron);
+}
+
+.stats-panel-info {
+    flex-grow: 1;
 }
 
 .stats-panel-name {
-    margin-bottom: 5px;
-    font-size: 14px;
+    -unity-font-definition: url("/Assets/Fonts/Cinzel.ttf");
+    margin-bottom: 4px;
+    font-size: 19px;
     -unity-font-style: bold;
-    -unity-text-align: middle-center;
-    color: var(--torch);
+    -unity-text-align: middle-left;
+    color: var(--parchment);
 }
 
 .stats-panel-hp,
 .stats-panel-mp {
-    height: 16px;
-    margin-bottom: 4px;
+    height: 15px;
+    margin-bottom: 3px;
 }
 
 .stats-panel-hp .unity-progress-bar__container,
@@ -310,52 +334,52 @@
 
 .stats-panel-hp .unity-progress-bar__background,
 .stats-panel-mp .unity-progress-bar__background {
-    background-color: rgb(8, 6, 8);
-    border-radius: 3px;
-    border-width: 1px;
-    border-color: var(--iron-dark);
+    background-color: rgb(30, 24, 20);
+    border-width: 0;
 }
 
-.stats-panel-hp .unity-progress-bar__progress { background-color: rgb(78, 168, 96); border-radius: 2px; }
-.stats-panel-mp .unity-progress-bar__progress { background-color: var(--mp); border-radius: 2px; }
+.stats-panel-hp .unity-progress-bar__progress { background-color: rgb(78, 168, 96); }
+.stats-panel-mp .unity-progress-bar__progress { background-color: var(--mp); }
 
 .stats-panel-hp .unity-progress-bar__title,
 .stats-panel-mp .unity-progress-bar__title {
-    font-size: 10px;
-    -unity-font-style: bold;
+    font-size: 13px;
     color: var(--parchment);
 }
 
 .stats-panel-rows {
-    margin-top: 4px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin-top: 8px;
 }
 
 .stats-panel-row {
     flex-direction: row;
     align-items: center;
-    margin-bottom: 2px;
-    padding: 1px 3px;
-    border-radius: 2px;
+    margin: 0 4px 2px 0;
+    padding: 1px 6px;
+    border-width: 1px;
+    border-color: var(--line);
     background-color: rgba(0, 0, 0, 0);
     transition-property: background-color;
     transition-duration: 0.35s;
 }
 
 .stats-panel-row-icon {
-    width: 14px;
-    height: 14px;
-    margin-right: 6px;
+    width: 12px;
+    height: 12px;
+    margin-right: 4px;
     -unity-background-scale-mode: scale-to-fit;
 }
 
 .stats-panel-row-label {
-    flex-grow: 1;
-    font-size: 11px;
+    margin-right: 4px;
+    font-size: 13px;
     color: var(--muted);
 }
 
 .stats-panel-row-value {
-    font-size: 12px;
+    font-size: 14px;
     -unity-font-style: bold;
     color: var(--parchment);
 }
@@ -363,45 +387,65 @@
 .stats-panel-row--up   { background-color: rgba(110, 200, 120, 0.45); }
 .stats-panel-row--down { background-color: rgba(230, 90, 80, 0.45); }
 
-/* ── Battle log (right) ─────────────────────────────────────────────────── */
+/* ── Battle log (bottom centre) ─────────────────────────────────────────── */
 
 .battle-log {
     position: absolute;
-    right: 10px;
-    top: 10px;
-    width: 250px;
-    background-color: rgba(16, 13, 15, 0.82);
-    border-radius: 4px;
+    left: 322px;
+    right: 272px;
+    bottom: 10px;
+    background-color: rgba(12, 10, 10, 0.95);
     border-width: 2px;
-    border-top-color: var(--iron);
-    border-left-color: var(--iron);
-    border-bottom-color: var(--iron-dark);
-    border-right-color: var(--iron-dark);
+    border-color: var(--line);
 }
 
 .battle-log-header {
-    padding: 4px 8px;
-    font-size: 11px;
-    -unity-font-style: bold;
-    color: var(--torch);
-    background-color: var(--stone-2);
+    padding: 6px 12px 2px 12px;
+    font-size: 12px;
+    letter-spacing: 3px;
+    color: var(--muted);
 }
 
 .battle-log-header:hover {
-    background-color: var(--stone-3);
+    color: var(--torch);
 }
 
 .battle-log-scroll {
-    max-height: 92px;
+    height: 92px;
+}
+
+.battle-log-scroll .unity-scroller--vertical {
+    width: 6px;
+    margin-right: 2px;
+}
+
+.battle-log-scroll .unity-base-slider__drag-container {
+    margin: 0;
+}
+
+.battle-log-scroll .unity-base-slider__tracker {
+    background-color: rgba(0, 0, 0, 0);
+    border-width: 0;
+}
+
+.battle-log-scroll .unity-base-slider__dragger {
+    width: 4px;
+    background-color: var(--iron);
+    border-width: 0;
+    border-radius: 2px;
+}
+
+.battle-log-scroll .unity-repeat-button {
+    display: none;
 }
 
 .battle-log-content {
-    padding: 4px 8px;
+    padding: 2px 12px 6px 12px;
 }
 
 .battle-log-entry {
     margin-bottom: 2px;
-    font-size: 12px;
+    font-size: 16px;
     white-space: normal;
     color: var(--parchment);
 }
@@ -411,26 +455,30 @@
 .log-death  { color: var(--bad); }
 .log-system { color: var(--muted); -unity-font-style: italic; }
 
-/* ── Bottom HUD ─────────────────────────────────────────────────────────── */
+/* ── Command panel (bottom right) ───────────────────────────────────────── */
 
 .bottom-hud {
     position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 104px;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    padding: 8px 14px;
-    background-color: rgba(16, 13, 15, 0.9);
-    border-top-width: 3px;
-    border-top-color: var(--iron-dark);
+    right: 10px;
+    bottom: 10px;
+    width: 252px;
+    padding: 8px 10px 6px 10px;
+    background-color: rgba(12, 10, 10, 0.96);
+    border-width: 2px;
+    border-color: var(--torch);
+}
+
+.command-title {
+    -unity-font-definition: url("/Assets/Fonts/Cinzel.ttf");
+    margin: 0 0 6px 2px;
+    font-size: 15px;
+    -unity-font-style: bold;
+    color: var(--torch);
 }
 
 .bottom-message-zone {
     position: absolute;
-    bottom: 104px;
+    bottom: 160px;
     left: 0;
     right: 0;
     align-items: center;
@@ -439,62 +487,50 @@
 
 .battle-message {
     margin-bottom: 8px;
-    padding: 5px 16px;
-    font-size: 17px;
-    -unity-font-style: bold;
+    padding: 5px 18px;
+    font-size: 20px;
     -unity-text-align: middle-center;
     color: var(--parchment);
-    background-color: rgba(16, 13, 15, 0.85);
-    border-radius: 4px;
+    background-color: rgba(12, 10, 10, 0.95);
     border-width: 1px;
-    border-color: var(--iron);
+    border-color: var(--line);
 }
 
 .action-zone {
-    flex-direction: row;
-    align-items: center;
     flex-shrink: 0;
 }
 
 .target-panel-zone {
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: flex-end;
-    padding: 0 8px;
     flex-shrink: 0;
 }
 
+.target-panel-zone .menu-button {
+    margin: 0 0 4px 0;
+    min-width: 0;
+    height: 30px;
+    -unity-text-align: middle-left;
+}
+
 .action-btn {
-    width: 84px;
-    height: 84px;
-    margin: 0 4px;
-    padding: 6px 4px;
-    flex-direction: column;
+    height: 34px;
+    margin: 0 0 4px 0;
+    padding: 0 8px;
+    flex-direction: row;
     align-items: center;
-    justify-content: space-around;
-    background-color: var(--stone-2);
-    border-radius: 5px;
+    background-color: var(--stone-1);
     border-width: 2px;
-    border-top-color: var(--iron-light);
-    border-left-color: var(--iron-light);
-    border-bottom-color: var(--iron-dark);
-    border-right-color: var(--iron-dark);
-    transition-property: background-color, border-color, scale, translate;
+    border-color: var(--line);
+    transition-property: background-color, border-color, translate;
     transition-duration: 0.12s;
 }
 
 .action-btn:hover {
     background-color: var(--stone-3);
-    border-top-color: var(--torch);
-    border-left-color: var(--torch);
-    border-bottom-color: var(--torch-dim);
-    border-right-color: var(--torch-dim);
-    translate: 0 -3px;
+    border-color: var(--torch);
 }
 
 .action-btn:active {
-    background-color: var(--stone-1);
+    background-color: var(--stone-0);
     translate: 0 1px;
 }
 
@@ -502,18 +538,47 @@
     opacity: 0.35;
 }
 
+.action-btn--primary {
+    background-color: rgb(224, 178, 86);
+    border-color: rgb(224, 178, 86);
+}
+
+.action-btn--primary:hover {
+    background-color: rgb(240, 200, 118);
+    border-color: rgb(240, 200, 118);
+}
+
 .action-btn-icon {
-    width: 42px;
-    height: 42px;
+    width: 20px;
+    height: 20px;
     flex-shrink: 0;
+    margin-right: 8px;
     -unity-background-scale-mode: scale-to-fit;
 }
 
 .action-btn-label {
-    font-size: 10px;
+    -unity-font-definition: url("/Assets/Fonts/Cinzel.ttf");
+    flex-grow: 1;
+    font-size: 16px;
     -unity-font-style: bold;
-    -unity-text-align: middle-center;
-    color: var(--torch);
+    -unity-text-align: middle-left;
+    color: var(--parchment);
+}
+
+.action-btn-sub {
+    font-size: 15px;
+    color: var(--muted);
+}
+
+.action-btn-chevron {
+    margin-left: 6px;
+    font-size: 16px;
+    color: var(--muted);
+}
+
+.action-btn--primary .action-btn-label,
+.action-btn--primary .action-btn-sub {
+    color: var(--stone-0);
 }
 
 /* ── Overlays (rewards / events / summary) ──────────────────────────────── */
@@ -544,10 +609,7 @@
     background-color: var(--stone-1);
     border-radius: 6px;
     border-width: 3px;
-    border-top-color: var(--iron-light);
-    border-left-color: var(--iron-light);
-    border-bottom-color: var(--iron-dark);
-    border-right-color: var(--iron-dark);
+    border-color: var(--line);
 }
 
 .intermission-layout {
@@ -572,7 +634,7 @@
 .overlay-instruction {
     margin-top: 10px;
     margin-bottom: 8px;
-    font-size: 13px;
+    font-size: 15px;
     color: var(--muted);
 }
 
@@ -653,7 +715,7 @@
 }
 
 .reward-card-desc {
-    font-size: 12px;
+    font-size: 14px;
     -unity-text-align: upper-center;
     white-space: normal;
     color: var(--muted);
@@ -661,7 +723,7 @@
 
 .reward-card-for {
     margin-top: 6px;
-    font-size: 11px;
+    font-size: 13px;
     -unity-font-style: bold;
     color: var(--gold);
 }
@@ -732,14 +794,14 @@
 }
 
 .tooltip-title {
-    font-size: 13px;
+    font-size: 15px;
     -unity-font-style: bold;
     color: var(--torch);
 }
 
 .tooltip-body {
     margin-top: 2px;
-    font-size: 11px;
+    font-size: 13px;
     white-space: normal;
     color: var(--parchment);
 }
@@ -773,7 +835,7 @@
 
 .reward-card-need {
     margin-top: 2px;
-    font-size: 11px;
+    font-size: 13px;
     -unity-text-align: middle-center;
     color: var(--bad);
 }
@@ -810,7 +872,7 @@
 }
 
 .summary-stat-label {
-    font-size: 10px;
+    font-size: 12px;
     -unity-text-align: middle-center;
     color: var(--muted);
 }
@@ -831,4 +893,19 @@
     max-height: 90px;
     margin-top: 6px;
     overflow: hidden;
+}
+
+/* ── Display font (Cinzel) for headings ─────────────────────────────────── */
+
+.overlay-title,
+.reward-card-name,
+.reward-card-title,
+.reward-card-type-label,
+.summary-stat-value,
+.summary-section-title,
+.tooltip-title,
+.reward-card-price-text,
+.menu-button,
+.reward-button {
+    -unity-font-definition: url("/Assets/Fonts/Cinzel.ttf");
 }

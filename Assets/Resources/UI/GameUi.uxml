@@ -10,12 +10,17 @@
     <ui:VisualElement name="battle-root" class="battle-root">
 
         <!-- Top centre: turn order -->
-        <ui:VisualElement name="turn-order" class="turn-order"/>
+        <ui:VisualElement class="turn-order-wrap" picking-mode="Ignore">
+            <ui:VisualElement class="turn-order-panel">
+                <ui:Label text="TURN ORDER" class="turn-order-title"/>
+                <ui:VisualElement name="turn-order" class="turn-order"/>
+            </ui:VisualElement>
+        </ui:VisualElement>
 
         <!-- Top left: run info -->
         <ui:VisualElement name="run-hud" class="run-hud">
             <ui:VisualElement class="run-hud-row">
-                <ui:Label name="encounter-label" text="Encounter 1" class="run-hud-label"/>
+                <ui:Label name="encounter-label" text="Encounter 1" class="run-hud-label run-hud-title"/>
                 <ui:Label name="room-badge" text="" class="room-badge"/>
             </ui:VisualElement>
             <ui:VisualElement class="run-hud-row">
@@ -25,41 +30,52 @@
         </ui:VisualElement>
         <ui:VisualElement name="run-rewards" class="run-rewards"/>
 
-        <!-- Left: hero card -->
+        <!-- Bottom left: hero card -->
         <ui:VisualElement name="stats-panel-left" class="stats-panel-left">
-            <ui:VisualElement name="stats-panel-portrait" class="stats-panel-portrait"/>
-            <ui:Label name="stats-panel-name" class="stats-panel-name" text=""/>
-            <ui:ProgressBar name="stats-panel-hp" class="stats-panel-hp"/>
-            <ui:ProgressBar name="stats-panel-mp" class="stats-panel-mp" style="display: none;"/>
+            <ui:VisualElement class="stats-panel-head">
+                <ui:VisualElement name="stats-panel-portrait" class="stats-panel-portrait"/>
+                <ui:VisualElement class="stats-panel-info">
+                    <ui:Label name="stats-panel-name" class="stats-panel-name" text=""/>
+                    <ui:ProgressBar name="stats-panel-hp" class="stats-panel-hp"/>
+                    <ui:ProgressBar name="stats-panel-mp" class="stats-panel-mp" style="display: none;"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
             <ui:VisualElement name="stats-panel-rows" class="stats-panel-rows"/>
         </ui:VisualElement>
 
-        <!-- Right: battle log -->
+        <!-- Bottom centre: battle log -->
         <ui:VisualElement name="battle-log" class="battle-log">
-            <ui:Label name="battle-log-header" text="BATTLE LOG  -" class="battle-log-header"/>
+            <ui:Label name="battle-log-header" text="COMBAT LOG  -" class="battle-log-header"/>
             <ui:ScrollView name="battle-log-scroll" class="battle-log-scroll">
                 <ui:VisualElement name="battle-log-content" class="battle-log-content"/>
             </ui:ScrollView>
         </ui:VisualElement>
 
-        <!-- Bottom: commands -->
+        <!-- Bottom right: commands -->
         <ui:VisualElement name="bottom-hud" class="bottom-hud">
+            <ui:Label name="command-title" text="YOUR TURN" class="command-title"/>
             <ui:VisualElement name="action-zone" class="action-zone">
-                <ui:Button name="attack-btn" class="action-btn">
+                <ui:Button name="attack-btn" class="action-btn action-btn--primary">
                     <ui:VisualElement name="attack-btn-icon" class="action-btn-icon icon-attack"/>
                     <ui:Label text="ATTACK" class="action-btn-label"/>
+                    <ui:Label name="attack-btn-sub" text="" class="action-btn-sub"/>
                 </ui:Button>
                 <ui:Button name="special-btn" class="action-btn">
                     <ui:VisualElement name="special-btn-icon" class="action-btn-icon icon-special"/>
                     <ui:Label text="SPECIAL" class="action-btn-label"/>
+                    <ui:Label name="special-btn-sub" text="" class="action-btn-sub"/>
+                    <ui:Label text="&gt;" class="action-btn-chevron"/>
                 </ui:Button>
                 <ui:Button name="item-btn" class="action-btn">
                     <ui:VisualElement name="item-btn-icon" class="action-btn-icon icon-item"/>
                     <ui:Label text="ITEM" class="action-btn-label"/>
+                    <ui:Label name="item-btn-sub" text="" class="action-btn-sub"/>
+                    <ui:Label text="&gt;" class="action-btn-chevron"/>
                 </ui:Button>
                 <ui:Button name="defend-btn" class="action-btn">
                     <ui:VisualElement name="defend-btn-icon" class="action-btn-icon icon-defend"/>
                     <ui:Label text="DEFEND" class="action-btn-label"/>
+                    <ui:Label name="defend-btn-sub" text="Half damage" class="action-btn-sub"/>
                 </ui:Button>
             </ui:VisualElement>
             <ui:VisualElement name="target-panel-zone" class="target-panel-zone" style="display: none;"/>

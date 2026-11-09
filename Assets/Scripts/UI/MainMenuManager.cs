@@ -22,7 +22,8 @@ public class MainMenuManager : MonoBehaviour
     private Label _characterDescLabel;
     private VisualElement _statBars;
     private VisualElement _skillList;
-    private VisualElement _dots;
+    private VisualElement _heroList;
+    private Label _detailsName;
     private bool _switching;
 
     // Bar scale: the value that fills a bar completely.
@@ -60,32 +61,28 @@ public class MainMenuManager : MonoBehaviour
         _characterDescLabel = root.Q<Label>("character-desc");
         _statBars = root.Q<VisualElement>("stat-bars");
         _skillList = root.Q<VisualElement>("skill-list");
-        _dots = root.Q<VisualElement>("carousel-dots");
+        _heroList = root.Q<VisualElement>("hero-list");
+        _detailsName = root.Q<Label>("details-name");
 
-        var prev = root.Q<Button>("prev-btn");
-        var next = root.Q<Button>("next-btn");
         var start = root.Q<Button>("start-btn");
         var quit = root.Q<Button>("quit-btn");
-        if (prev != null) prev.clicked += () => Step(-1);
-        if (next != null) next.clicked += () => Step(1);
         if (start != null) start.clicked += OnStartRun;
         if (quit != null) quit.clicked += OnQuit;
 
         BuildStatBars();
-        BuildDots();
+        BuildHeroList();
         UpdateUI();
     }
 
     // ─── Navigation ───────────────────────────────────────────────────────
 
-    private void Step(int direction)
+    private void Select(int index)
     {
         if (_availableCharacters == null || _availableCharacters.Length == 0 || _switching) return;
+        if (index == _selectedIndex || index < 0 || index >= _availableCharacters.Length) return;
+        _selectedIndex = index;
 
-        int count = _availableCharacters.Length;
-        _selectedIndex = (_selectedIndex + direction + count) % count;
-
-        // Fade the card and panel out, swap the content, fade back in.
+        // Fade the preview and panel out, swap the content, fade back in.
         _switching = true;
         _card?.AddToClassList("swapping");
         _detailsPanel?.AddToClassList("swapping");
@@ -139,25 +136,45 @@ public class MainMenuManager : MonoBehaviour
         }
     }
 
-    private void BuildDots()
+    private void BuildHeroList()
     {
-        if (_dots == null) return;
-        _dots.Clear();
-        int count = _availableCharacters?.Length ?? 0;
-        for (int i = 0; i < count; i++)
+        if (_heroList == null) return;
+        _heroList.Clear();
+        if (_availableCharacters == null) return;
+
+        for (int i = 0; i < _availableCharacters.Length; i++)
         {
-            var dot = new VisualElement();
-            dot.AddToClassList("dot");
+            CharacterDefinitionSO def = _availableCharacters[i];
             int index = i;
-            dot.RegisterCallback<ClickEvent>(_ => JumpTo(index));
-            _dots.Add(dot);
+
+            var entry = new VisualElement();
+            entry.AddToClassList("hero-entry");
+            entry.RegisterCallback<ClickEvent>(_ => Select(index));
+
+            var icon = new VisualElement();
+            icon.AddToClassList("hero-entry-icon");
+            if (def.icon != null) icon.style.backgroundImage = new StyleBackground(def.icon);
+            entry.Add(icon);
+
+            var text = new VisualElement();
+            var name = new Label(def.characterName);
+            name.AddToClassList("hero-entry-name");
+            text.Add(name);
+            var sub = new Label(FirstSentence(def.description));
+            sub.AddToClassList("hero-entry-sub");
+            text.Add(sub);
+            entry.Add(text);
+
+            _heroList.Add(entry);
         }
     }
 
-    private void JumpTo(int index)
+    private static string FirstSentence(string text)
     {
-        if (index == _selectedIndex || _switching) return;
-        Step(index - _selectedIndex);   // modular step lands exactly on index
+        if (string.IsNullOrEmpty(text)) return "";
+        int dot = text.IndexOfAny(new[] { '.', '!', '\n' });
+        string first = dot > 0 ? text.Substring(0, dot) : text;
+        return first.Length > 28 ? first.Substring(0, 26).TrimEnd() + "..." : first;
     }
 
     // ─── Content ──────────────────────────────────────────────────────────
@@ -177,9 +194,11 @@ public class MainMenuManager : MonoBehaviour
         UpdateStats(unit);
         UpdateSkills(unit);
 
-        if (_dots != null)
-            for (int i = 0; i < _dots.childCount; i++)
-                _dots[i].EnableInClassList("dot--active", i == _selectedIndex);
+        if (_detailsName != null) _detailsName.text = selected.characterName;
+
+        if (_heroList != null)
+            for (int i = 0; i < _heroList.childCount; i++)
+                _heroList[i].EnableInClassList("hero-entry--selected", i == _selectedIndex);
     }
 
     private void UpdateStats(Unit unit)

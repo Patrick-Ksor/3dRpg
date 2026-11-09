@@ -22,11 +22,13 @@ Unity 6 (URP 17, Input System, UI Toolkit + uGUI hybrid) 3D turn-based roguelike
 - `UI/RewardCardBuilder` builds every reward, merchant and room card; add new card variants there. Merchant cards (price > 0) show the price, the missing gold, and need a second click ("CONFIRM?") to buy.
 - The run summary is a stat grid (`summary-grid`) plus the relics/upgrades collected (`summary-relics`), filled in `ShowRunSummary`.
 - World-space health bars and damage pops (`FloatingHealthBar`, uGUI) use a shared canvas at sorting order -10, i.e. under the UI Toolkit panel, so overlays cover them.
+- Look: warm gold on dark brown (palette variables at the top of `GameUi.uss`), flat 2px `--line` borders. Fonts live in `Assets/Fonts` (Cinzel for headings, Barlow Condensed for body; both OFL). In USS use `-unity-font-definition: url(...)`: `-unity-font` is overridden by the default theme and silently does nothing. Fonts added after a USS was imported need a reimport of that USS.
+- HUD layout: turn order top centre, run info top left, hero card bottom left, combat log bottom centre, command panel bottom right (Attack/Special/Item/Defend rows with sub-labels filled in `ShowCommandMenu`). World-space nameplates (name above the HP bar) are built in `FloatingHealthBar.Init`.
 - Panel scale mode is `ConstantPhysicalSize` (see `Assets/UI Toolkit/PanelSettings.asset`); px sizes in the USS scale with screen DPI.
 - Testing in the Editor via Unity-MCP: the player loop does not tick while the Editor window is unfocused, so set `Application.runInBackground = true` first; `screenshot-game-view` then shows the real HUD. Load `BattleScene` from a running game with `SceneManager.LoadScene` (the `scene-open` tool rejected the path).
 
 ## Main menu
-- `Assets/UI Toolkit/MainMenu/MainMenu.uxml` + `MainMenuStyles.uss` (same palette variables as `GameUi.uss`; keep them in sync). `UI/MainMenuManager` drives it: hero carousel with dots, stat bars and skill list read from the hero prefab's `Unit` component (so changing a prefab's stats or attacks updates the menu), Start and Quit.
+- `Assets/UI Toolkit/MainMenu/MainMenu.uxml` + `MainMenuStyles.uss` (same palette variables as `GameUi.uss`; keep them in sync). `UI/MainMenuManager` drives it: hero list (left), big preview and description (centre), stat bars and skill list (right) read from the hero prefab's `Unit` component (so changing a prefab's stats or attacks updates the menu), Start and Quit.
 - Bar scales (the value that fills a bar) are in `MainMenuManager.StatDefs`; raise them if a hero's stats can exceed them.
 - Editing the UXML/USS while in play mode rebuilds the tree and orphans the script's element references; stop and restart play after style edits.
 

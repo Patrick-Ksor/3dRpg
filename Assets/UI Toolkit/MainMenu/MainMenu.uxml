@@ -11,11 +11,12 @@
 
         <ui:VisualElement class="title-block">
             <ui:Label text="CHOOSE YOUR HERO" class="main-title" />
-            <ui:Label text="Descend. Fight. Grow stronger. Survive." class="main-subtitle" />
+            <ui:Label text="DESCEND. FIGHT. GROW STRONGER. SURVIVE." class="main-subtitle" />
         </ui:VisualElement>
 
         <ui:VisualElement class="selection-area">
-            <ui:Button name="prev-btn" text="&lt;" class="nav-btn" />
+
+            <ui:VisualElement name="hero-list" class="hero-list" />
 
             <ui:VisualElement name="character-card" class="character-card">
                 <ui:VisualElement name="character-preview" class="character-preview" />
@@ -24,19 +25,17 @@
             </ui:VisualElement>
 
             <ui:VisualElement name="details-panel" class="details-panel">
+                <ui:Label name="details-name" text="" class="details-name" />
                 <ui:Label text="STATS" class="section-title" />
                 <ui:VisualElement name="stat-bars" class="stat-bars" />
                 <ui:Label text="SKILLS" class="section-title section-title--spaced" />
                 <ui:VisualElement name="skill-list" class="skill-list" />
             </ui:VisualElement>
 
-            <ui:Button name="next-btn" text="&gt;" class="nav-btn" />
         </ui:VisualElement>
 
-        <ui:VisualElement name="carousel-dots" class="carousel-dots" />
-
         <ui:VisualElement class="footer">
-            <ui:Button name="start-btn" text="START RUN" class="start-btn" />
+            <ui:Button name="start-btn" text="BEGIN DESCENT  &gt;" class="start-btn" />
             <ui:Button name="quit-btn" text="QUIT" class="quit-btn" />
         </ui:VisualElement>
 

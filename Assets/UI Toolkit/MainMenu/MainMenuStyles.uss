@@ -1,27 +1,28 @@
 /* Main menu — same dungeon palette as Resources/UI/GameUi.uss (keep the variables in sync). */
 
 :root {
-    --stone-0: rgb(16, 13, 15);
-    --stone-1: rgb(27, 23, 26);
-    --stone-2: rgb(42, 36, 40);
-    --stone-3: rgb(60, 53, 58);
-    --iron: rgb(96, 88, 94);
-    --iron-dark: rgb(52, 47, 52);
-    --iron-light: rgb(138, 128, 134);
-    --torch: rgb(255, 160, 70);
-    --torch-dim: rgb(178, 100, 36);
-    --parchment: rgb(236, 224, 200);
-    --muted: rgb(160, 150, 142);
+    --stone-0: rgb(14, 12, 12);
+    --stone-1: rgb(22, 17, 14);
+    --stone-2: rgb(36, 29, 23);
+    --stone-3: rgb(54, 43, 32);
+    --iron: rgb(92, 74, 54);
+    --iron-dark: rgb(58, 46, 34);
+    --iron-light: rgb(120, 98, 70);
+    --line: rgb(74, 59, 44);
+    --torch: rgb(224, 178, 86);
+    --torch-dim: rgb(150, 115, 52);
+    --parchment: rgb(238, 228, 208);
+    --muted: rgb(166, 154, 138);
     --hp: rgb(78, 168, 96);
     --mp: rgb(70, 110, 215);
 }
 
 .main-container {
+    -unity-font-definition: url("/Assets/Fonts/BarlowCondensed-Regular.ttf");
+    font-size: 16px;
     flex-grow: 1;
     background-color: var(--stone-0);
-    align-items: center;
-    justify-content: center;
-    padding: 16px;
+    padding: 20px 36px 24px 36px;
     color: var(--parchment);
 }
 
@@ -29,87 +30,125 @@
 
 .title-block {
     flex-shrink: 0;
-    align-items: center;
-    margin-bottom: 10px;
 }
 
 .main-title {
-    font-size: 38px;
+    -unity-font-definition: url("/Assets/Fonts/Cinzel.ttf");
+    font-size: 34px;
     -unity-font-style: bold;
     letter-spacing: 4px;
     color: var(--torch);
 }
 
 .main-subtitle {
-    margin-top: 4px;
+    margin-top: 2px;
     font-size: 15px;
+    letter-spacing: 3px;
     color: var(--muted);
 }
 
-/* ── Carousel ───────────────────────────────────────────────────────────── */
+/* ── Three columns: hero list | preview | details ───────────────────────── */
 
 .selection-area {
-    flex-shrink: 0;
+    flex-grow: 1;
     flex-direction: row;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
+    margin: 10px 0;
+    min-height: 0;
 }
 
-.nav-btn {
-    width: 54px;
-    height: 54px;
-    margin: 0 22px;
-    font-size: 28px;
-    -unity-font-style: bold;
-    color: var(--parchment);
-    background-color: var(--stone-2);
-    border-radius: 27px;
+.hero-list {
+    width: 270px;
+    flex-shrink: 0;
+}
+
+.hero-entry {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 6px;
+    padding: 5px 10px;
+    background-color: var(--stone-1);
     border-width: 2px;
-    border-top-color: var(--iron-light);
-    border-left-color: var(--iron-light);
-    border-bottom-color: var(--iron-dark);
-    border-right-color: var(--iron-dark);
-    transition-property: background-color, border-color, scale;
+    border-color: var(--line);
+    transition-property: background-color, border-color;
     transition-duration: 0.12s;
 }
 
-.nav-btn:hover {
-    background-color: var(--stone-3);
+.hero-entry:hover {
+    background-color: var(--stone-2);
+    border-color: var(--iron-light);
+}
+
+.hero-entry--selected {
+    background-color: rgb(58, 44, 24);
     border-color: var(--torch);
-    scale: 1.1 1.1;
 }
 
-.nav-btn:active {
-    scale: 0.95 0.95;
+.hero-entry-icon {
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+    margin-right: 12px;
+    background-color: var(--stone-0);
+    border-width: 2px;
+    border-color: var(--iron-dark);
+    -unity-background-scale-mode: scale-to-fit;
 }
 
-.character-card,
-.details-panel {
-    background-color: var(--stone-1);
-    border-radius: 6px;
-    border-width: 3px;
-    border-top-color: var(--iron-light);
-    border-left-color: var(--iron-light);
-    border-bottom-color: var(--iron-dark);
-    border-right-color: var(--iron-dark);
+.hero-entry--selected .hero-entry-icon {
+    border-color: var(--torch-dim);
+}
+
+.hero-entry-name {
+    -unity-font-definition: url("/Assets/Fonts/Cinzel.ttf");
+    font-size: 17px;
+    -unity-font-style: bold;
+    color: var(--parchment);
+}
+
+.hero-entry-sub {
+    font-size: 14px;
+    color: var(--muted);
+}
+
+/* centre: big preview */
+
+.character-card {
+    flex-grow: 1;
+    align-items: center;
+    justify-content: center;
+    padding: 0 24px;
     transition-property: opacity, translate;
     transition-duration: 0.14s;
 }
 
-.character-card {
-    width: 280px;
-    min-height: 330px;
-    align-self: stretch;
-    padding: 12px;
-    align-items: center;
+.character-preview {
+    width: 170px;
+    height: 170px;
+    margin-bottom: 12px;
+    background-color: rgba(255, 255, 255, 0.04);
+    border-radius: 85px;
+    border-width: 2px;
+    border-color: var(--iron-dark);
+    -unity-background-scale-mode: scale-to-fit;
 }
 
-.details-panel {
-    width: 330px;
-    min-height: 330px;
-    align-self: stretch;
-    margin-left: 14px;
-    padding: 12px;
+.character-name {
+    -unity-font-definition: url("/Assets/Fonts/Cinzel.ttf");
+    margin-bottom: 6px;
+    font-size: 26px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    color: var(--parchment);
+}
+
+.character-desc {
+    max-width: 320px;
+    font-size: 17px;
+    white-space: normal;
+    -unity-text-align: upper-center;
+    color: var(--muted);
 }
 
 .swapping {
@@ -117,39 +156,31 @@
     translate: 0 10px;
 }
 
-.character-preview {
-    width: 150px;
-    height: 150px;
-    margin-bottom: 8px;
-    background-color: rgba(0, 0, 0, 0.35);
-    border-radius: 4px;
-    border-width: 1px;
-    border-color: var(--iron-dark);
-    -unity-background-scale-mode: scale-to-fit;
+/* right: details */
+
+.details-panel {
+    width: 330px;
+    flex-shrink: 0;
+    padding: 10px 16px;
+    background-color: var(--stone-1);
+    border-width: 2px;
+    border-color: var(--line);
+    transition-property: opacity, translate;
+    transition-duration: 0.14s;
 }
 
-.character-name {
-    margin-bottom: 8px;
-    font-size: 24px;
+.details-name {
+    -unity-font-definition: url("/Assets/Fonts/Cinzel.ttf");
+    margin-bottom: 4px;
+    font-size: 22px;
     -unity-font-style: bold;
-    -unity-text-align: middle-center;
-    color: var(--torch);
+    color: var(--parchment);
 }
-
-.character-desc {
-    font-size: 14px;
-    white-space: normal;
-    -unity-text-align: upper-center;
-    color: var(--muted);
-}
-
-/* ── Details: stat bars + skills ────────────────────────────────────────── */
 
 .section-title {
-    font-size: 12px;
-    -unity-font-style: bold;
-    letter-spacing: 2px;
-    color: var(--torch);
+    font-size: 13px;
+    letter-spacing: 3px;
+    color: var(--muted);
 }
 
 .section-title--spaced {
@@ -158,14 +189,14 @@
 
 .stat-bars {
     flex-shrink: 0;
-    margin-top: 8px;
+    margin-top: 6px;
 }
 
 .stat-row {
     flex-shrink: 0;
     flex-direction: row;
     align-items: center;
-    margin-bottom: 2px;
+    margin-bottom: 1px;
 }
 
 .stat-icon {
@@ -176,37 +207,32 @@
 }
 
 .stat-name {
-    width: 38px;
-    font-size: 12px;
+    width: 40px;
+    font-size: 14px;
     color: var(--muted);
 }
 
 .stat-track {
     flex-grow: 1;
-    height: 10px;
+    height: 8px;
     margin: 0 8px;
-    background-color: rgb(8, 6, 8);
-    border-radius: 3px;
-    border-width: 1px;
-    border-color: var(--iron-dark);
+    background-color: rgb(34, 27, 21);
 }
 
 .stat-fill {
     height: 100%;
     width: 0;
-    border-radius: 2px;
     background-color: var(--torch);
     transition-property: width;
     transition-duration: 0.35s;
 }
 
-.stat-fill--hp { background-color: var(--hp); }
-.stat-fill--mp { background-color: var(--mp); }
+.stat-fill--hp { background-color: rgb(212, 82, 74); }
+.stat-fill--mp { background-color: rgb(91, 141, 214); }
 
 .stat-value {
     width: 34px;
-    font-size: 13px;
-    -unity-font-style: bold;
+    font-size: 16px;
     -unity-text-align: middle-right;
     color: var(--parchment);
 }
@@ -220,21 +246,21 @@
 
 .skill-list {
     flex-shrink: 0;
-    margin-top: 8px;
+    margin-top: 6px;
 }
 
 .skill {
     flex-shrink: 0;
-    margin-bottom: 6px;
-    padding: 6px 8px;
+    margin-bottom: 4px;
+    padding: 4px 10px;
     background-color: var(--stone-2);
-    border-radius: 3px;
     border-left-width: 3px;
     border-left-color: var(--torch-dim);
 }
 
 .skill-name {
-    font-size: 13px;
+    -unity-font-definition: url("/Assets/Fonts/Cinzel.ttf");
+    font-size: 15px;
     -unity-font-style: bold;
     color: var(--parchment);
 }
@@ -242,40 +268,16 @@
 .skill-desc {
     flex-shrink: 0;
     margin-top: 1px;
-    font-size: 11px;
+    font-size: 14px;
     white-space: normal;
     color: var(--muted);
 }
 
 .skill-note {
-    font-size: 11px;
+    font-size: 14px;
     -unity-font-style: italic;
     white-space: normal;
     color: var(--muted);
-}
-
-/* ── Dots ───────────────────────────────────────────────────────────────── */
-
-.carousel-dots {
-    flex-shrink: 0;
-    flex-direction: row;
-    justify-content: center;
-    margin-top: 14px;
-}
-
-.dot {
-    width: 10px;
-    height: 10px;
-    margin: 0 5px;
-    border-radius: 5px;
-    background-color: var(--iron-dark);
-    transition-property: background-color, scale;
-    transition-duration: 0.15s;
-}
-
-.dot--active {
-    background-color: var(--torch);
-    scale: 1.4 1.4;
 }
 
 /* ── Footer buttons ─────────────────────────────────────────────────────── */
@@ -284,49 +286,49 @@
     flex-shrink: 0;
     flex-direction: row;
     align-items: center;
-    margin-top: 14px;
+    justify-content: center;
 }
 
 .start-btn {
-    width: 240px;
-    height: 48px;
-    margin-right: 12px;
-    font-size: 20px;
+    -unity-font-definition: url("/Assets/Fonts/Cinzel.ttf");
+    width: 300px;
+    height: 54px;
+    margin-right: 14px;
+    font-size: 21px;
     -unity-font-style: bold;
-    letter-spacing: 2px;
+    letter-spacing: 3px;
     color: var(--stone-0);
     background-color: var(--torch);
     border-width: 0;
-    border-radius: 5px;
     transition-property: background-color, scale;
     transition-duration: 0.12s;
 }
 
 .start-btn:hover {
-    background-color: rgb(255, 190, 110);
-    scale: 1.04 1.04;
+    background-color: rgb(240, 200, 118);
+    scale: 1.03 1.03;
 }
 
 .start-btn:active {
     background-color: var(--torch-dim);
-    scale: 0.97 0.97;
+    scale: 0.98 0.98;
 }
 
 .quit-btn {
+    -unity-font-definition: url("/Assets/Fonts/Cinzel.ttf");
     width: 100px;
-    height: 48px;
+    height: 54px;
     font-size: 16px;
     -unity-font-style: bold;
     color: var(--parchment);
-    background-color: var(--stone-2);
-    border-radius: 5px;
+    background-color: var(--stone-1);
     border-width: 2px;
-    border-color: var(--iron);
+    border-color: var(--line);
     transition-property: background-color, border-color;
     transition-duration: 0.12s;
 }
 
 .quit-btn:hover {
-    background-color: var(--stone-3);
+    background-color: var(--stone-2);
     border-color: var(--torch);
 }
