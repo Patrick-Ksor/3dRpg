@@ -210,10 +210,10 @@ public class RunManager : MonoBehaviour
                 case UpgradeType.Speed: unit.speed = Mathf.Max(0, unit.speed + u.value); break;
                 case UpgradeType.MaxMana: unit.maxMana = Mathf.Max(0, unit.maxMana + u.value); break;
                 case UpgradeType.Luck: unit.luck = Mathf.Max(0, unit.luck + u.value); break;
-                case UpgradeType.Vampiric: unit.hasVampiric = true; break;
-                case UpgradeType.Thorns: unit.hasThorns = true; break;
-                case UpgradeType.Regenerating: unit.hasRegeneration = true; break;
-                case UpgradeType.Enraged: unit.hasEnraged = true; break;
+                case UpgradeType.Vampiric: unit.hasVampiric = true; unit.vampiricStacks++; break;
+                case UpgradeType.Thorns: unit.hasThorns = true; unit.thornsStacks++; break;
+                case UpgradeType.Regenerating: unit.hasRegeneration = true; unit.regenStacks++; break;
+                case UpgradeType.Enraged: unit.hasEnraged = true; unit.enragedStacks++; break;
                 case UpgradeType.BonusSummons: unit.bonusSummonCount += u.value; break;
             }
         }
@@ -342,10 +342,11 @@ public class RunManager : MonoBehaviour
                 case UpgradeType.Speed: unit.speed += boost.value; break;
                 case UpgradeType.MaxMana: unit.maxMana += boost.value; break;
                 case UpgradeType.Luck: unit.luck += boost.value; break;
-                case UpgradeType.Vampiric: unit.hasVampiric = true; break;
-                case UpgradeType.Thorns: unit.hasThorns = true; break;
-                case UpgradeType.Regenerating: unit.hasRegeneration = true; break;
-                case UpgradeType.Enraged: unit.hasEnraged = true; break;
+                case UpgradeType.Vampiric: unit.hasVampiric = true; unit.vampiricStacks++; break;
+                case UpgradeType.Thorns: unit.hasThorns = true; unit.thornsStacks++; break;
+                case UpgradeType.Regenerating: unit.hasRegeneration = true; unit.regenStacks++; break;
+                case UpgradeType.Enraged: unit.hasEnraged = true; unit.enragedStacks++; break;
+                case UpgradeType.BonusSummons: unit.flatBonusSummons += boost.value; break;
             }
         }
 
@@ -734,9 +735,9 @@ public class RunManager : MonoBehaviour
     public static List<RewardChoice> GenerateMerchantChoices(List<Unit> playerUnits, int encounter, int count = 3)
     {
         var choices = GenerateRewardChoices(playerUnits, encounter, count);
-        int baseGold = Mathf.RoundToInt(20f * Mathf.Pow(1.35f, encounter - 1));
+        int baseGold = 20 + 5 * (encounter - 1);   // one winning fight's gold income
         foreach (var choice in choices)
-            choice.goldCost = Mathf.Max(5, Mathf.RoundToInt(baseGold * UnityEngine.Random.Range(0.5f, 0.85f)));
+            choice.goldCost = Mathf.Max(10, Mathf.RoundToInt(baseGold * UnityEngine.Random.Range(1.2f, 2.2f)));   // 1.2-2.2 fights of income
         return choices;
     }
 

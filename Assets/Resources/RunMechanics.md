@@ -8,7 +8,7 @@ The game is a roguelike turn-based RPG. A **run** is an endless chain of **encou
 
 The run is a **single hero** chosen on the main menu (Barbarian, Knight, Necromancer, Ninja, Wizard). The battle manager also supports a list of `playerPrefabs` as a fallback, so multi-unit parties are possible but not used.
 
-**Every encounter re-instantiates all units** and re-applies the run's upgrades, attack upgrades and relic. This means **HP and Mana are fully restored at the start of every encounter**, and status effects do not carry over. Mana does not regenerate during a battle.
+**Every encounter re-instantiates all units** and re-applies the run's upgrades, attack upgrades and relic. This means **HP and Mana are fully restored at the start of every encounter**, and status effects do not carry over. Mana regenerates a little during a battle: **10% of max mana at the start of each of the player's turns** (enemies do not regenerate mana).
 
 ---
 
@@ -67,13 +67,11 @@ Extra room roll: Shrine 40%, Merchant 35%, Mystery 25%.
 | Room         | Behaviour                                                                                         |
 | ------------ | ------------------------------------------------------------------------------------------------- |
 | **Combat**   | Normal fight (or mini-boss / boss), then gold + reward cards.                                     |
-| **Shrine**   | No enemies. Heals 40% max HP (see note), then pick 1 of 2 free reward cards.                      |
+| **Shrine**   | No enemies. Pick 1 of **3** free reward cards (more choice than a Mystery room).                  |
 | **Merchant** | No enemies. 3 reward cards with gold prices. Can be skipped.                                      |
 | **Mystery**  | No enemies. 50%: gain `GetGoldReward()` gold and pick 1 of 2 cards. 50%: pick 1 of 3 cards.       |
 
-> **Note:** because HP is restored to full at the start of every encounter (see Overview), the Shrine's heal currently has no practical effect; the blessing card is its real value.
-
-**Merchant prices:** `max(5, round(floor(20 × 1.35^(E−1)) × rand(0.5, 0.85)))` gold per card. Cards the player cannot afford are disabled.
+**Merchant prices:** `max(10, round((20 + 5 × (E−1)) × rand(1.2, 2.2)))` gold per card, i.e. roughly 1.2–2.2 winning fights of income, so the shop stays usable late in a run. Cards the player cannot afford are disabled.
 
 Event rooms grant no gold and no Victory reward screen.
 
@@ -235,17 +233,15 @@ Learnable attacks come from each hero prefab's `unlockableAttacks` list; their o
 
 ### Passive Traits
 
-Each trait can be taken **up to 2 times per run** (counting relic-granted copies).
+Each trait can be taken **up to 2 times per run** (counting relic-granted copies). **A second copy strengthens the effect.**
 
 | Trait            | Effect                                                                  |
 | ---------------- | ----------------------------------------------------------------------- |
-| **Vampiric**     | Heal for 25% of damage dealt                                            |
-| **Thorns**       | Take 50% of incoming damage; the other 50% is dealt to the attacker     |
-| **Regenerating** | Restore 8% max HP at the start of your turn                             |
-| **Enraged**      | Deal double damage while below 50% HP                                   |
+| **Vampiric**     | Heal for 25% of damage dealt (50% with two copies)                      |
+| **Thorns**       | Take 50% of incoming damage; the other 50% is dealt to the attacker (65% reflected with two copies) |
+| **Regenerating** | Restore 8% max HP at the start of your turn (16% with two copies)       |
+| **Enraged**      | Deal double damage while below 50% HP (triple with two copies)          |
 | **More Minions** | Only if the hero has a summon attack; up to 3×. Each pick **doubles** the minions per summon (`summonCount << picks`) |
-
-> A second copy of Vampiric/Thorns/Regenerating/Enraged currently only adds a stacked aura visual; the effect is a boolean and does not increase.
 
 ### Curses (Tier 2+)
 
@@ -275,13 +271,11 @@ Bonus card granting Luck (+3 / +4 / +5 by tier). Appears with probability equal 
 | ---------------------------- | ----------- | --------------------------------------- | ------------- |
 | Blade of the Fallen King     | Knight      | +20 ATK, +15 HP, Enraged                | yes           |
 | Inquisitor's Aegis           | Knight      | +25 DEF, +30 HP, Thorns, Regenerating   | –             |
-| Dark Staff                   | Necromancer | +10 Summons*, +15 ATK, +15 Mana         | yes           |
+| Dark Staff                   | Necromancer | +10 Summons (extra minions per cast, total capped at 24), +15 ATK, +15 Mana | yes |
 | Oni Mask of the Void         | Ninja       | +10 ATK, +20 SPD, +10 Luck              | yes           |
 | Phantom Kusarigama           | Ninja       | +20 ATK, +15 SPD, Vampiric              | yes           |
 | Crown of the Undying         | Any         | +50 HP, +15 DEF, Regenerating           | yes           |
 | Heart of Chaos               | Any         | +10 ATK / DEF / SPD, +20 HP             | yes           |
-
-\* See Known Issues.
 
 ---
 
@@ -338,9 +332,7 @@ The run ends when all player units reach 0 HP. The run summary shows the encount
 
 ## Known Issues (found while documenting)
 
-1. **Dark Staff's "+10 Summons" does nothing.** `ApplyRelicToUnit` has no `BonusSummons` case. (If it were added as-is, `summonCount << 10` would spawn ×1024 minions, so the shift needs a cap.)
-2. **Shrine heal is moot** because each encounter restores full HP.
-3. **Second trait copy has no mechanical effect**, only extra auras.
-4. **Relic grants:** Dark Staff (Necromancer) and Crown of the Undying both grant *Undying Wrath*, a melee ×3 attack. Verify that is intended for the Necromancer.
-5. **Boss affix comment mismatch:** a code comment says "3 forced affixes" but `RollAffixes` gives 2.
-6. **Footstep SFX and BGM only play in the Editor** (loaded via `AssetDatabase` under `#if UNITY_EDITOR`).
+1. **Relic grants:** Dark Staff (Necromancer) and Crown of the Undying both grant *Undying Wrath*, a melee ×3 attack. Verify that is intended for the Necromancer.
+2. **Boss affix comment mismatch:** a code comment says "3 forced affixes" but `RollAffixes` gives 2.
+3. **Footstep SFX and BGM only play in the Editor** (loaded via `AssetDatabase` under `#if UNITY_EDITOR`).
+4. **Dark Staff** now adds up to +10 minions per Raise Skeleton cast, which is a large power spike; re-check it in playtests.

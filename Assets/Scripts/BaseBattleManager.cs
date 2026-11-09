@@ -454,7 +454,7 @@ public class BaseBattleManager : MonoBehaviour
 
         if (_activeUnit.hasRegeneration)
         {
-            int regenAmt = Mathf.Max(1, Mathf.RoundToInt(_activeUnit.maxHealth * 0.08f));
+            int regenAmt = Mathf.Max(1, Mathf.RoundToInt(_activeUnit.maxHealth * _activeUnit.RegenFraction));
             int actualRegen = Mathf.Min(_activeUnit.maxHealth - _activeUnit.currentHealth, regenAmt);
             _activeUnit.currentHealth += actualRegen;
             if (_activeUnit.isPlayer) RunManager.Instance?.CurrentRunStats?.AddPlayerHealing(actualRegen);
@@ -462,6 +462,13 @@ public class BaseBattleManager : MonoBehaviour
             _activeUnit.GetComponent<TraitAuraController>()?.RefreshDynamicAuras();
             _uiManager.SetMessage($"{_activeUnit.unitName} regenerates {regenAmt} HP!");
             yield return new WaitForSeconds(0.6f);
+        }
+        // Mana trickles back so Specials are not a once-per-fight resource: 10% of max mana at the start of each of the player's turns.
+        if (_activeUnit.maxMana > 0 && _activeUnit.currentMana < _activeUnit.maxMana)
+        {
+            int manaRegen = Mathf.Max(1, Mathf.RoundToInt(_activeUnit.maxMana * 0.10f));
+            _activeUnit.currentMana = Mathf.Min(_activeUnit.maxMana, _activeUnit.currentMana + manaRegen);
+            _uiManager.UpdateHealth(_activeUnit);
         }
         _uiManager.SetMessage($"{_activeUnit.unitName}'s turn!");
         _uiManager.EnableAttackButton(true);
@@ -633,7 +640,7 @@ public class BaseBattleManager : MonoBehaviour
                 if (isCrit) damage = Mathf.RoundToInt(damage * 1.5f);
                 // Enraged perk: double damage below 50% HP
                 if (attackingUnit.hasEnraged && attackingUnit.currentHealth < attackingUnit.maxHealth * 0.5f)
-                    damage = Mathf.RoundToInt(damage * 2f);
+                    damage = Mathf.RoundToInt(damage * attackingUnit.EnragedMultiplier);
 
                 // Weaken: attacker deals less damage
                 var weakenSe = attackingUnit.activeStatusEffects.Find(e => e.type == StatusEffectType.Weaken);
@@ -673,7 +680,7 @@ public class BaseBattleManager : MonoBehaviour
                 // Vampiric perk: heal attacker for 25% of damage dealt
                 if (attackingUnit.hasVampiric && !attackingUnit.isDead)
                 {
-                    int healAmt = Mathf.Max(1, Mathf.RoundToInt(damage * 0.25f));
+                    int healAmt = Mathf.Max(1, Mathf.RoundToInt(damage * attackingUnit.VampiricFraction));
                     int actualHealed = Mathf.Min(attackingUnit.maxHealth - attackingUnit.currentHealth, healAmt);
                     attackingUnit.currentHealth += actualHealed;
                     RunManager.Instance?.CurrentRunStats?.AddPlayerHealing(actualHealed);
@@ -876,8 +883,8 @@ public class BaseBattleManager : MonoBehaviour
                     continue;
                 }
 
-                // Thorns perk: redirect 50% of incoming damage to the attacker
-                int playerDamage = (u.hasThorns && !_activeUnit.isDead) ? Mathf.Max(1, damage / 2) : damage;
+                // Thorns perk: redirect a share of incoming damage (50%, 65% with a second copy) to the attacker
+                int playerDamage = (u.hasThorns && !_activeUnit.isDead) ? Mathf.Max(1, Mathf.RoundToInt(damage * (1f - u.ThornsReflect))) : damage;
                 u.TakeDamage(playerDamage);
                 RunManager.Instance?.CurrentRunStats?.AddPlayerDamageTaken(playerDamage);
                 DamagePopSpawner.Show(u.transform, playerDamage, isCrit ? PopType.Crit : PopType.Normal);
@@ -1280,14 +1287,13 @@ public class BaseBattleManager : MonoBehaviour
         switch (type)
         {
             case EncounterType.Shrine:
-                foreach (var p in playerTeam)
-                    if (!p.isDead)
-                        p.currentHealth = Mathf.Min(p.maxHealth, p.currentHealth + Mathf.RoundToInt(p.maxHealth * 0.40f));
-                _uiManager.SetupHealthBars(playerTeam);
-                _uiManager.SetMessage("A sacred shrine heals your wounds...");
-                yield return new WaitForSeconds(1.2f);
+                // HP is fully restored at the start of every encounter, so healing here would do nothing;
+                // the shrine's value is a wider choice of free blessings (3 cards, no price).
+                _uiManager.SetMessage("A sacred shrine offers its blessings...");
+                yield return new WaitForSeconds(1.0f);
                 title = "\u26E9 Ancient Shrine";
-                subtitle = "Restored 40% HP. Choose a blessing.";
+                subtitle = "Choose a blessing. All three are free.";
+                choiceCount = 3;
                 break;
 
             case EncounterType.Merchant:
@@ -1375,7 +1381,8 @@ public class BaseBattleManager : MonoBehaviour
 
     private IEnumerator SpawnMinionAttack(Unit caster, List<Unit> targets, AttackAction action, bool isCrit)
     {
-        int minionCount = action.summonCount << caster.bonusSummonCount; // Starts at base and doubles
+        // Base count doubles per More Minions pick, plus flat relic minions; capped so a stacked build cannot spawn hundreds.
+        int minionCount = Mathf.Min(24, (action.summonCount << Mathf.Min(caster.bonusSummonCount, 4)) + caster.flatBonusSummons);
         int activeSkeletons = 0;
         bool isFirstSpawn = true;
 
@@ -1489,7 +1496,7 @@ public class BaseBattleManager : MonoBehaviour
                 if (target.isDefending) damage = Mathf.Max(1, damage / 2);
                 if (isCrit) damage = Mathf.RoundToInt(damage * 1.5f);
                 if (caster.hasEnraged && caster.currentHealth < caster.maxHealth * 0.5f)
-                    damage = Mathf.RoundToInt(damage * 2f);
+                    damage = Mathf.RoundToInt(damage * caster.EnragedMultiplier);
 
                 var weakenSe = caster.activeStatusEffects.Find(e => e.type == StatusEffectType.Weaken);
                 if (weakenSe != null) damage = Mathf.Max(1, Mathf.RoundToInt(damage * (1f - weakenSe.value)));
@@ -1513,7 +1520,7 @@ public class BaseBattleManager : MonoBehaviour
                 // Vampiric perk: heal attacker for 25% of damage dealt
                 if (caster.hasVampiric && !caster.isDead)
                 {
-                    int healAmt = Mathf.Max(1, Mathf.RoundToInt(damage * 0.25f));
+                    int healAmt = Mathf.Max(1, Mathf.RoundToInt(damage * caster.VampiricFraction));
                     caster.currentHealth = Mathf.Min(caster.maxHealth, caster.currentHealth + healAmt);
                     DamagePopSpawner.Show(caster.transform, healAmt, PopType.Heal);
                     _uiManager.UpdateHealth(caster);

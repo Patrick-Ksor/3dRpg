@@ -43,6 +43,22 @@ public class Unit : MonoBehaviour
     [HideInInspector] public bool hasRegeneration;
     [HideInInspector] public bool hasEnraged;
     [HideInInspector] public int bonusSummonCount;
+    [HideInInspector] public int flatBonusSummons;   // relic bonus: extra minions per summon cast
+
+    // How many times each trait was acquired (a second copy strengthens the effect).
+    [HideInInspector] public int vampiricStacks;
+    [HideInInspector] public int thornsStacks;
+    [HideInInspector] public int regenStacks;
+    [HideInInspector] public int enragedStacks;
+
+    /// <summary>Fraction of damage dealt that is healed: 25% per copy.</summary>
+    public float VampiricFraction => 0.25f * Mathf.Max(1, vampiricStacks);
+    /// <summary>Share of incoming damage sent back to the attacker: 50% with one copy, 65% with two.</summary>
+    public float ThornsReflect => Mathf.Min(0.8f, 0.35f + 0.15f * Mathf.Max(1, thornsStacks));
+    /// <summary>Max-HP fraction restored at the start of the unit's turn: 8% per copy.</summary>
+    public float RegenFraction => 0.08f * Mathf.Max(1, regenStacks);
+    /// <summary>Damage multiplier below 50% HP: x2 with one copy, x3 with two.</summary>
+    public float EnragedMultiplier => 1f + Mathf.Max(1, enragedStacks);
 
     [HideInInspector] public List<StatusEffect> activeStatusEffects = new List<StatusEffect>();
 
