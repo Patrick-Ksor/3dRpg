@@ -11,11 +11,12 @@ Unity 6 (URP 17, Input System, UI Toolkit + uGUI hybrid) 3D turn-based roguelike
 - `RunManager`: `DontDestroyOnLoad` singleton. Run state (encounter, gold, upgrades, relics), enemy scaling formulas, room generation, reward pool and merchant pricing (`GenerateRewardChoices`, `GenerateMerchantChoices`), `RunStatistics`.
 - `BaseBattleManager`: battle state machine, turn queue by speed, player/enemy turns, damage formula, enemy spawning (tiers, elites, affixes, mini-boss, boss), event rooms, summon minions with pooling, evasion, end-of-battle flow.
 - `Unit`: stats, status effects, attack animation coroutines (melee lunge, projectiles, instant VFX), death.
-- `BattleUIManager`: UI Toolkit HUD from `Resources/UI/GameUi.uxml/.uss` (falls back to a code-built tree), command menu, intermission/reward cards, room choices, run summary. `FloatingHealthBar` (world-space bars, affix/status icons), `DamagePopSpawner`, `TraitAuraController`.
+- `BattleUIManager`: UI Toolkit HUD from `Resources/UI/GameUi.uxml/.uss`, command menu, intermission/reward cards, room choices, run summary. `FloatingHealthBar` (world-space bars, affix/status icons), `DamagePopSpawner`, `TraitAuraController`.
 - ScriptableObjects: `AttackAction` (`Assets/Attacks`), `LegendaryRelicSO` (`Resources/Relics`), `CharacterDefinitionSO` (`Resources/Characters`), `BattleItem`, `StatusIconConfig`. `AttackUpgrade`/`RewardChoice` are plain classes.
 - Editor tools: `Assets/Editor/RelicAssetGenerator.cs`, `Assets/Scripts/Editor/BattleEnvironmentGenerator.cs`.
 
 ## Battle UI
+- Design mockups the UI follows are in `Docs/ui-mockups/` (they include features the game lacks: XP, inventory, hotkeys; those were intentionally left out).
 - Layout is `Resources/UI/GameUi.uxml`; all styling is `GameUi.uss` (dungeon palette = variables in `:root` at the top; edit colours there). There is no code-built fallback tree any more, so a broken UXML means an empty HUD (an error is logged).
 - Icons are applied from USS (`.icon-*` classes with `url("/Assets/...")`) so they work in builds; do not load icons with `AssetDatabase`.
 - `BattleUIManager` public API is called by `BaseBattleManager`. It also owns the turn-order bar (`UpdateTurnOrder`, called from `ProcessNextTurn`), eased HP/MP bars, in-place stat rows, tooltips (`RegisterTooltip`), battle log, and overlay fade/stagger animations.
