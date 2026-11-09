@@ -425,6 +425,12 @@ public class FloatingHealthBar : MonoBehaviour
         _barRect.anchoredPosition = canvasPos;
     }
 
+    /// <summary>Shows or hides every nameplate (used while full-screen overlays are open).</summary>
+    public static void SetCanvasVisible(bool visible)
+    {
+        if (s_Canvas != null) s_Canvas.enabled = visible;
+    }
+
     /// <summary>
     /// Immediately destroys every HP bar container in the shared canvas.
     /// Call this at the start of a new encounter (before SetupBattle) so stale

@@ -913,6 +913,14 @@ public class BattleUIManager : MonoBehaviour
         HidePanel(_intermissionPanel);
         HidePanel(_summaryPanel);
         HidePanel(_victoryPanel);
+        SetOverlayOpen(false);
+    }
+
+    /// <summary>While a full-screen overlay is open, hide the HUD panels and world-space nameplates behind it.</summary>
+    private void SetOverlayOpen(bool open)
+    {
+        _root?.EnableInClassList("overlay-open", open);
+        FloatingHealthBar.SetCanvasVisible(!open);
     }
 
     private static void HidePanel(VisualElement panel)
@@ -968,6 +976,7 @@ public class BattleUIManager : MonoBehaviour
     private void EndChoiceScreen()
     {
         AnimateIn(_upgradeChoices);
+        SetOverlayOpen(true);
         ShowPanel(_intermissionPanel);
     }
 
@@ -1018,6 +1027,7 @@ public class BattleUIManager : MonoBehaviour
         {
             _victoryClaim.clickable = new Clickable(() => onClaim?.Invoke());
         }
+        SetOverlayOpen(true);
         ShowPanel(_victoryPanel);
     }
 
@@ -1211,6 +1221,7 @@ public class BattleUIManager : MonoBehaviour
         if (_summaryRelics != null)
             _summaryRelics.style.display = hasLoot ? DisplayStyle.Flex : DisplayStyle.None;
 
+        SetOverlayOpen(true);
         ShowPanel(_summaryPanel);
     }
 

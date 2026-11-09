@@ -1074,3 +1074,13 @@
     font-size: 17px;
     letter-spacing: 3px;
 }
+
+/* Full-screen overlays hide the in-battle HUD behind them (run info stays for gold). */
+.overlay-open .stats-panel-left,
+.overlay-open .battle-log,
+.overlay-open .bottom-hud,
+.overlay-open .bottom-message-zone,
+.overlay-open .turn-order-wrap,
+.overlay-open .run-rewards {
+    display: none;
+}
