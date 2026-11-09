@@ -8,7 +8,7 @@
     --iron: rgb(92, 74, 54);
     --iron-dark: rgb(58, 46, 34);
     --iron-light: rgb(120, 98, 70);
-    --line: rgb(74, 59, 44);
+    --line: rgb(61, 50, 40);
     --torch: rgb(224, 178, 86);
     --torch-dim: rgb(150, 115, 52);
     --parchment: rgb(238, 228, 208);
@@ -19,56 +19,51 @@
 
 .main-container {
     -unity-font-definition: url("/Assets/Fonts/BarlowCondensed-Regular.ttf");
-    font-size: 16px;
+    font-size: 20px;
     flex-grow: 1;
-    background-color: var(--stone-0);
-    padding: 20px 36px 24px 36px;
+    background-color: rgb(15, 13, 12);
     color: var(--parchment);
 }
 
 /* ── Title ──────────────────────────────────────────────────────────────── */
 
 .title-block {
-    flex-shrink: 0;
+    position: absolute;
+    left: 40px;
+    top: 34px;
 }
 
 .main-title {
     -unity-font-definition: url("/Assets/Fonts/Cinzel.ttf");
-    font-size: 34px;
+    font-size: 40px;
     -unity-font-style: bold;
-    letter-spacing: 4px;
+    letter-spacing: 3px;
     color: var(--torch);
 }
 
 .main-subtitle {
-    margin-top: 2px;
-    font-size: 15px;
-    letter-spacing: 3px;
+    margin-top: 8px;
+    font-size: 18px;
+    letter-spacing: 2px;
     color: var(--muted);
 }
 
-/* ── Three columns: hero list | preview | details ───────────────────────── */
-
-.selection-area {
-    flex-grow: 1;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    margin: 10px 0;
-    min-height: 0;
-}
+/* ── Hero list (left) ───────────────────────────────────────────────────── */
 
 .hero-list {
-    width: 270px;
-    flex-shrink: 0;
+    position: absolute;
+    left: 40px;
+    top: 150px;
+    width: 300px;
 }
 
 .hero-entry {
     flex-direction: row;
     align-items: center;
-    margin-bottom: 6px;
-    padding: 5px 10px;
-    background-color: var(--stone-1);
+    height: 64px;
+    margin-bottom: 8px;
+    padding: 0 14px;
+    background-color: rgba(18, 14, 12, 0.86);
     border-width: 2px;
     border-color: var(--line);
     transition-property: background-color, border-color;
@@ -76,79 +71,87 @@
 }
 
 .hero-entry:hover {
-    background-color: var(--stone-2);
-    border-color: var(--iron-light);
+    background-color: rgba(34, 27, 22, 0.95);
+    border-color: var(--iron);
 }
 
 .hero-entry--selected {
-    background-color: rgb(58, 44, 24);
+    background-color: rgba(58, 44, 28, 0.92);
     border-color: var(--torch);
 }
 
 .hero-entry-icon {
-    width: 42px;
-    height: 42px;
+    width: 44px;
+    height: 44px;
     flex-shrink: 0;
-    margin-right: 12px;
-    background-color: var(--stone-0);
+    margin-right: 14px;
+    background-color: rgba(94, 102, 112, 0.12);
     border-width: 2px;
-    border-color: var(--iron-dark);
+    border-color: rgb(94, 102, 112);
     -unity-background-scale-mode: scale-to-fit;
 }
 
-.hero-entry--selected .hero-entry-icon {
-    border-color: var(--torch-dim);
-}
+.hero-entry--selected .hero-entry-icon { border-color: var(--torch); }
 
 .hero-entry-name {
     -unity-font-definition: url("/Assets/Fonts/Cinzel.ttf");
-    font-size: 17px;
+    font-size: 18px;
     -unity-font-style: bold;
     color: var(--parchment);
 }
 
 .hero-entry-sub {
-    font-size: 14px;
+    font-size: 15px;
+    letter-spacing: 2px;
     color: var(--muted);
 }
 
-/* centre: big preview */
+/* ── Centre: portrait + description ─────────────────────────────────────── */
 
 .character-card {
-    flex-grow: 1;
+    position: absolute;
+    left: 380px;
+    top: 150px;
+    width: 500px;
     align-items: center;
-    justify-content: center;
-    padding: 0 24px;
     transition-property: opacity, translate;
     transition-duration: 0.14s;
 }
 
 .character-preview {
-    width: 170px;
-    height: 170px;
-    margin-bottom: 12px;
-    background-color: rgba(255, 255, 255, 0.04);
-    border-radius: 85px;
-    border-width: 2px;
-    border-color: var(--iron-dark);
+    width: 240px;
+    height: 240px;
+    margin-bottom: 14px;
+    background-color: rgba(94, 102, 112, 0.12);
+    border-radius: 120px;
+    border-width: 3px;
+    border-color: var(--torch);
     -unity-background-scale-mode: scale-to-fit;
 }
 
 .character-name {
     -unity-font-definition: url("/Assets/Fonts/Cinzel.ttf");
-    margin-bottom: 6px;
-    font-size: 26px;
+    font-size: 30px;
+    letter-spacing: 2px;
     -unity-font-style: bold;
     -unity-text-align: middle-center;
     color: var(--parchment);
 }
 
+.character-role {
+    margin-top: 4px;
+    margin-bottom: 14px;
+    font-size: 16px;
+    letter-spacing: 3px;
+    color: var(--torch);
+}
+
 .character-desc {
-    max-width: 320px;
-    font-size: 17px;
+    max-width: 400px;
+    font-size: 20px;
     white-space: normal;
     -unity-text-align: upper-center;
-    color: var(--muted);
+    color: rgb(217, 205, 185);
 }
 
 .swapping {
@@ -156,67 +159,63 @@
     translate: 0 10px;
 }
 
-/* right: details */
+/* ── Right: stats + starting skill ──────────────────────────────────────── */
 
 .details-panel {
-    width: 330px;
-    flex-shrink: 0;
-    padding: 10px 16px;
-    background-color: var(--stone-1);
+    position: absolute;
+    right: 40px;
+    top: 150px;
+    width: 340px;
+    padding: 16px 22px;
+    background-color: rgba(18, 14, 12, 0.92);
     border-width: 2px;
-    border-color: var(--line);
+    border-color: var(--iron);
     transition-property: opacity, translate;
     transition-duration: 0.14s;
 }
 
-.details-name {
-    -unity-font-definition: url("/Assets/Fonts/Cinzel.ttf");
-    margin-bottom: 4px;
-    font-size: 22px;
-    -unity-font-style: bold;
-    color: var(--parchment);
-}
-
 .section-title {
-    font-size: 13px;
-    letter-spacing: 3px;
+    font-size: 15px;
+    letter-spacing: 2px;
     color: var(--muted);
 }
 
-.section-title--spaced {
-    margin-top: 8px;
+.divider {
+    height: 1px;
+    margin: 10px 0;
+    background-color: var(--line);
 }
 
 .stat-bars {
     flex-shrink: 0;
-    margin-top: 6px;
+    margin-top: 10px;
 }
 
 .stat-row {
     flex-shrink: 0;
     flex-direction: row;
     align-items: center;
-    margin-bottom: 1px;
+    margin-bottom: 5px;
 }
 
-.stat-icon {
-    width: 18px;
-    height: 18px;
-    margin-right: 8px;
-    -unity-background-scale-mode: scale-to-fit;
+.stat-dot {
+    width: 10px;
+    height: 10px;
+    margin-right: 12px;
 }
 
 .stat-name {
-    width: 40px;
-    font-size: 14px;
+    width: 36px;
+    margin-right: 10px;
+    font-size: 17px;
+    letter-spacing: 1px;
     color: var(--muted);
 }
 
 .stat-track {
     flex-grow: 1;
     height: 8px;
-    margin: 0 8px;
-    background-color: rgb(34, 27, 21);
+    background-color: rgb(46, 39, 34);
 }
 
 .stat-fill {
@@ -227,108 +226,107 @@
     transition-duration: 0.35s;
 }
 
-.stat-fill--hp { background-color: rgb(212, 82, 74); }
-.stat-fill--mp { background-color: rgb(91, 141, 214); }
-
 .stat-value {
-    width: 34px;
-    font-size: 16px;
+    width: 36px;
+    margin-left: 10px;
+    font-size: 17px;
     -unity-text-align: middle-right;
     color: var(--parchment);
 }
 
-.icon-heart  { background-image: url("/Assets/Violet Theme Ui/Colored Icons/Heart.png"); }
-.icon-star   { background-image: url("/Assets/Violet Theme Ui/Colored Icons/Star.png"); }
-.icon-sword  { background-image: url("/Assets/Violet Theme Ui/Colored Icons/Sword.png"); }
-.icon-shield { background-image: url("/Assets/Violet Theme Ui/Colored Icons/Shield.png"); }
-.icon-energy { background-image: url("/Assets/Violet Theme Ui/Colored Icons/Energy.png"); }
-.icon-clover { background-image: url("/Assets/Violet Theme Ui/Colored Icons/Clover.png"); }
-
 .skill-list {
     flex-shrink: 0;
-    margin-top: 6px;
+    margin-top: 10px;
 }
 
 .skill {
     flex-shrink: 0;
-    margin-bottom: 4px;
-    padding: 4px 10px;
-    background-color: var(--stone-2);
-    border-left-width: 3px;
-    border-left-color: var(--torch-dim);
+    padding: 8px 14px;
+    background-color: rgb(31, 25, 21);
+    border-width: 1px;
+    border-color: var(--line);
 }
 
 .skill-name {
     -unity-font-definition: url("/Assets/Fonts/Cinzel.ttf");
-    font-size: 15px;
+    font-size: 17px;
     -unity-font-style: bold;
     color: var(--parchment);
 }
 
 .skill-desc {
     flex-shrink: 0;
-    margin-top: 1px;
-    font-size: 14px;
+    margin-top: 4px;
+    font-size: 16px;
+    white-space: normal;
+    color: rgb(217, 205, 185);
+}
+
+.skill-note-row {
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin-top: 8px;
+}
+
+.skill-note {
+    font-size: 17px;
     white-space: normal;
     color: var(--muted);
 }
 
-.skill-note {
-    font-size: 14px;
-    -unity-font-style: italic;
-    white-space: normal;
-    color: var(--muted);
+.skill-note--learn {
+    color: rgb(169, 194, 238);
 }
 
 /* ── Footer buttons ─────────────────────────────────────────────────────── */
 
 .footer {
-    flex-shrink: 0;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 604px;
     flex-direction: row;
-    align-items: center;
     justify-content: center;
 }
 
 .start-btn {
     -unity-font-definition: url("/Assets/Fonts/Cinzel.ttf");
     width: 300px;
-    height: 54px;
-    margin-right: 14px;
-    font-size: 21px;
+    height: 56px;
+    margin: 0 16px 0 0;
+    font-size: 20px;
     -unity-font-style: bold;
-    letter-spacing: 3px;
-    color: var(--stone-0);
+    letter-spacing: 2px;
+    color: rgb(27, 20, 12);
     background-color: var(--torch);
-    border-width: 0;
-    transition-property: background-color, scale;
+    border-width: 2px;
+    border-color: rgb(243, 208, 138);
+    border-radius: 0;
+    transition-property: background-color;
     transition-duration: 0.12s;
 }
 
-.start-btn:hover {
-    background-color: rgb(240, 200, 118);
-    scale: 1.03 1.03;
-}
-
-.start-btn:active {
-    background-color: var(--torch-dim);
-    scale: 0.98 0.98;
-}
+.start-btn:hover { background-color: rgb(240, 200, 118); }
+.start-btn:active { background-color: var(--torch-dim); }
 
 .quit-btn {
     -unity-font-definition: url("/Assets/Fonts/Cinzel.ttf");
-    width: 100px;
-    height: 54px;
-    font-size: 16px;
+    width: 120px;
+    height: 56px;
+    margin: 0;
+    font-size: 17px;
     -unity-font-style: bold;
+    letter-spacing: 2px;
     color: var(--parchment);
-    background-color: var(--stone-1);
+    background-color: rgba(0, 0, 0, 0);
     border-width: 2px;
-    border-color: var(--line);
+    border-color: var(--iron);
+    border-radius: 0;
     transition-property: background-color, border-color;
     transition-duration: 0.12s;
 }
 
 .quit-btn:hover {
-    background-color: var(--stone-2);
+    background-color: rgba(34, 27, 22, 0.95);
     border-color: var(--torch);
 }

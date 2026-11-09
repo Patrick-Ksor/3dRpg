@@ -9,6 +9,9 @@
 
     <ui:VisualElement name="battle-root" class="battle-root">
 
+        <!-- World-following nameplates (filled by Nameplates.cs) -->
+        <ui:VisualElement name="nameplate-layer" class="nameplate-layer" picking-mode="Ignore"/>
+
         <!-- Top centre: turn order -->
         <ui:VisualElement class="turn-order-wrap" picking-mode="Ignore">
             <ui:VisualElement class="turn-order-panel">
@@ -45,7 +48,10 @@
 
         <!-- Bottom centre: battle log -->
         <ui:VisualElement name="battle-log" class="battle-log">
-            <ui:Label name="battle-log-header" text="COMBAT LOG  -" class="battle-log-header"/>
+            <ui:VisualElement class="battle-log-head">
+                <ui:Label name="battle-log-header" text="COMBAT LOG" class="battle-log-header"/>
+                <ui:Button name="claim-btn" text="CLAIM SPOILS" class="claim-btn"/>
+            </ui:VisualElement>
             <ui:ScrollView name="battle-log-scroll" class="battle-log-scroll">
                 <ui:VisualElement name="battle-log-content" class="battle-log-content"/>
             </ui:ScrollView>
@@ -53,9 +59,12 @@
 
         <!-- Bottom right: commands -->
         <ui:VisualElement name="bottom-hud" class="bottom-hud">
-            <ui:Label name="command-title" text="YOUR TURN" class="command-title"/>
+            <ui:VisualElement class="command-head">
+                <ui:Label name="command-title" text="COMMANDS" class="command-title"/>
+                <ui:Label name="command-round" text="" class="command-round"/>
+            </ui:VisualElement>
             <ui:VisualElement name="action-zone" class="action-zone">
-                <ui:Button name="attack-btn" class="action-btn action-btn--primary">
+                <ui:Button name="attack-btn" class="action-btn">
                     <ui:VisualElement name="attack-btn-icon" class="action-btn-icon icon-attack"/>
                     <ui:Label text="ATTACK" class="action-btn-label"/>
                     <ui:Label name="attack-btn-sub" text="" class="action-btn-sub"/>
@@ -92,26 +101,6 @@
                 <ui:Label name="intermission-instruction" text="Choose an upgrade:" class="overlay-instruction"/>
                 <ui:VisualElement name="upgrade-choices" class="upgrade-choices"/>
                 <ui:VisualElement name="reroll-container" class="reroll-container"/>
-            </ui:VisualElement>
-        </ui:VisualElement>
-        <ui:VisualElement name="victory-panel" class="overlay-panel">
-            <ui:VisualElement class="victory-layout">
-                <ui:Label name="victory-title" text="VICTORY" class="victory-title"/>
-                <ui:Label name="victory-sub" text="" class="victory-sub"/>
-                <ui:VisualElement class="victory-card">
-                    <ui:VisualElement class="victory-row">
-                        <ui:VisualElement class="victory-block">
-                            <ui:Label text="GOLD" class="victory-label"/>
-                            <ui:Label name="victory-gold" text="+0" class="victory-gold"/>
-                            <ui:Label name="victory-gold-total" text="" class="victory-small"/>
-                        </ui:VisualElement>
-                        <ui:VisualElement class="victory-block victory-block--grow">
-                            <ui:Label text="FOES DEFEATED" class="victory-label"/>
-                            <ui:VisualElement name="victory-foes" class="loot-chips"/>
-                        </ui:VisualElement>
-                    </ui:VisualElement>
-                    <ui:Button name="victory-claim" text="CLAIM LOOT  &gt;" class="reward-button victory-claim"/>
-                </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="run-summary-panel" class="overlay-panel">

@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: NecromancerDef
   m_EditorClassIdentifier: Assembly-CSharp::CharacterDefinitionSO
   characterName: Necromancer
+  role: SUMMONER
   description: A dark and commanding necromancer stands with a composed, symmetrical
     form.
   icon: {fileID: 21300000, guid: dabbee89bc57e49459bfcc7d00d3a60f, type: 3}

@@ -23,18 +23,18 @@ public class MainMenuManager : MonoBehaviour
     private VisualElement _statBars;
     private VisualElement _skillList;
     private VisualElement _heroList;
-    private Label _detailsName;
+    private Label _characterRoleLabel;
     private bool _switching;
 
-    // Bar scale: the value that fills a bar completely.
-    private static readonly (string label, string icon, string fillClass, float max)[] StatDefs =
+    // Bar scale: the value that fills a bar completely, plus each stat's colour.
+    private static readonly (string label, Color color, float max)[] StatDefs =
     {
-        ("HP",  "icon-heart",  "stat-fill--hp", 150f),
-        ("MP",  "icon-star",   "stat-fill--mp", 40f),
-        ("ATK", "icon-sword",  null,            40f),
-        ("DEF", "icon-shield", null,            25f),
-        ("SPD", "icon-energy", null,            25f),
-        ("LCK", "icon-clover", null,            80f),
+        ("HP",  new Color(0.82f, 0.33f, 0.29f), 150f),
+        ("MP",  new Color(0.36f, 0.55f, 0.84f), 50f),
+        ("ATK", new Color(0.88f, 0.71f, 0.35f), 40f),
+        ("DEF", new Color(0.79f, 0.48f, 0.29f), 25f),
+        ("SPD", new Color(0.91f, 0.82f, 0.35f), 25f),
+        ("LCK", new Color(0.50f, 0.75f, 0.53f), 100f),
     };
 
     private readonly List<VisualElement> _statFills = new List<VisualElement>();
@@ -62,7 +62,7 @@ public class MainMenuManager : MonoBehaviour
         _statBars = root.Q<VisualElement>("stat-bars");
         _skillList = root.Q<VisualElement>("skill-list");
         _heroList = root.Q<VisualElement>("hero-list");
-        _detailsName = root.Q<Label>("details-name");
+        _characterRoleLabel = root.Q<Label>("character-role");
 
         var start = root.Q<Button>("start-btn");
         var quit = root.Q<Button>("quit-btn");
@@ -109,10 +109,10 @@ public class MainMenuManager : MonoBehaviour
             var row = new VisualElement();
             row.AddToClassList("stat-row");
 
-            var icon = new VisualElement();
-            icon.AddToClassList("stat-icon");
-            icon.AddToClassList(def.icon);
-            row.Add(icon);
+            var dot = new VisualElement();
+            dot.AddToClassList("stat-dot");
+            dot.style.backgroundColor = def.color;
+            row.Add(dot);
 
             var name = new Label(def.label);
             name.AddToClassList("stat-name");
@@ -122,7 +122,7 @@ public class MainMenuManager : MonoBehaviour
             track.AddToClassList("stat-track");
             var fill = new VisualElement();
             fill.AddToClassList("stat-fill");
-            if (def.fillClass != null) fill.AddToClassList(def.fillClass);
+            fill.style.backgroundColor = def.color;
             track.Add(fill);
             row.Add(track);
 
@@ -160,7 +160,7 @@ public class MainMenuManager : MonoBehaviour
             var name = new Label(def.characterName);
             name.AddToClassList("hero-entry-name");
             text.Add(name);
-            var sub = new Label(FirstSentence(def.description));
+            var sub = new Label(string.IsNullOrEmpty(def.role) ? "HERO" : def.role.ToUpperInvariant());
             sub.AddToClassList("hero-entry-sub");
             text.Add(sub);
             entry.Add(text);
@@ -185,7 +185,7 @@ public class MainMenuManager : MonoBehaviour
 
         var selected = _availableCharacters[_selectedIndex];
 
-        if (_characterNameLabel != null) _characterNameLabel.text = selected.characterName;
+        if (_characterNameLabel != null) _characterNameLabel.text = selected.characterName.ToUpperInvariant();
         if (_characterDescLabel != null) _characterDescLabel.text = selected.description;
         if (_characterPreviewImage != null && selected.icon != null)
             _characterPreviewImage.style.backgroundImage = new StyleBackground(selected.icon);
@@ -194,7 +194,7 @@ public class MainMenuManager : MonoBehaviour
         UpdateStats(unit);
         UpdateSkills(unit);
 
-        if (_detailsName != null) _detailsName.text = selected.characterName;
+        if (_characterRoleLabel != null) _characterRoleLabel.text = string.IsNullOrEmpty(selected.role) ? "HERO" : selected.role.ToUpperInvariant();
 
         if (_heroList != null)
             for (int i = 0; i < _heroList.childCount; i++)
@@ -223,9 +223,6 @@ public class MainMenuManager : MonoBehaviour
         if (unit == null) return;
 
         if (unit.basicAttack != null) AddSkill(unit.basicAttack, "Basic attack");
-        if (unit.specialAttacks != null)
-            foreach (AttackAction special in unit.specialAttacks)
-                if (special != null) AddSkill(special, "Special");
 
         if (unit.unlockableAttacks != null && unit.unlockableAttacks.Count > 0)
         {
@@ -234,9 +231,16 @@ public class MainMenuManager : MonoBehaviour
                 if (a != null) names.Add(a.actionName);
             if (names.Count > 0)
             {
-                var note = new Label("Can learn during a run: " + string.Join(", ", names));
-                note.AddToClassList("skill-note");
-                _skillList.Add(note);
+                var row = new VisualElement();
+                row.AddToClassList("skill-note-row");
+                var lead = new Label("Can learn during a run: ");
+                lead.AddToClassList("skill-note");
+                row.Add(lead);
+                var list = new Label(string.Join(", ", names));
+                list.AddToClassList("skill-note");
+                list.AddToClassList("skill-note--learn");
+                row.Add(list);
+                _skillList.Add(row);
             }
         }
     }
@@ -253,7 +257,7 @@ public class MainMenuManager : MonoBehaviour
 
         // Compact one-line summary of the same text the battle tooltips use.
         string summary = BattleUIManager.DescribeAttack(attack).Replace("\n", "  ");
-        var desc = new Label($"{kind}: {summary}");
+        var desc = new Label($"{kind} \u00b7 {summary.Replace("  ", " \u00b7 ")}");
         desc.AddToClassList("skill-desc");
         box.Add(desc);
 

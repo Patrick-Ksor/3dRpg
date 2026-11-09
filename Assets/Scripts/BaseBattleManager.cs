@@ -112,6 +112,7 @@ public class BaseBattleManager : MonoBehaviour
 
     private BattleUIManager _uiManager;
     private bool _isMiniBoss = false;
+    public int BattleRounds => _battleRounds;
     private int _battleRounds;   // turn-queue rebuilds this fight; shown on the victory/loot screens
 
     public static BaseBattleManager Instance { get; private set; }
@@ -1149,11 +1150,8 @@ public class BaseBattleManager : MonoBehaviour
                 Action showLoot = () =>
                     _uiManager.ShowIntermission(clearedEncounter, goldEarned, choices, applyChoice, onReroll, rounds, foes);
 
-                // Boss and mini-boss fights get their own victory card first; normal fights go straight to loot.
-                if (_isMiniBoss || clearedEncounter % 10 == 0)
-                    _uiManager.ShowVictory(clearedEncounter, rounds, goldEarned, rm.Gold, foes, showLoot);
-                else
-                    showLoot();
+                // The player claims the spoils from the combat-log header once they have seen the result.
+                _uiManager.ShowClaimButton("CLAIM SPOILS", showLoot);
             }
             else
             {

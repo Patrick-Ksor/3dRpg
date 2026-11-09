@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: NinjaDef
   m_EditorClassIdentifier: Assembly-CSharp::CharacterDefinitionSO
   characterName: Ninja
+  role: STRIKER
   description: A swift and disciplined ninja stands in a low, balanced stance.
   icon: {fileID: 21300000, guid: 666962dfb52e03b4696d17e429ce42e3, type: 3}
   characterPrefab: {fileID: 8008301962833846410, guid: fae1d6d1f6a725a41a7fc8dac34f85f6, type: 3}

@@ -29,8 +29,10 @@ public static class RewardCardBuilder
         if (choice.curseEffect != null) card.AddToClassList("reward-card--curse");
 
         string tag = choice.curseEffect != null ? "CURSED"
-                   : choice.legendaryRelic != null ? "RELIC"
-                   : IsLegendaryTrait(choice) ? "LEGENDARY" : "";
+                   : choice.legendaryRelic != null ? "LEGENDARY"
+                   : IsLegendaryTrait(choice) ? "EPIC"
+                   : choice.attackUpgrade != null && choice.attackUpgrade.upgradeType == AttackUpgradeType.UnlockNewAttack ? "RARE"
+                   : "COMMON";
         card.Add(CreateTypeHeader(GetChoiceTypeLabel(choice), tag));
 
         var body = new VisualElement();
@@ -93,22 +95,74 @@ public static class RewardCardBuilder
         return card;
     }
 
-    /// <summary>A "choose your path" room card.</summary>
-    public static VisualElement CreateRoomCard(RoomChoice choice, Action<RoomChoice> onSelect)
+    /// <summary>A "choose your path" card: click to select, then confirm with the Enter button on the screen.</summary>
+    public static VisualElement CreateRoomCard(RoomChoice choice, Action<VisualElement, RoomChoice> onPick)
     {
+        var look = GetRoomLook(choice.encounterType);
+
         var card = new VisualElement();
         card.AddToClassList("reward-card");
+        card.AddToClassList("reward-card--pick");
+        card.AddToClassList("room-card");
 
-        card.Add(CreateTypeHeader(choice.encounterType.ToString().ToUpperInvariant()));
+        var header = new VisualElement();
+        header.AddToClassList("reward-card-type");
+        header.style.borderBottomColor = look.color;
+        var kind = CreateLabel(choice.encounterType.ToString().ToUpperInvariant(), "reward-card-type-label");
+        kind.style.color = look.color;
+        header.Add(kind);
+        card.Add(header);
 
         var body = new VisualElement();
         body.AddToClassList("reward-card-body");
+
+        var frame = new VisualElement();
+        frame.AddToClassList("reward-card-icon");
+        frame.style.borderTopColor = frame.style.borderBottomColor = frame.style.borderLeftColor = frame.style.borderRightColor = look.color;
+        var glyph = new VisualElement();
+        glyph.AddToClassList("reward-card-icon-img");
+        glyph.AddToClassList(look.icon);
+        frame.Add(glyph);
+        body.Add(frame);
+
         body.Add(CreateLabel(choice.title, "reward-card-title"));
         body.Add(CreateLabel(choice.description, "reward-card-desc"));
         card.Add(body);
 
-        card.Add(CreateSelectButton("ENTER", true, () => onSelect?.Invoke(choice)));
+        var stats = new VisualElement();
+        stats.AddToClassList("room-card-stats");
+        stats.Add(CreateStatRow("Reward", look.reward, new Color(0.93f, 0.89f, 0.81f)));
+        stats.Add(CreateStatRow("Danger", look.danger, look.dangerColor));
+        card.Add(stats);
+
+        card.RegisterCallback<ClickEvent>(_ => onPick(card, choice));
         return card;
+    }
+
+    private static VisualElement CreateStatRow(string label, string value, Color valueColor)
+    {
+        var row = new VisualElement();
+        row.AddToClassList("room-card-stat");
+        row.Add(CreateLabel(label, "room-card-stat-label"));
+        var v = CreateLabel(value, "room-card-stat-value");
+        v.style.color = valueColor;
+        row.Add(v);
+        return row;
+    }
+
+    private static (Color color, string icon, string reward, string danger, Color dangerColor) GetRoomLook(EncounterType type)
+    {
+        switch (type)
+        {
+            case EncounterType.Merchant:
+                return (new Color(0.91f, 0.82f, 0.35f), "icon-coin", "Shop", "None", new Color(0.56f, 0.83f, 0.59f));
+            case EncounterType.Shrine:
+                return (new Color(0.56f, 0.83f, 0.59f), "icon-star", "Blessing", "None", new Color(0.56f, 0.83f, 0.59f));
+            case EncounterType.Mystery:
+                return (new Color(0.76f, 0.60f, 0.94f), "icon-book", "Unknown", "Varies", new Color(0.70f, 0.64f, 0.56f));
+            default:
+                return (new Color(1.00f, 0.62f, 0.56f), "icon-sword", "Spoils + Gold", "Normal", new Color(0.91f, 0.82f, 0.35f));
+        }
     }
 
     // ── helpers ────────────────────────────────────────────────────────────

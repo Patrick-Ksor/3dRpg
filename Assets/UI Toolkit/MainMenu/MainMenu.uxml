@@ -14,24 +14,21 @@
             <ui:Label text="DESCEND. FIGHT. GROW STRONGER. SURVIVE." class="main-subtitle" />
         </ui:VisualElement>
 
-        <ui:VisualElement class="selection-area">
+        <ui:VisualElement name="hero-list" class="hero-list" />
 
-            <ui:VisualElement name="hero-list" class="hero-list" />
+        <ui:VisualElement name="character-card" class="character-card">
+            <ui:VisualElement name="character-preview" class="character-preview" />
+            <ui:Label name="character-name" text="Hero Name" class="character-name" />
+            <ui:Label name="character-role" text="" class="character-role" />
+            <ui:Label name="character-desc" text="Hero description goes here..." class="character-desc" />
+        </ui:VisualElement>
 
-            <ui:VisualElement name="character-card" class="character-card">
-                <ui:VisualElement name="character-preview" class="character-preview" />
-                <ui:Label name="character-name" text="Hero Name" class="character-name" />
-                <ui:Label name="character-desc" text="Hero description goes here..." class="character-desc" />
-            </ui:VisualElement>
-
-            <ui:VisualElement name="details-panel" class="details-panel">
-                <ui:Label name="details-name" text="" class="details-name" />
-                <ui:Label text="STATS" class="section-title" />
-                <ui:VisualElement name="stat-bars" class="stat-bars" />
-                <ui:Label text="SKILLS" class="section-title section-title--spaced" />
-                <ui:VisualElement name="skill-list" class="skill-list" />
-            </ui:VisualElement>
-
+        <ui:VisualElement name="details-panel" class="details-panel">
+            <ui:Label text="STATS" class="section-title" />
+            <ui:VisualElement name="stat-bars" class="stat-bars" />
+            <ui:VisualElement class="divider" />
+            <ui:Label text="STARTING SKILL" class="section-title" />
+            <ui:VisualElement name="skill-list" class="skill-list" />
         </ui:VisualElement>
 
         <ui:VisualElement class="footer">

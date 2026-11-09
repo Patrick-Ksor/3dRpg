@@ -36,6 +36,11 @@ public class BattleUIManager : MonoBehaviour
     private Label _specialSub;
     private Label _itemSub;
     private Label _commandTitle;
+    private Label _commandRound;
+    private Button _claimBtn;
+    private VisualElement _nameplateLayer;
+    private Unit _selectedTarget;
+    private bool _playerTurn;
     private bool _buttonsWired;
 
     // Hero card (left)
@@ -85,12 +90,6 @@ public class BattleUIManager : MonoBehaviour
     private VisualElement _upgradeChoices;
     private VisualElement _rerollContainer;
     private VisualElement _summaryPanel;
-    private VisualElement _victoryPanel;
-    private Label _victorySub;
-    private Label _victoryGold;
-    private Label _victoryGoldTotal;
-    private VisualElement _victoryFoes;
-    private Button _victoryClaim;
     private Label _summaryTitle;
     private Label _summaryStats;
     private VisualElement _summaryGrid;
@@ -184,6 +183,10 @@ public class BattleUIManager : MonoBehaviour
         _specialSub = _root.Q<Label>("special-btn-sub");
         _itemSub = _root.Q<Label>("item-btn-sub");
         _commandTitle = _root.Q<Label>("command-title");
+        _commandRound = _root.Q<Label>("command-round");
+        _claimBtn = _root.Q<Button>("claim-btn");
+        _nameplateLayer = _root.Q<VisualElement>("nameplate-layer");
+        Nameplates.SetLayer(_nameplateLayer, OnPlateClicked);
 
         // Tooltip
         _tooltip = _root.Q<VisualElement>("tooltip");
@@ -234,12 +237,6 @@ public class BattleUIManager : MonoBehaviour
         _intermissionInstruction = _root.Q<Label>("intermission-instruction");
         _upgradeChoices = _root.Q<VisualElement>("upgrade-choices");
         _summaryPanel = _root.Q<VisualElement>("run-summary-panel");
-        _victoryPanel = _root.Q<VisualElement>("victory-panel");
-        _victorySub = _root.Q<Label>("victory-sub");
-        _victoryGold = _root.Q<Label>("victory-gold");
-        _victoryGoldTotal = _root.Q<Label>("victory-gold-total");
-        _victoryFoes = _root.Q<VisualElement>("victory-foes");
-        _victoryClaim = _root.Q<Button>("victory-claim");
         _summaryTitle = _root.Q<Label>("summary-title");
         _summaryStats = _root.Q<Label>("summary-stats");
         _summaryGrid = _root.Q<VisualElement>("summary-grid");
@@ -534,6 +531,17 @@ public class BattleUIManager : MonoBehaviour
         _tooltipBody.text = content.body;
         _tooltipBody.style.display = string.IsNullOrEmpty(content.body) ? DisplayStyle.None : DisplayStyle.Flex;
 
+        bool fixedSpot = anchor.GetFirstAncestorOfType<VisualElement>() != null && IsInsideCommandPanel(anchor);
+        _tooltip.EnableInClassList("tooltip--fixed", fixedSpot);
+        if (fixedSpot)
+        {
+            _tooltip.style.left = StyleKeyword.Null;
+            _tooltip.style.top = StyleKeyword.Null;
+            _tooltip.style.bottom = StyleKeyword.Null;
+            _tooltip.style.display = DisplayStyle.Flex;
+            return;
+        }
+
         Rect rootRect = _root.worldBound;
         Rect a = anchor.worldBound;
         float left = Mathf.Clamp(a.xMin - rootRect.xMin, 8f, Mathf.Max(8f, rootRect.width - 280f));
@@ -551,6 +559,13 @@ public class BattleUIManager : MonoBehaviour
             _tooltip.style.top = StyleKeyword.Auto;
         }
         _tooltip.style.display = DisplayStyle.Flex;
+    }
+
+    private static bool IsInsideCommandPanel(VisualElement e)
+    {
+        for (VisualElement p = e; p != null; p = p.parent)
+            if (p.ClassListContains("bottom-hud")) return true;
+        return false;
     }
 
     private void HideTooltip()
@@ -617,14 +632,28 @@ public class BattleUIManager : MonoBehaviour
         bool hasSpecials = activeUnit.specialAttacks != null && activeUnit.specialAttacks.Count > 0;
         bool hasItems = activeUnit.inventory != null && activeUnit.inventory.Count > 0;
 
-        if (_commandTitle != null) _commandTitle.text = $"{activeUnit.unitName} - your turn";
+        _playerTurn = true;
+        if (_commandRound != null && _battleManager != null) _commandRound.text = $"Round {_battleManager.BattleRounds}";
+
+        // Default target: keep the previous one while it is alive, otherwise the first living enemy.
+        var living = _battleManager.GetAliveEnemies();
+        if (_selectedTarget == null || _selectedTarget.isDead || !living.Contains(_selectedTarget))
+            _selectedTarget = living.Count > 0 ? living[0] : null;
+        Nameplates.SetTarget(_selectedTarget);
+
         AttackAction basic = activeUnit.basicAttack;
         if (_attackSub != null)
-            _attackSub.text = basic == null ? "" : basic.isSummon ? "summon" : $"{basic.minDamage}-{basic.maxDamage} dmg";
+            _attackSub.text = basic == null ? "" : basic.isSummon ? "Summon" : $"{basic.minDamage}\u2013{basic.maxDamage} dmg";
         if (_specialSub != null)
-            _specialSub.text = hasSpecials ? $"{activeUnit.specialAttacks.Count} known" : "none";
+        {
+            int n = activeUnit.specialAttacks?.Count ?? 0;
+            AttackAction first = n > 0 ? activeUnit.specialAttacks[0] : null;
+            _specialSub.text = n == 0 ? "None learned"
+                : n == 1 && first != null ? (first.manaCost > 0 ? $"{first.actionName} \u00b7 {first.manaCost} MP" : first.actionName)
+                : $"{n} known";
+        }
         if (_itemSub != null)
-            _itemSub.text = hasItems ? $"{activeUnit.inventory.Count} in pack" : "empty";
+            _itemSub.text = hasItems ? $"{activeUnit.inventory.Count} in pack" : "Empty";
 
         _attackBtn?.SetEnabled(true);
         _specialBtn?.SetEnabled(hasSpecials);
@@ -636,6 +665,8 @@ public class BattleUIManager : MonoBehaviour
     {
         if (!EnsureUiReady()) return;
         HideTooltip();
+        _playerTurn = false;
+        Nameplates.SetTarget(null);
         _targetPanelZone?.Clear();
         if (_targetPanelZone != null) _targetPanelZone.style.display = DisplayStyle.None;
         if (_actionZone != null) _actionZone.style.display = DisplayStyle.None;
@@ -651,6 +682,8 @@ public class BattleUIManager : MonoBehaviour
             return;
         }
 
+        _playerTurn = false;
+        Nameplates.SetTarget(null);
         _targetPanelZone?.Clear();
         if (_targetPanelZone != null) _targetPanelZone.style.display = DisplayStyle.None;
         if (_actionZone != null) _actionZone.style.display = DisplayStyle.Flex;
@@ -688,18 +721,22 @@ public class BattleUIManager : MonoBehaviour
 
     private void HandleDefendClicked() => _battleManager?.PlayerDefend();
 
-    /// <summary>AoE attacks fire immediately; single-target attacks open the target list.</summary>
+    /// <summary>AoE attacks fire at once; single-target attacks hit the enemy chosen by clicking its nameplate.</summary>
     private void SelectTargetFor(AttackAction action)
     {
         var enemies = _battleManager.GetAliveEnemies();
-        if (action.isAoE)
-        {
-            if (enemies.Count > 0) _battleManager.PlayerSelectTarget(enemies[0], action);
-        }
-        else
-        {
-            ShowTargetSelection(action, enemies);
-        }
+        if (enemies.Count == 0) return;
+
+        Unit target = action.isAoE || _selectedTarget == null || _selectedTarget.isDead
+            ? enemies[0] : _selectedTarget;
+        _battleManager.PlayerSelectTarget(target, action);
+    }
+
+    private void OnPlateClicked(Unit unit)
+    {
+        if (!_playerTurn || unit == null || unit.isPlayer || unit.isDead) return;
+        _selectedTarget = unit;
+        Nameplates.SetTarget(unit);
     }
 
     // ─── SUB-MENUS ─────────────────────────────────────────────────────────
@@ -773,24 +810,6 @@ public class BattleUIManager : MonoBehaviour
         });
     }
 
-    private void ShowTargetSelection(AttackAction selectedAction, List<Unit> enemies)
-    {
-        OpenSubMenu(() =>
-        {
-            SetMessage($"Select target for {selectedAction.actionName}");
-            foreach (Unit enemy in enemies)
-            {
-                Unit captured = enemy;
-                SpawnMenuButton(enemy.unitName, true, () =>
-                {
-                    _targetPanelZone?.Clear();
-                    _battleManager.PlayerSelectTarget(captured, selectedAction);
-                }, enemy.unitName, $"HP {enemy.currentHealth}/{enemy.maxHealth}");
-            }
-            SpawnMenuButton("Back", true, ShowCommandMenu);
-        });
-    }
-
     public void ClearTargetButtons()
     {
         if (!EnsureUiReady()) return;
@@ -823,7 +842,26 @@ public class BattleUIManager : MonoBehaviour
         AddLogEntry(msg, logType);
     }
 
-    public void ClearBattleLog() => _battleLogContent?.Clear();
+    public void ClearBattleLog()
+    {
+        _battleLogContent?.Clear();
+        HideClaimButton();
+    }
+
+    /// <summary>Shows the gold button in the combat-log header (e.g. "CLAIM SPOILS") until it is clicked.</summary>
+    public void ShowClaimButton(string text, Action onClick)
+    {
+        if (!EnsureUiReady() || _claimBtn == null) { onClick?.Invoke(); return; }
+        _claimBtn.text = text;
+        _claimBtn.clickable = new Clickable(() =>
+        {
+            HideClaimButton();
+            onClick?.Invoke();
+        });
+        _claimBtn.AddToClassList("claim-btn--shown");
+    }
+
+    public void HideClaimButton() => _claimBtn?.RemoveFromClassList("claim-btn--shown");
 
     /// <summary>Adds an entry to the battle log (newest at top, older entries fade).</summary>
     public void AddLogEntry(string msg, LogEntryType type = LogEntryType.Normal)
@@ -912,7 +950,6 @@ public class BattleUIManager : MonoBehaviour
     {
         HidePanel(_intermissionPanel);
         HidePanel(_summaryPanel);
-        HidePanel(_victoryPanel);
         SetOverlayOpen(false);
     }
 
@@ -971,6 +1008,7 @@ public class BattleUIManager : MonoBehaviour
         }
         _upgradeChoices?.Clear();
         _rerollContainer?.Clear();
+        _root?.Q<VisualElement>("path-track")?.RemoveFromHierarchy();
     }
 
     private void EndChoiceScreen()
@@ -1003,32 +1041,6 @@ public class BattleUIManager : MonoBehaviour
             pill.AddToClassList(extraClass);
             parent.Add(pill);
         }
-    }
-
-    /// <summary>Full-screen victory card shown after boss and mini-boss fights, before the loot screen.</summary>
-    public void ShowVictory(int clearedEncounter, int rounds, int goldEarned, int totalGold,
-                            IEnumerable<string> foes, Action onClaim)
-    {
-        if (!EnsureUiReady() || _victoryPanel == null) { onClaim?.Invoke(); return; }
-        HideOverlays();
-        ClearTargetButtons();
-        ClearTurnOrder();
-
-        if (_victorySub != null)
-            _victorySub.text = $"ENCOUNTER {clearedEncounter} CLEARED IN {rounds} ROUND{(rounds == 1 ? "" : "S")}";
-        if (_victoryGold != null) _victoryGold.text = $"+{goldEarned}";
-        if (_victoryGoldTotal != null) _victoryGoldTotal.text = $"{totalGold} total";
-        if (_victoryFoes != null)
-        {
-            _victoryFoes.Clear();
-            AddPills(_victoryFoes, foes, "loot-pill--foe");
-        }
-        if (_victoryClaim != null)
-        {
-            _victoryClaim.clickable = new Clickable(() => onClaim?.Invoke());
-        }
-        SetOverlayOpen(true);
-        ShowPanel(_victoryPanel);
     }
 
     /// <summary>
@@ -1089,28 +1101,42 @@ public class BattleUIManager : MonoBehaviour
             }
             _rerollContainer.Add(collected);
 
-            // Footer: reroll | hint | take
+            // Footer: reroll | hint | take (becomes "claimed" + continue after taking)
             var footer = new VisualElement();
             footer.AddToClassList("loot-footer");
 
-            if (onReroll != null)
+            var rerollBtn = new Button { text = onReroll != null ? "REROLL \u00b7 1 LEFT" : "REROLL \u00b7 0 LEFT" };
+            rerollBtn.AddToClassList("menu-button");
+            rerollBtn.AddToClassList("reroll-button");
+            rerollBtn.SetEnabled(onReroll != null);
+            rerollBtn.clicked += () =>
             {
-                var rerollBtn = new Button { text = "REROLL" };
-                rerollBtn.AddToClassList("menu-button");
-                rerollBtn.AddToClassList("reroll-button");
-                rerollBtn.clicked += () =>
-                {
-                    rerollBtn.SetEnabled(false);
-                    onReroll.Invoke();
-                };
-                footer.Add(rerollBtn);
-            }
+                rerollBtn.SetEnabled(false);
+                onReroll?.Invoke();
+            };
+            footer.Add(rerollBtn);
 
             hint = new Label("Select a reward.");
             hint.AddToClassList("loot-hint");
             footer.Add(hint);
 
-            takeBtn = new Button(() => { if (selected != null) onChoose?.Invoke(selected); }) { text = "TAKE REWARD" };
+            takeBtn = new Button(() =>
+            {
+                if (selected == null) return;
+                RewardChoice taken = selected;
+
+                foreach (VisualElement card in _upgradeChoices.Children()) card.pickingMode = PickingMode.Ignore;
+                footer.Clear();
+
+                var done = new Label($"\u2713  {taken.name} claimed.");
+                done.AddToClassList("loot-claimed");
+                footer.Add(done);
+
+                var cont = new Button(() => onChoose?.Invoke(taken)) { text = "CONTINUE  >" };
+                cont.AddToClassList("reward-button");
+                cont.AddToClassList("loot-take");
+                footer.Add(cont);
+            }) { text = "TAKE REWARD" };
             takeBtn.AddToClassList("reward-button");
             takeBtn.AddToClassList("loot-take");
             takeBtn.SetEnabled(false);
@@ -1154,13 +1180,109 @@ public class BattleUIManager : MonoBehaviour
     public void ShowRoomChoices(int clearedEncounter, List<RoomChoice> choices, Action<RoomChoice> onChoose)
     {
         if (!EnsureUiReady()) return;
-        BeginChoiceScreen("Choose Your Path", $"Encounter {clearedEncounter} cleared.", "Choose where to go next:");
+        BeginChoiceScreen("Choose Your Path", $"Encounter {clearedEncounter} cleared.",
+                          choices != null && choices.Count == 1 ? "ONE PATH AHEAD" : "CHOOSE WHERE TO GO NEXT");
 
-        if (_upgradeChoices != null)
+        // Run progress track, inserted between the heading and the cards.
+        VisualElement layout = _upgradeChoices?.parent;
+        if (layout != null)
+        {
+            VisualElement track = BuildPathTrack(clearedEncounter);
+            layout.Insert(layout.IndexOf(_upgradeChoices), track);
+        }
+
+        RoomChoice selected = choices != null && choices.Count > 0 ? choices[0] : null;
+        VisualElement selectedCard = null;
+        Button enterBtn = null;
+
+        if (_upgradeChoices != null && choices != null)
+        {
             foreach (RoomChoice choice in choices)
-                _upgradeChoices.Add(RewardCardBuilder.CreateRoomCard(choice, onChoose));
+            {
+                VisualElement card = RewardCardBuilder.CreateRoomCard(choice, (c, picked) =>
+                {
+                    selectedCard?.RemoveFromClassList("reward-card--selected");
+                    selected = picked;
+                    selectedCard = c;
+                    c.AddToClassList("reward-card--selected");
+                    if (enterBtn != null) enterBtn.text = $"ENTER {picked.title.ToUpperInvariant()}  >";
+                });
+                _upgradeChoices.Add(card);
+                if (choice == selected)
+                {
+                    selectedCard = card;
+                    card.AddToClassList("reward-card--selected");
+                }
+            }
+        }
+
+        if (_rerollContainer != null && selected != null)
+        {
+            enterBtn = new Button(() => { if (selected != null) onChoose?.Invoke(selected); })
+            {
+                text = $"ENTER {selected.title.ToUpperInvariant()}  >"
+            };
+            enterBtn.AddToClassList("reward-button");
+            enterBtn.AddToClassList("loot-take");
+            enterBtn.AddToClassList("path-enter");
+            _rerollContainer.Add(enterBtn);
+        }
 
         EndChoiceScreen();
+    }
+
+    /// <summary>Encounter progress: cleared rooms, the next one, a few ahead, then the next boss.</summary>
+    private static VisualElement BuildPathTrack(int cleared)
+    {
+        var track = new VisualElement { name = "path-track" };
+        track.AddToClassList("path-track");
+
+        int boss = (cleared / 10 + 1) * 10;
+        var steps = new List<(string label, string mark, string cls)>();
+        steps.Add(($"ENC {cleared}", "\u2713", "path-step--done"));
+        int enc = cleared + 1;
+        bool first = true;
+        while (enc < boss && steps.Count < 4)
+        {
+            steps.Add(($"ENC {enc}", enc.ToString(), first ? "path-step--next" : "path-step--ahead"));
+            first = false;
+            enc++;
+        }
+        bool gap = enc < boss;
+        steps.Add(("BOSS", "!", boss == cleared + 1 ? "path-step--boss path-step--next" : "path-step--boss"));
+
+        for (int i = 0; i < steps.Count; i++)
+        {
+            if (i > 0)
+            {
+                var line = new VisualElement();
+                line.AddToClassList("path-line");
+                if (i == 1) line.AddToClassList("path-line--lit");
+                track.Add(line);
+                if (gap && i == steps.Count - 1)
+                {
+                    var dots = new Label("\u2026");
+                    dots.AddToClassList("path-gap");
+                    track.Add(dots);
+                    var line2 = new VisualElement();
+                    line2.AddToClassList("path-line");
+                    track.Add(line2);
+                }
+            }
+
+            var step = new VisualElement();
+            step.AddToClassList("path-step");
+            foreach (string c in steps[i].cls.Split(' ')) step.AddToClassList(c);
+
+            var dot = new Label(steps[i].mark);
+            dot.AddToClassList("path-dot");
+            step.Add(dot);
+            var lbl = new Label(steps[i].label);
+            lbl.AddToClassList("path-label");
+            step.Add(lbl);
+            track.Add(step);
+        }
+        return track;
     }
 
     public void ShowRunSummary(bool won, int reachedEncounter, int gold)

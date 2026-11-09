@@ -12,7 +12,7 @@
     --iron: rgb(92, 74, 54);
     --iron-dark: rgb(58, 46, 34);
     --iron-light: rgb(120, 98, 70);
-    --line: rgb(74, 59, 44);
+    --line: rgb(61, 50, 40);
 
     --torch: rgb(224, 178, 86);
     --torch-dim: rgb(150, 115, 52);
@@ -31,7 +31,7 @@
 
 .battle-root {
     -unity-font-definition: url("/Assets/Fonts/BarlowCondensed-Regular.ttf");
-    font-size: 16px;
+    font-size: 20px;
     position: absolute;
     left: 0;
     right: 0;
@@ -102,7 +102,7 @@
 
 .turn-order-wrap {
     position: absolute;
-    top: 10px;
+    top: 18px;
     left: 0;
     right: 0;
     align-items: center;
@@ -111,16 +111,16 @@
 .turn-order-panel {
     flex-direction: row;
     align-items: center;
-    padding: 6px 12px;
-    background-color: rgba(12, 10, 10, 0.95);
+    padding: 8px 12px;
+    background-color: rgba(18, 14, 12, 0.88);
     border-width: 2px;
     border-color: var(--line);
 }
 
 .turn-order-title {
     margin-right: 12px;
-    font-size: 12px;
-    letter-spacing: 3px;
+    font-size: 14px;
+    letter-spacing: 2px;
     color: var(--muted);
 }
 
@@ -132,7 +132,7 @@
 .turn-chip {
     width: 40px;
     height: 40px;
-    margin: 0 3px;
+    margin: 0 4px;
     background-color: var(--stone-1);
     background-size: cover;
     -unity-background-scale-mode: scale-and-crop;
@@ -146,25 +146,22 @@
     transition-duration: 0.2s;
 }
 
-.turn-chip--player { border-color: rgb(78, 120, 190); }
-.turn-chip--enemy  { border-color: rgb(150, 64, 58); }
+.turn-chip--player { border-color: var(--torch); }
+.turn-chip--enemy  { border-color: rgb(154, 59, 51); }
 
 .turn-chip--active {
-    scale: 1.2 1.2;
+    scale: 1.18 1.18;
     opacity: 1;
-    margin: 0 7px;
-    border-color: var(--torch);
+    margin: 0 8px;
     background-color: rgb(60, 46, 24);
 }
 
-.turn-chip--dead {
-    opacity: 0.18;
-}
+.turn-chip--dead { opacity: 0.18; }
 
 .turn-chip-letter {
     -unity-font-definition: url("/Assets/Fonts/Cinzel.ttf");
     color: var(--parchment);
-    font-size: 16px;
+    font-size: 15px;
     -unity-font-style: bold;
 }
 
@@ -185,7 +182,7 @@
 .turn-divider {
     width: 2px;
     height: 30px;
-    margin: 0 8px;
+    margin: 0 6px;
     background-color: var(--iron);
 }
 
@@ -193,17 +190,12 @@
 
 .run-hud {
     position: absolute;
-    top: 10px;
-    left: 10px;
-    padding: 8px 12px;
-    background-color: rgba(12, 10, 10, 0.95);
+    top: 20px;
+    left: 24px;
+    padding: 10px 18px;
+    background-color: rgba(18, 14, 12, 0.88);
     border-width: 2px;
     border-color: var(--line);
-}
-
-.run-hud-title {
-    -unity-font-definition: url("/Assets/Fonts/Cinzel.ttf");
-    font-size: 18px;
 }
 
 .run-hud-row {
@@ -212,9 +204,16 @@
 }
 
 .run-hud-label {
-    font-size: 17px;
+    font-size: 18px;
     -unity-font-style: bold;
     color: var(--parchment);
+}
+
+.run-hud-title {
+    -unity-font-definition: url("/Assets/Fonts/Cinzel.ttf");
+    margin-bottom: 4px;
+    font-size: 18px;
+    letter-spacing: 1px;
 }
 
 .gold-label {
@@ -230,20 +229,21 @@
 }
 
 .gold-icon {
-    width: 20px;
-    height: 20px;
-    margin-right: 5px;
-    background-image: url("/Assets/Violet Theme Ui/Colored Icons/Coin.png");
-    -unity-background-scale-mode: scale-to-fit;
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
+    border-radius: 8px;
+    background-color: var(--torch);
+    border-width: 2px;
+    border-color: rgb(138, 100, 32);
 }
 
 .room-badge {
     display: none;
-    margin-left: 8px;
-    padding: 1px 7px;
-    font-size: 11px;
+    margin-left: 10px;
+    padding: 1px 8px;
+    font-size: 13px;
     -unity-font-style: bold;
-    border-radius: 3px;
     color: var(--stone-0);
 }
 
@@ -262,9 +262,9 @@
 
 .run-rewards {
     position: absolute;
-    top: 82px;
-    left: 10px;
-    max-width: 260px;
+    top: 100px;
+    left: 24px;
+    max-width: 300px;
     max-height: 26%;
     flex-direction: row;
     flex-wrap: wrap;
@@ -292,13 +292,13 @@
 
 .stats-panel-left {
     position: absolute;
-    left: 10px;
-    bottom: 10px;
-    width: 300px;
-    padding: 10px 12px;
-    background-color: rgba(12, 10, 10, 0.95);
+    left: 24px;
+    bottom: 24px;
+    width: 320px;
+    padding: 14px 16px;
+    background-color: rgba(18, 14, 12, 0.92);
     border-width: 2px;
-    border-color: var(--line);
+    border-color: var(--iron);
 }
 
 .stats-panel-head {
@@ -307,8 +307,8 @@
 }
 
 .stats-panel-portrait {
-    width: 58px;
-    height: 58px;
+    width: 56px;
+    height: 56px;
     flex-shrink: 0;
     margin-right: 12px;
     background-color: var(--stone-1);
@@ -324,7 +324,7 @@
 .stats-panel-name {
     -unity-font-definition: url("/Assets/Fonts/Cinzel.ttf");
     margin-bottom: 4px;
-    font-size: 19px;
+    font-size: 18px;
     -unity-font-style: bold;
     -unity-text-align: middle-left;
     color: var(--parchment);
@@ -332,8 +332,8 @@
 
 .stats-panel-hp,
 .stats-panel-mp {
-    height: 15px;
-    margin-bottom: 3px;
+    height: 16px;
+    margin-bottom: 4px;
 }
 
 .stats-panel-hp .unity-progress-bar__container,
@@ -341,54 +341,59 @@
     height: 100%;
 }
 
-.stats-panel-hp .unity-progress-bar__background,
-.stats-panel-mp .unity-progress-bar__background {
-    background-color: rgb(30, 24, 20);
-    border-width: 0;
-}
-
-.stats-panel-hp .unity-progress-bar__progress { background-color: rgb(78, 168, 96); }
-.stats-panel-mp .unity-progress-bar__progress { background-color: var(--mp); }
+.stats-panel-hp .unity-progress-bar__background { background-color: rgb(31, 42, 32); border-width: 0; }
+.stats-panel-mp .unity-progress-bar__background { background-color: rgb(28, 35, 51); border-width: 0; }
+.stats-panel-hp .unity-progress-bar__progress { background-color: rgb(76, 175, 106); }
+.stats-panel-mp .unity-progress-bar__progress { background-color: rgb(74, 120, 196); }
 
 .stats-panel-hp .unity-progress-bar__title,
 .stats-panel-mp .unity-progress-bar__title {
     font-size: 13px;
-    color: var(--parchment);
+    -unity-font-style: bold;
+    color: rgb(255, 255, 255);
 }
 
 .stats-panel-rows {
     flex-direction: row;
-    flex-wrap: wrap;
-    margin-top: 8px;
+    margin-top: 10px;
 }
 
 .stats-panel-row {
+    flex-grow: 1;
+    flex-basis: 0;
     flex-direction: row;
     align-items: center;
-    margin: 0 4px 2px 0;
-    padding: 1px 6px;
+    justify-content: center;
+    height: 30px;
+    margin: 0 3px;
+    background-color: rgb(31, 25, 21);
     border-width: 1px;
     border-color: var(--line);
-    background-color: rgba(0, 0, 0, 0);
     transition-property: background-color;
     transition-duration: 0.35s;
 }
 
 .stats-panel-row-icon {
-    width: 12px;
-    height: 12px;
-    margin-right: 4px;
-    -unity-background-scale-mode: scale-to-fit;
+    width: 8px;
+    height: 8px;
+    margin-right: 5px;
+    background-image: none;
+    background-color: var(--torch);
 }
 
+.stats-panel-row-icon.icon-sword  { background-color: rgb(224, 180, 90); }
+.stats-panel-row-icon.icon-shield { background-color: rgb(201, 122, 74); }
+.stats-panel-row-icon.icon-energy { background-color: rgb(232, 210, 90); }
+.stats-panel-row-icon.icon-clover { background-color: rgb(127, 191, 134); }
+
 .stats-panel-row-label {
-    margin-right: 4px;
-    font-size: 13px;
+    margin-right: 5px;
+    font-size: 15px;
     color: var(--muted);
 }
 
 .stats-panel-row-value {
-    font-size: 14px;
+    font-size: 15px;
     -unity-font-style: bold;
     color: var(--parchment);
 }
@@ -396,65 +401,70 @@
 .stats-panel-row--up   { background-color: rgba(110, 200, 120, 0.45); }
 .stats-panel-row--down { background-color: rgba(230, 90, 80, 0.45); }
 
-/* ── Battle log (bottom centre) ─────────────────────────────────────────── */
+/* ── Combat log (bottom centre) ─────────────────────────────────────────── */
 
 .battle-log {
     position: absolute;
-    left: 322px;
-    right: 272px;
-    bottom: 10px;
-    background-color: rgba(12, 10, 10, 0.95);
-    border-width: 2px;
+    left: 360px;
+    bottom: 24px;
+    width: 480px;
+    height: 120px;
+    padding: 8px 16px;
+    background-color: rgba(12, 10, 9, 0.78);
+    border-width: 1px;
     border-color: var(--line);
 }
 
+.battle-log-head {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 26px;
+    flex-shrink: 0;
+}
+
 .battle-log-header {
-    padding: 6px 12px 2px 12px;
-    font-size: 12px;
-    letter-spacing: 3px;
+    font-size: 14px;
+    letter-spacing: 2px;
     color: var(--muted);
 }
 
-.battle-log-header:hover {
-    color: var(--torch);
+.battle-log-header:hover { color: var(--torch); }
+
+.claim-btn {
+    display: none;
+    height: 26px;
+    margin: 0;
+    padding: 0 12px;
+    font-size: 15px;
+    letter-spacing: 1px;
+    -unity-font-style: bold;
+    color: var(--stone-0);
+    background-color: var(--torch);
+    border-width: 1px;
+    border-color: rgb(243, 208, 138);
 }
+
+.claim-btn--shown { display: flex; }
+
+.claim-btn:hover { background-color: rgb(240, 200, 118); }
 
 .battle-log-scroll {
-    height: 92px;
+    flex-grow: 1;
+    min-height: 0;
 }
 
-.battle-log-scroll .unity-scroller--vertical {
-    width: 6px;
-    margin-right: 2px;
-}
+.battle-log-scroll .unity-scroller--vertical { width: 6px; margin-right: 2px; }
+.battle-log-scroll .unity-base-slider__drag-container { margin: 0; }
+.battle-log-scroll .unity-base-slider__tracker { background-color: rgba(0, 0, 0, 0); border-width: 0; }
+.battle-log-scroll .unity-base-slider__dragger { width: 4px; background-color: var(--iron); border-width: 0; border-radius: 2px; }
+.battle-log-scroll .unity-repeat-button { display: none; }
 
-.battle-log-scroll .unity-base-slider__drag-container {
-    margin: 0;
-}
-
-.battle-log-scroll .unity-base-slider__tracker {
-    background-color: rgba(0, 0, 0, 0);
-    border-width: 0;
-}
-
-.battle-log-scroll .unity-base-slider__dragger {
-    width: 4px;
-    background-color: var(--iron);
-    border-width: 0;
-    border-radius: 2px;
-}
-
-.battle-log-scroll .unity-repeat-button {
-    display: none;
-}
-
-.battle-log-content {
-    padding: 2px 12px 6px 12px;
-}
+.battle-log-content { padding: 0; }
 
 .battle-log-entry {
     margin-bottom: 2px;
-    font-size: 16px;
+    font-size: 18px;
     white-space: normal;
     color: var(--parchment);
 }
@@ -468,114 +478,114 @@
 
 .bottom-hud {
     position: absolute;
-    right: 10px;
-    bottom: 10px;
-    width: 252px;
-    padding: 8px 10px 6px 10px;
-    background-color: rgba(12, 10, 10, 0.96);
+    right: 24px;
+    bottom: 24px;
+    width: 300px;
+    padding: 12px;
+    background-color: rgba(18, 14, 12, 0.94);
     border-width: 2px;
     border-color: var(--torch);
+}
+
+.command-head {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0 2px 6px 2px;
 }
 
 .command-title {
     -unity-font-definition: url("/Assets/Fonts/Cinzel.ttf");
-    margin: 0 0 6px 2px;
     font-size: 15px;
+    letter-spacing: 2px;
     -unity-font-style: bold;
     color: var(--torch);
 }
 
+.command-round {
+    font-size: 15px;
+    color: var(--muted);
+}
+
 .bottom-message-zone {
     position: absolute;
-    bottom: 160px;
+    top: 84px;
     left: 0;
     right: 0;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
 }
 
 .battle-message {
-    margin-bottom: 8px;
-    padding: 5px 18px;
+    padding: 6px 18px;
     font-size: 20px;
     -unity-text-align: middle-center;
     color: var(--parchment);
-    background-color: rgba(12, 10, 10, 0.95);
+    background-color: rgba(12, 10, 9, 0.9);
     border-width: 1px;
-    border-color: var(--line);
+    border-color: var(--iron);
 }
 
-.action-zone {
-    flex-shrink: 0;
-}
-
-.target-panel-zone {
-    flex-shrink: 0;
-}
+.action-zone { flex-shrink: 0; }
+.target-panel-zone { flex-shrink: 0; }
 
 .target-panel-zone .menu-button {
-    margin: 0 0 4px 0;
+    margin: 0 0 6px 0;
     min-width: 0;
-    height: 30px;
+    height: 44px;
     -unity-text-align: middle-left;
 }
 
 .action-btn {
-    height: 34px;
-    margin: 0 0 4px 0;
-    padding: 0 8px;
+    height: 44px;
+    margin: 0 0 6px 0;
+    padding: 0 14px;
     flex-direction: row;
     align-items: center;
-    background-color: var(--stone-1);
+    background-color: rgb(34, 27, 22);
     border-width: 2px;
     border-color: var(--line);
-    transition-property: background-color, border-color, translate;
-    transition-duration: 0.12s;
+    transition-property: background-color, border-color;
+    transition-duration: 0.1s;
 }
 
 .action-btn:hover {
-    background-color: var(--stone-3);
-    border-color: var(--torch);
+    background-color: var(--torch);
+    border-color: rgb(243, 208, 138);
 }
 
-.action-btn:active {
-    background-color: var(--stone-0);
-    translate: 0 1px;
-}
+.action-btn:active { background-color: var(--torch-dim); }
 
 .action-btn:disabled {
-    opacity: 0.35;
+    background-color: rgb(23, 19, 15);
+    border-color: rgb(42, 35, 29);
 }
 
-.action-btn--primary {
-    background-color: rgb(224, 178, 86);
-    border-color: rgb(224, 178, 86);
-}
-
-.action-btn--primary:hover {
-    background-color: rgb(240, 200, 118);
-    border-color: rgb(240, 200, 118);
-}
+.action-btn:disabled .action-btn-label,
+.action-btn:disabled .action-btn-sub { color: rgb(141, 127, 110); }
+.action-btn:disabled .action-btn-icon { opacity: 0.4; }
+.action-btn:disabled .action-btn-chevron { display: none; }
 
 .action-btn-icon {
     width: 20px;
     height: 20px;
     flex-shrink: 0;
-    margin-right: 8px;
+    margin-right: 10px;
     -unity-background-scale-mode: scale-to-fit;
 }
 
 .action-btn-label {
     -unity-font-definition: url("/Assets/Fonts/Cinzel.ttf");
     flex-grow: 1;
-    font-size: 16px;
+    font-size: 17px;
+    letter-spacing: 1px;
     -unity-font-style: bold;
     -unity-text-align: middle-left;
     color: var(--parchment);
 }
 
 .action-btn-sub {
-    font-size: 15px;
+    font-size: 16px;
     color: var(--muted);
 }
 
@@ -585,9 +595,163 @@
     color: var(--muted);
 }
 
-.action-btn--primary .action-btn-label,
-.action-btn--primary .action-btn-sub {
-    color: var(--stone-0);
+.action-btn:hover .action-btn-label,
+.action-btn:hover .action-btn-sub,
+.action-btn:hover .action-btn-chevron { color: var(--stone-0); }
+
+/* ── Nameplates (world-following, clickable on enemies) ─────────────────── */
+
+.nameplate-layer {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+}
+
+.np {
+    position: absolute;
+    width: 196px;
+    translate: -50% -100%;
+    background-color: rgba(12, 10, 9, 0.88);
+    border-width: 2px;
+    border-color: var(--line);
+}
+
+.np--player { width: 220px; }
+
+.np--enemy:hover { border-color: var(--iron-light); }
+
+.np--target {
+    background-color: rgba(40, 31, 24, 0.95);
+    border-color: var(--torch);
+}
+
+.np-name {
+    -unity-font-definition: url("/Assets/Fonts/Cinzel.ttf");
+    padding: 3px 4px;
+    font-size: 14px;
+    letter-spacing: 1px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    color: var(--parchment);
+}
+
+.np--player .np-name { color: rgb(169, 194, 238); font-size: 15px; }
+
+.np-hp {
+    height: 20px;
+    background-color: rgb(58, 29, 26);
+}
+
+.np--player .np-hp { background-color: rgb(31, 42, 32); }
+
+.np-hp-fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    background-color: rgb(201, 67, 58);
+}
+
+.np--player .np-hp-fill { background-color: rgb(76, 175, 106); }
+
+.np-hp-text {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    font-size: 15px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    color: rgb(255, 255, 255);
+}
+
+.np-mp {
+    height: 6px;
+    background-color: rgb(28, 35, 51);
+}
+
+.np--player .np-mp { height: 12px; }
+
+.np-mp-fill {
+    height: 100%;
+    background-color: rgb(74, 120, 196);
+}
+
+.np-status {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: 4px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.np-tag {
+    margin: 0 3px 3px 3px;
+    padding: 0 6px;
+    font-size: 13px;
+    letter-spacing: 1px;
+    background-color: rgba(12, 10, 9, 0.9);
+    border-width: 1px;
+}
+
+.np-chip {
+    width: 24px;
+    height: 24px;
+    margin: 0 3px 3px 3px;
+    border-width: 1px;
+    border-color: rgb(12, 10, 9);
+    -unity-background-scale-mode: scale-to-fit;
+    align-items: center;
+    justify-content: center;
+}
+
+.np-chip-letter {
+    font-size: 14px;
+    -unity-font-style: bold;
+    color: rgb(255, 255, 255);
+}
+
+.np-chip-turns {
+    position: absolute;
+    right: 1px;
+    bottom: 0;
+    font-size: 11px;
+    color: rgb(255, 255, 178);
+}
+
+.np-affixes {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: 32px;
+    align-items: center;
+}
+
+.np-affix {
+    font-size: 15px;
+    -unity-font-style: bold;
+}
+
+.np-ring {
+    position: absolute;
+    display: none;
+    width: 150px;
+    height: 34px;
+    translate: -50% -50%;
+    border-radius: 75px;
+    border-width: 2px;
+    border-color: rgba(0, 0, 0, 0);
+}
+
+.np-ring--on {
+    border-color: var(--torch);
 }
 
 /* ── Overlays (rewards / events / summary) ──────────────────────────────── */
@@ -694,17 +858,18 @@
     padding: 5px 10px;
     background-color: rgba(0, 0, 0, 0.35);
     border-bottom-width: 2px;
-    border-bottom-color: var(--iron);
+    border-bottom-color: rgb(179, 164, 144);
 }
 
 .reward-card-tag {
-    font-size: 12px;
-    letter-spacing: 1px;
-    color: var(--muted);
+    font-size: 13px;
+    letter-spacing: 2px;
+    color: rgb(179, 164, 144);
 }
 
 .reward-card-type-label {
-    font-size: 13px;
+    color: rgb(179, 164, 144);
+    font-size: 14px;
     -unity-font-style: bold;
     letter-spacing: 2px;
     color: var(--parchment);
@@ -802,18 +967,22 @@
 /* rarity variants: coloured header line + label */
 .reward-card--legendary { border-color: rgb(110, 76, 150); }
 .reward-card--legendary .reward-card-type { border-bottom-color: var(--violet); }
-.reward-card--legendary .reward-card-type-label { color: var(--violet); }
+.reward-card--legendary .reward-card-type-label,
+.reward-card--legendary .reward-card-tag { color: rgb(195, 154, 240); }
 
-.reward-card--relic { border-color: rgb(140, 110, 50); }
-.reward-card--relic .reward-card-type { border-bottom-color: var(--gold); }
-.reward-card--relic .reward-card-type-label { color: var(--gold); }
+.reward-card--relic { border-color: rgba(240, 163, 90, 0.55); }
+.reward-card--relic .reward-card-type { border-bottom-color: rgb(240, 163, 90); }
+.reward-card--relic .reward-card-type-label,
+.reward-card--relic .reward-card-tag { color: rgb(240, 163, 90); }
 
 .reward-card--curse { border-color: rgb(80, 110, 56); }
 .reward-card--curse .reward-card-type { border-bottom-color: var(--curse); }
-.reward-card--curse .reward-card-type-label { color: var(--curse); }
+.reward-card--curse .reward-card-type-label,
+.reward-card--curse .reward-card-tag { color: var(--curse); }
 
 .reward-card--skill .reward-card-type { border-bottom-color: rgb(110, 160, 230); }
-.reward-card--skill .reward-card-type-label { color: rgb(110, 160, 230); }
+.reward-card--skill .reward-card-type-label,
+.reward-card--skill .reward-card-tag { color: rgb(143, 178, 238); }
 
 /* pick-then-confirm loot cards */
 .reward-card--pick:hover { scale: 1.02 1.02; }
@@ -830,16 +999,23 @@
 .tooltip {
     position: absolute;
     display: none;
-    max-width: 260px;
-    padding: 7px 10px;
-    background-color: rgb(14, 11, 13);
-    border-radius: 4px;
+    width: 250px;
+    padding: 12px 14px;
+    background-color: rgba(12, 10, 9, 0.96);
     border-width: 2px;
-    border-color: var(--torch-dim);
+    border-color: var(--iron);
+}
+
+.tooltip--fixed {
+    right: 336px;
+    top: 444px;
+    bottom: auto;
+    left: auto;
 }
 
 .tooltip-title {
-    font-size: 15px;
+    -unity-font-definition: url("/Assets/Fonts/Cinzel.ttf");
+    font-size: 16px;
     -unity-font-style: bold;
     color: var(--torch);
 }
@@ -1021,82 +1197,88 @@
     padding: 0 14px;
 }
 
-/* ── Victory screen ─────────────────────────────────────────────────────── */
-
-.victory-layout {
-    align-items: center;
-}
-
-.victory-title {
-    -unity-font-definition: url("/Assets/Fonts/Cinzel.ttf");
-    font-size: 64px;
-    -unity-font-style: bold;
-    letter-spacing: 12px;
-    color: var(--torch);
-}
-
-.victory-sub {
-    margin-top: 2px;
-    font-size: 17px;
-    letter-spacing: 3px;
-    color: var(--muted);
-}
-
-.victory-card {
-    width: 520px;
-    margin-top: 22px;
-    padding: 18px 22px;
-    background-color: var(--stone-1);
-    border-width: 2px;
-    border-color: var(--line);
-}
-
-.victory-row {
-    flex-direction: row;
-    align-items: flex-start;
-}
-
-.victory-block {
-    margin-right: 30px;
-}
-
-.victory-block--grow {
-    flex-grow: 1;
-    flex-shrink: 1;
-    margin-right: 0;
-}
-
-.victory-label {
-    font-size: 13px;
-    letter-spacing: 3px;
-    color: var(--muted);
-}
-
-.victory-gold {
-    -unity-font-definition: url("/Assets/Fonts/Cinzel.ttf");
-    font-size: 34px;
-    -unity-font-style: bold;
-    color: var(--torch);
-}
-
-.victory-small {
-    font-size: 14px;
-    color: var(--muted);
-}
-
-.victory-claim {
-    height: 46px;
-    margin: 20px 0 0 0;
-    font-size: 17px;
-    letter-spacing: 3px;
-}
-
 /* Full-screen overlays hide the in-battle HUD behind them (run info stays for gold). */
 .overlay-open .stats-panel-left,
 .overlay-open .battle-log,
 .overlay-open .bottom-hud,
 .overlay-open .bottom-message-zone,
 .overlay-open .turn-order-wrap,
-.overlay-open .run-rewards {
+.overlay-open .run-rewards,
+.overlay-open .nameplate-layer {
     display: none;
 }
+
+/* ── Loot footer states ─────────────────────────────────────────────────── */
+
+.loot-claimed {
+    flex-grow: 1;
+    font-size: 19px;
+    -unity-text-align: middle-left;
+    color: var(--parchment);
+}
+
+/* ── Choose your path ───────────────────────────────────────────────────── */
+
+.room-card { width: 230px; min-height: 244px; }
+
+.room-card-stats {
+    margin-top: 6px;
+    padding: 10px 14px 14px 14px;
+    border-top-width: 1px;
+    border-top-color: var(--line);
+}
+
+.room-card-stat {
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 4px;
+}
+
+.room-card-stat-label { font-size: 16px; color: var(--muted); }
+.room-card-stat-value { font-size: 16px; color: var(--parchment); }
+
+.path-enter { align-self: center; min-width: 300px; }
+
+.path-track {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: center;
+    margin: 10px 0 4px 0;
+}
+
+.path-step {
+    width: 64px;
+    align-items: center;
+}
+
+.path-dot {
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    border-radius: 16px;
+    border-width: 2px;
+    color: rgb(141, 127, 110);
+    background-color: rgb(28, 23, 19);
+    border-color: var(--line);
+}
+
+.path-label { margin-top: 4px; font-size: 13px; letter-spacing: 1px; color: rgb(141, 127, 110); }
+
+.path-step--done .path-dot { background-color: var(--torch); color: var(--stone-0); border-color: rgb(243, 208, 138); }
+.path-step--done .path-label { color: var(--parchment); }
+.path-step--next .path-dot { background-color: rgb(42, 33, 24); color: var(--torch); border-color: var(--torch); }
+.path-step--next .path-label { color: var(--parchment); }
+.path-step--boss .path-dot { background-color: rgb(42, 23, 21); color: rgb(255, 157, 144); border-color: rgb(154, 59, 51); }
+
+.path-line {
+    width: 36px;
+    height: 2px;
+    margin-top: 15px;
+    background-color: var(--line);
+}
+
+.path-line--lit { background-color: var(--torch); }
+
+.path-gap { margin-top: 6px; font-size: 18px; color: rgb(141, 127, 110); }
