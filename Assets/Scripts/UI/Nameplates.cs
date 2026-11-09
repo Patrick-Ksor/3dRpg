@@ -22,6 +22,47 @@ public static class Nameplates
         s_Layer = layer;
         s_OnEnemyClicked = onEnemyClicked;
         s_Plates.Clear();
+        s_Layer?.schedule.Execute(SeparatePlates).Every(16);
+    }
+
+    /// <summary>
+    /// Plates follow their unit's screen x. When units stand close together the plates would overlap, so spread
+    /// them apart left-to-right while keeping the group centred on where the units are.
+    /// </summary>
+    private static void SeparatePlates()
+    {
+        var visible = new List<Plate>();
+        foreach (Plate p in s_Plates) if (p.IsShown) visible.Add(p);
+        if (visible.Count == 0) return;
+
+        visible.Sort((a, b) => a.DesiredX.CompareTo(b.DesiredX));
+
+        const float gap = 8f;
+        var x = new float[visible.Count];
+        for (int i = 0; i < visible.Count; i++)
+        {
+            x[i] = visible[i].DesiredX;
+            if (i > 0)
+            {
+                float minX = x[i - 1] + visible[i - 1].Width * 0.5f + visible[i].Width * 0.5f + gap;
+                if (x[i] < minX) x[i] = minX;
+            }
+        }
+
+        // Re-centre pushed clusters so plates drift both ways, not all to the right.
+        int start = 0;
+        while (start < visible.Count)
+        {
+            int end = start;
+            while (end + 1 < visible.Count && x[end + 1] - x[end] <= visible[end].Width * 0.5f + visible[end + 1].Width * 0.5f + gap + 0.5f) end++;
+            float shift = 0f;
+            for (int i = start; i <= end; i++) shift += x[i] - visible[i].DesiredX;
+            shift /= (end - start + 1);
+            for (int i = start; i <= end; i++) x[i] -= shift;
+            start = end + 1;
+        }
+
+        for (int i = 0; i < visible.Count; i++) visible[i].SetLeft(x[i]);
     }
 
     public static Plate Create(Unit unit, bool isPlayer)
@@ -86,6 +127,11 @@ public static class Nameplates
         private readonly VisualElement _statusRow;
         private readonly VisualElement _affixRow;
         private string _lastStatusKey = "__init__";
+
+        public float DesiredX { get; private set; }
+        public bool IsShown { get; private set; }
+        public float Width => 224f;
+        public void SetLeft(float x) => _root.style.left = x;
 
         public Plate(Unit unit, bool isPlayer, Action<Unit> onClick, VisualElement layer)
         {
@@ -167,6 +213,7 @@ public static class Nameplates
 
             bool show = !Unit.isDead && cam.WorldToScreenPoint(anchorWorld).z > 0f;
             _root.style.display = show ? DisplayStyle.Flex : DisplayStyle.None;
+            IsShown = show;
             if (!show) { _ring.style.display = DisplayStyle.None; return; }
             _ring.style.display = DisplayStyle.Flex;
 
@@ -180,7 +227,7 @@ public static class Nameplates
 
             Vector2 p = RuntimePanelUtils.CameraTransformWorldToPanel(_root.panel, anchorWorld, cam);
             p.y = Mathf.Max(p.y, 205f);   // keep clear of the turn order and the banner
-            _root.style.left = p.x;
+            DesiredX = p.x;   // left is set by SeparatePlates so neighbouring plates do not overlap
             _root.style.top = p.y;
 
             Vector2 f = RuntimePanelUtils.CameraTransformWorldToPanel(_ring.panel, feetWorld, cam);

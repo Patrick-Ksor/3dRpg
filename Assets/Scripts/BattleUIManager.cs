@@ -705,7 +705,7 @@ public class BattleUIManager : MonoBehaviour
 
     private void HandleAttackClicked()
     {
-        if (_battleManager == null) return;
+        if (_battleManager == null || !_playerTurn) return;
         Unit activeUnit = _battleManager.GetActiveUnit();
         if (activeUnit == null) return;
 
@@ -719,17 +719,22 @@ public class BattleUIManager : MonoBehaviour
 
     private void HandleSpecialClicked()
     {
+        if (!_playerTurn) return;
         Unit activeUnit = _battleManager?.GetActiveUnit();
         if (activeUnit != null) ShowSpecialSelection(activeUnit);
     }
 
     private void HandleItemClicked()
     {
+        if (!_playerTurn) return;
         Unit activeUnit = _battleManager?.GetActiveUnit();
         if (activeUnit != null) ShowItemSelection(activeUnit);
     }
 
-    private void HandleDefendClicked() => _battleManager?.PlayerDefend();
+    private void HandleDefendClicked()
+    {
+        if (_playerTurn) _battleManager?.PlayerDefend();
+    }
 
     /// <summary>
     /// AoE attacks fire at once. Single-target skills use the enemy whose plate was clicked this turn; if there are
@@ -747,15 +752,50 @@ public class BattleUIManager : MonoBehaviour
             return;
         }
 
-        ShowCommandMenu();   // bring the command panel back while waiting
-        _pendingAction = action;
-        Nameplates.SetPicking(true);
-        SetMessage($"Choose a target for {action.actionName}: click an enemy.");
+        ShowTargetPrompt(action, enemies);
+    }
+
+    /// <summary>
+    /// Lists the living enemies under Commands (name + HP). Clicking a row, or an enemy's nameplate, fires the
+    /// pending skill. Hovering a row highlights that enemy in the scene.
+    /// </summary>
+    private void ShowTargetPrompt(AttackAction action, List<Unit> enemies)
+    {
+        OpenSubMenu(() =>
+        {
+            _pendingAction = action;
+            Nameplates.SetPicking(true);
+            SetMessage($"Choose a target for {action.actionName}.");
+
+            foreach (Unit enemy in enemies)
+            {
+                Unit captured = enemy;
+                var row = new Button(() => ChooseTarget(captured));
+                row.AddToClassList("menu-button");
+                row.AddToClassList("target-row");
+
+                var nameLabel = new Label(PrettyName(enemy.unitName)) { pickingMode = PickingMode.Ignore };
+                nameLabel.AddToClassList("target-row-name");
+                row.Add(nameLabel);
+                var hpLabel = new Label($"{enemy.currentHealth}/{enemy.maxHealth}") { pickingMode = PickingMode.Ignore };
+                hpLabel.AddToClassList("target-row-hp");
+                row.Add(hpLabel);
+
+                row.RegisterCallback<PointerEnterEvent>(_ => Nameplates.SetTarget(captured));   // highlight it in the scene
+                _targetPanelZone.Add(row);
+            }
+            SpawnMenuButton("Back", true, ShowCommandMenu);
+        });
     }
 
     private void OnPlateClicked(Unit unit)
     {
         if (!_playerTurn || unit == null || unit.isPlayer || unit.isDead) return;
+        ChooseTarget(unit);
+    }
+
+    private void ChooseTarget(Unit unit)
+    {
         _selectedTarget = unit;
         _targetChosen = true;
         Nameplates.SetTarget(unit);
@@ -765,6 +805,7 @@ public class BattleUIManager : MonoBehaviour
             AttackAction action = _pendingAction;
             _pendingAction = null;
             Nameplates.SetPicking(false);
+            _targetPanelZone?.Clear();
             _battleManager.PlayerSelectTarget(unit, action);
         }
     }
@@ -781,13 +822,14 @@ public class BattleUIManager : MonoBehaviour
     }
 
     private void SpawnMenuButton(string label, bool interactable, Action onClick,
-                                 string tooltipTitle = null, string tooltipBody = null)
+                                 string tooltipTitle = null, string tooltipBody = null, Action onHover = null)
     {
         if (!EnsureUiReady() || _targetPanelZone == null) return;
 
         var btn = new Button(() => onClick?.Invoke()) { text = label };
         btn.SetEnabled(interactable);
         btn.AddToClassList("menu-button");
+        if (onHover != null) btn.RegisterCallback<PointerEnterEvent>(_ => onHover());
         if (tooltipTitle != null || tooltipBody != null)
             RegisterTooltip(btn, () => (tooltipTitle ?? "", tooltipBody ?? ""));
         _targetPanelZone.Add(btn);

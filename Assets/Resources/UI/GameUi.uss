@@ -611,14 +611,14 @@
 
 .np {
     position: absolute;
-    width: 196px;
+    width: 224px;
     translate: -50% -100%;
     background-color: rgba(12, 10, 9, 0.88);
     border-width: 2px;
     border-color: var(--line);
 }
 
-.np--player { width: 220px; }
+.np--player { width: 224px; }
 
 .np--enemy:hover { border-color: var(--iron-light); }
 
@@ -629,11 +629,14 @@
 
 .np-name {
     -unity-font-definition: url("/Assets/Fonts/Cinzel.ttf");
-    padding: 3px 4px;
-    font-size: 14px;
-    letter-spacing: 1px;
+    padding: 3px 6px;
+    font-size: 13px;
+    letter-spacing: 0;
     -unity-font-style: bold;
     -unity-text-align: middle-center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     color: var(--parchment);
 }
 
@@ -1292,3 +1295,32 @@
 .np--pick:hover {
     background-color: rgba(88, 66, 30, 0.98);
 }
+
+/* Target list under Commands */
+.target-row {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 12px;
+}
+
+.target-row-name {
+    -unity-font-definition: url("/Assets/Fonts/BarlowCondensed-Regular.ttf");
+    flex-grow: 1;
+    flex-shrink: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 17px;
+    -unity-text-align: middle-left;
+}
+
+.target-row-hp {
+    -unity-font-definition: url("/Assets/Fonts/BarlowCondensed-Regular.ttf");
+    flex-shrink: 0;
+    margin-left: 8px;
+    font-size: 18px;
+    color: var(--muted);
+}
+
+.target-row:hover .target-row-hp { color: var(--stone-0); }
