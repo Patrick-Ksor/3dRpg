@@ -656,6 +656,7 @@ public class BaseBattleManager : MonoBehaviour
                 if (isCrit) RunManager.Instance?.CurrentRunStats?.AddPlayerCrit();
                 if (u.isDead) RunManager.Instance?.CurrentRunStats?.AddEnemyDefeated();
                 DamagePopSpawner.Show(u.transform, damage, isCrit ? PopType.Crit : PopType.Normal);
+                HitFeedback.Play(u, damage, isCrit);
                 _uiManager.UpdateHealth(u);
                 u.GetComponent<TraitAuraController>()?.RefreshDynamicAuras();
 
@@ -880,6 +881,7 @@ public class BaseBattleManager : MonoBehaviour
                 u.TakeDamage(playerDamage);
                 RunManager.Instance?.CurrentRunStats?.AddPlayerDamageTaken(playerDamage);
                 DamagePopSpawner.Show(u.transform, playerDamage, isCrit ? PopType.Crit : PopType.Normal);
+                HitFeedback.Play(u, playerDamage, isCrit);
                 _uiManager.UpdateHealth(u);
                 u.GetComponent<TraitAuraController>()?.RefreshDynamicAuras();
 
@@ -1503,6 +1505,7 @@ public class BaseBattleManager : MonoBehaviour
 
                 target.TakeDamage(damage, silent: false);
                 DamagePopSpawner.Show(target.transform, damage, isCrit ? PopType.Crit : PopType.Normal);
+                HitFeedback.Play(target, damage, isCrit);
                 _uiManager.UpdateHealth(target);
                 target.TriggerHitAnimation();
                 SpawnImpactEffect(target.transform.position, action.hitVfxPrefab, action.hitSoundEffect);

@@ -46,6 +46,7 @@ Unity 6 (URP 17, Input System, UI Toolkit + uGUI hybrid) 3D turn-based roguelike
 - `Editor/BattleEnvironmentGenerator` (village scatter) is legacy and points at `Assets/OccaSoftware`, which is git-ignored.
 
 ## Conventions and gotchas
+- Impact feel lives in `HitFeedback.Play(target, damage, crit)` (called next to each `DamagePopSpawner.Show` for a hit): target recoil (`Unit.PlayRecoil`), `CameraShake` trauma, and a very short `HitStop` on crits/kills. Unit movement is script-driven (root motion is forced off); the idle state is resolved from the controller's default state because prefabs name it `<Hero>_Idle`.
 - Units are re-instantiated every encounter; upgrades are re-applied from `RunManager` lists. Anything stored only on a `Unit` is lost between encounters.
 - Attack enhancements work by cloning the `AttackAction` asset (`Instantiate`) and replacing the reference on the unit; attacks are matched by `actionName`, so names must be unique per hero.
 - A hero's `Unit.unitName` is set from the prefab name and is the key for `LegendaryRelicSO.targetCharacterName`.

@@ -143,24 +143,69 @@ public class Unit : MonoBehaviour
         }
     }
 
+    private float _hitUntil;
+    private Coroutine _hitRoutine;
+    private Coroutine _recoilRoutine;
+
     public void TriggerHitAnimation()
     {
-        // If currently in Hit state, rewind it to the beginning so it "stutters" repeatedly
+        // If currently in a hit state, rewind it so rapid multi-hits keep flinching
         AnimatorStateInfo stateInfo = _animator.GetCurrentAnimatorStateInfo(0);
-        if (stateInfo.IsName("Hit") || stateInfo.IsName("GetHit") || stateInfo.IsName("Damage"))
+        if (stateInfo.IsName("Hit") || stateInfo.IsName("GetHit") || stateInfo.IsName("Damage")
+            || stateInfo.IsName("Barb_Hit") || stateInfo.IsName("Knight_Hit") || stateInfo.IsName("Skeleton_Hit"))
         {
             _animator.Play(stateInfo.fullPathHash, -1, 0f);
         }
 
-        StartCoroutine(HandleHitAnimation());
+        // One routine holds isHit until the LAST hit's window ends (overlapping routines used to clear it early).
+        _hitUntil = Time.time + 0.2f;
+        if (_hitRoutine == null) _hitRoutine = StartCoroutine(HandleHitAnimation());
     }
 
     private IEnumerator HandleHitAnimation()
     {
         _animator.SetBool("isHit", true);
-        // Wait a tiny bit just to ensure the state machine picks up the transition
-        yield return new WaitForSeconds(0.2f);
+        while (Time.time < _hitUntil) yield return null;
         _animator.SetBool("isHit", false);
+        _hitRoutine = null;
+    }
+
+    /// <summary>A quick shove backwards from the hit and an eased return. Skipped while the unit is away from home (lunging).</summary>
+    public void PlayRecoil(float distance)
+    {
+        if (isDead) return;
+        if ((transform.position - _homePosition).sqrMagnitude > 0.04f) return;
+        if (_recoilRoutine != null) StopCoroutine(_recoilRoutine);
+        _recoilRoutine = StartCoroutine(RecoilRoutine(distance));
+    }
+
+    private IEnumerator RecoilRoutine(float distance)
+    {
+        Vector3 back = -(_homeRotation * Vector3.forward);   // units face their opponent, so "back" is away from the fight
+        back.y = 0f;
+        back.Normalize();
+
+        const float outTime = 0.06f, backTime = 0.24f;
+        float t = 0f;
+        while (t < outTime)
+        {
+            t += Time.deltaTime;
+            float k = 1f - Mathf.Pow(1f - Mathf.Clamp01(t / outTime), 2f);   // fast ease-out
+            transform.position = _homePosition + back * (distance * k);
+            yield return null;
+        }
+
+        t = 0f;
+        while (t < backTime)
+        {
+            t += Time.deltaTime;
+            float k = Mathf.SmoothStep(1f, 0f, Mathf.Clamp01(t / backTime));
+            transform.position = _homePosition + back * (distance * k);
+            yield return null;
+        }
+
+        transform.position = _homePosition;
+        _recoilRoutine = null;
     }
 
     public IEnumerator PerformAttackLunge(Transform target, AttackAction action, System.Action onHit, System.Action<Transform> onExtraHit = null, System.Action<Transform> onSpawnVfx = null, List<Transform> aoeTargets = null, Vector3? overrideLungePos = null)
