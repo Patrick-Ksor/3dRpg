@@ -1249,6 +1249,6 @@ public class BattleUIManager : MonoBehaviour
     private void OnRestartClicked()
     {
         RunManager.Instance?.StartRun();
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        SceneFader.Load(SceneManager.GetActiveScene().name);
     }
 }

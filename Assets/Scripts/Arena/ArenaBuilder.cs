@@ -331,7 +331,7 @@ public static class ArenaBuilder
     {
         var tmp = Object.Instantiate(prefab);
         Vector3 size = GetBounds(tmp).size;
-        Object.Destroy(tmp);
+        Object.DestroyImmediate(tmp);   // immediate, so the temporary copy at the origin is never rendered
         return size;
     }
 

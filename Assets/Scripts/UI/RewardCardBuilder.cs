@@ -36,13 +36,24 @@ public static class RewardCardBuilder
         var body = new VisualElement();
         body.AddToClassList("reward-card-body");
 
+        // Framed icon: a custom sprite when one exists, otherwise a generic pictogram picked from USS.
+        var frame = new VisualElement();
+        frame.AddToClassList("reward-card-icon");
         Sprite icon = GetRewardIcon(choice);
         if (icon != null)
         {
             var img = new Image { sprite = icon };
-            img.AddToClassList("reward-card-icon");
-            body.Add(img);
+            img.AddToClassList("reward-card-icon-img");
+            frame.Add(img);
         }
+        else
+        {
+            var glyph = new VisualElement();
+            glyph.AddToClassList("reward-card-icon-img");
+            glyph.AddToClassList(GetFallbackIconClass(choice));
+            frame.Add(glyph);
+        }
+        body.Add(frame);
 
         body.Add(CreateLabel(choice.name, "reward-card-name"));
         body.Add(CreateLabel(choice.description, "reward-card-desc"));
@@ -163,6 +174,43 @@ public static class RewardCardBuilder
 
     private static Sprite LoadRewardIcon(string resourceName) =>
         Resources.Load<Sprite>($"Rewards/{resourceName}");
+
+    /// <summary>USS class (from GameUi.uss) of a generic icon for rewards that have no sprite in Resources/Rewards.</summary>
+    public static string GetFallbackIconClass(RewardChoice choice)
+    {
+        if (choice.curseEffect != null) return "icon-skull";
+        if (choice.legendaryRelic != null) return "icon-gem";
+        if (choice.statUpgrade != null)
+        {
+            return choice.statUpgrade.upgradeType switch
+            {
+                UpgradeType.MaxHealth => "icon-heart",
+                UpgradeType.Attack => "icon-sword",
+                UpgradeType.Defense => "icon-shield",
+                UpgradeType.Speed => "icon-energy",
+                UpgradeType.MaxMana => "icon-star",
+                UpgradeType.Luck => "icon-clover",
+                UpgradeType.Vampiric => "icon-heart-dark",
+                UpgradeType.Thorns => "icon-shield",
+                UpgradeType.Regenerating => "icon-potion",
+                UpgradeType.Enraged => "icon-bomb",
+                _ => "icon-gem",
+            };
+        }
+        if (choice.attackUpgrade != null)
+        {
+            return choice.attackUpgrade.upgradeType switch
+            {
+                AttackUpgradeType.UnlockNewAttack => "icon-book",
+                AttackUpgradeType.DamageBoost => "icon-sword",
+                AttackUpgradeType.ManaCostReduce => "icon-star",
+                AttackUpgradeType.AoEUnlock => "icon-bomb",
+                AttackUpgradeType.HitCountBoost => "icon-hammer",
+                _ => "icon-energy",
+            };
+        }
+        return "icon-gem";
+    }
 
     public static Sprite GetRewardIcon(RewardChoice choice)
     {

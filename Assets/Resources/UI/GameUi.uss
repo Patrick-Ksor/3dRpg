@@ -84,6 +84,15 @@
 .icon-energy  { background-image: url("/Assets/Violet Theme Ui/Colored Icons/Energy.png"); }
 .icon-clover  { background-image: url("/Assets/Violet Theme Ui/Colored Icons/Clover.png"); }
 .icon-coin    { background-image: url("/Assets/Violet Theme Ui/Colored Icons/Coin.png"); }
+.icon-star    { background-image: url("/Assets/Violet Theme Ui/Colored Icons/Star.png"); }
+.icon-heart   { background-image: url("/Assets/Violet Theme Ui/Colored Icons/Heart.png"); }
+.icon-heart-dark { background-image: url("/Assets/Violet Theme Ui/Colored Icons/Heart Dark.png"); }
+.icon-bomb    { background-image: url("/Assets/Violet Theme Ui/Colored Icons/Bomb.png"); }
+.icon-book    { background-image: url("/Assets/Violet Theme Ui/Colored Icons/Book.png"); }
+.icon-hammer  { background-image: url("/Assets/Violet Theme Ui/Colored Icons/Hammer.png"); }
+.icon-potion  { background-image: url("/Assets/Violet Theme Ui/Colored Icons/Potion Green.png"); }
+.icon-gem     { background-image: url("/Assets/Violet Theme Ui/Colored Icons/Gem 1 Purple.png"); }
+.icon-skull   { background-image: url("/Assets/Violet Theme Ui/Colored Icons/Dark Gem.png"); }
 .icon-attack  { background-image: url("/Assets/UI/AttackButton.png"); }
 .icon-special { background-image: url("/Assets/Violet Theme Ui/Colored Icons/Energy.png"); }
 .icon-defend  { background-image: url("/Assets/Violet Theme Ui/Colored Icons/shield blue.png"); }
@@ -711,10 +720,17 @@
     width: 64px;
     height: 64px;
     margin-bottom: 10px;
-    padding: 14px;
+    align-items: center;
+    justify-content: center;
     background-color: rgba(255, 255, 255, 0.04);
     border-width: 2px;
     border-color: var(--iron-dark);
+}
+
+.reward-card-icon-img {
+    width: 38px;
+    height: 38px;
+    -unity-background-scale-mode: scale-to-fit;
 }
 
 .reward-card-name,

@@ -280,7 +280,7 @@ public class MainMenuManager : MonoBehaviour
 
         RunManager.Instance.SelectedCharacterPrefab = selected.characterPrefab;
         RunManager.Instance.StartRun();
-        SceneManager.LoadScene(_battleSceneName);
+        SceneFader.Load(_battleSceneName);
     }
 
     private void OnQuit()
