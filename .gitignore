@@ -131,3 +131,6 @@ Thumbs.db
 /Assets/MeshyImports/mage_soell_cast_2_20260406_112256.meta
 /Assets/MeshyImports/mage_soell_cast_7_20260406_112242/
 /Assets/MeshyImports/mage_soell_cast_7_20260406_112242.meta
+
+# Local player builds
+/Builds/
