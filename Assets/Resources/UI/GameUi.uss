@@ -93,7 +93,7 @@
 .icon-potion  { background-image: url("/Assets/Violet Theme Ui/Colored Icons/Potion Green.png"); }
 .icon-gem     { background-image: url("/Assets/Violet Theme Ui/Colored Icons/Gem 1 Purple.png"); }
 .icon-skull   { background-image: url("/Assets/Violet Theme Ui/Colored Icons/Dark Gem.png"); }
-.icon-attack  { background-image: url("/Assets/UI/AttackButton.png"); }
+.icon-attack  { background-image: url("/Assets/Violet Theme Ui/Colored Icons/Sword.png"); }
 .icon-special { background-image: url("/Assets/Violet Theme Ui/Colored Icons/Energy.png"); }
 .icon-defend  { background-image: url("/Assets/Violet Theme Ui/Colored Icons/shield blue.png"); }
 .icon-item    { background-image: url("/Assets/Violet Theme Ui/Colored Icons/Bag.png"); }
