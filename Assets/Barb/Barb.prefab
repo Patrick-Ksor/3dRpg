@@ -110,7 +110,7 @@ MonoBehaviour:
   attack: 30
   defense: 10
   speed: 10
-  luck: 40
+  luck: 30
   maxHealth: 100
   currentHealth: 100
   maxMana: 20

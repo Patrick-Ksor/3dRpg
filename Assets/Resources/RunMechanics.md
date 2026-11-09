@@ -163,7 +163,7 @@ Multi-hit, multi-projectile and AoE attacks apply this formula **per hit / per t
 | **Evasion**    | `Luck`% chance to fully dodge a hit ("MISS") | 70% |
 | Lucky Find     | Average team Luck = % chance the card appears | – |
 
-Evasion applies to both sides, rolled per hit. High Luck is very strong (the Barbarian starts at 40 Luck; it was 70, which meant a 70% dodge from the first fight).
+Evasion applies to both sides, rolled per hit. High Luck is very strong (the Barbarian starts at 30 Luck; it was 70, which meant a 70% dodge from the first fight).
 
 ### Status Effects
 
@@ -287,8 +287,17 @@ Bonus card granting Luck (+3 / +4 / +5 by tier). Appears with probability equal 
 
 ## Player Characters (base stats)
 
-| Hero        | HP  | Mana | ATK | DEF | SPD | Luck |
-| ----------- | --- | ---- | --- | --- | --- | ---- |
+| Hero        | HP  | Mana | ATK | DEF | SPD | Luck | Total |
+| ----------- | --- | ---- | --- | --- | --- | ---- | ----- |
+| Barbarian   | 100 | 20   | 30  | 10  | 10  | 30   | 200   |
+| Knight      | 120 | 20   | 20  | 20  | 15  | 5    | 200   |
+| Wizard      | 100 | 40   | 30  | 5   | 15  | 10   | 200   |
+| Ninja       | 110 | 30   | 15  | 10  | 20  | 15   | 200   |
+| Necromancer | 110 | 40   | 25  | 5   | 15  | 5    | 200   |
+
+Every hero's six base stats add up to **200** (keep that when editing a prefab). The balance simulation puts all five heroes' typical run end between encounters 21 and 26.
+
+----------- | --- | ---- | --- | --- | --- | ---- |
 | Barbarian   | 100 | 20   | 30  | 10  | 10  | 40   |
 | Knight      | 100 | 20   | 15  | 15  | 15  | 5    |
 | Wizard      | 100 | 20   | 30  | 5   | 15  | 0    |

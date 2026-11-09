@@ -107,11 +107,11 @@ MonoBehaviour:
   attack: 30
   defense: 5
   speed: 15
-  luck: 0
+  luck: 10
   maxHealth: 100
   currentHealth: 100
-  maxMana: 20
-  currentMana: 20
+  maxMana: 40
+  currentMana: 40
   isDead: 0
   runAnimatorState: Run
   idleAnimatorState: Idle

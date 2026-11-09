@@ -1282,3 +1282,13 @@
 .path-line--lit { background-color: var(--torch); }
 
 .path-gap { margin-top: 6px; font-size: 18px; color: rgb(141, 127, 110); }
+
+/* A skill is waiting for the player to click an enemy */
+.np--pick {
+    border-color: var(--torch);
+    background-color: rgba(60, 46, 24, 0.95);
+}
+
+.np--pick:hover {
+    background-color: rgba(88, 66, 30, 0.98);
+}

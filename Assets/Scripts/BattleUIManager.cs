@@ -41,6 +41,8 @@ public class BattleUIManager : MonoBehaviour
     private VisualElement _nameplateLayer;
     private Unit _selectedTarget;
     private bool _playerTurn;
+    private bool _targetChosen;          // the player clicked a plate this turn
+    private AttackAction _pendingAction; // a single-target skill waiting for the player to click an enemy
     private bool _buttonsWired;
 
     // Hero card (left)
@@ -633,6 +635,8 @@ public class BattleUIManager : MonoBehaviour
         bool hasItems = activeUnit.inventory != null && activeUnit.inventory.Count > 0;
 
         _playerTurn = true;
+        _pendingAction = null;
+        Nameplates.SetPicking(false);
         if (_commandRound != null && _battleManager != null) _commandRound.text = $"Round {_battleManager.BattleRounds}";
 
         // Default target: keep the previous one while it is alive, otherwise the first living enemy.
@@ -666,6 +670,9 @@ public class BattleUIManager : MonoBehaviour
         if (!EnsureUiReady()) return;
         HideTooltip();
         _playerTurn = false;
+        _targetChosen = false;
+        _pendingAction = null;
+        Nameplates.SetPicking(false);
         Nameplates.SetTarget(null);
         _targetPanelZone?.Clear();
         if (_targetPanelZone != null) _targetPanelZone.style.display = DisplayStyle.None;
@@ -683,6 +690,9 @@ public class BattleUIManager : MonoBehaviour
         }
 
         _playerTurn = false;
+        _targetChosen = false;
+        _pendingAction = null;
+        Nameplates.SetPicking(false);
         Nameplates.SetTarget(null);
         _targetPanelZone?.Clear();
         if (_targetPanelZone != null) _targetPanelZone.style.display = DisplayStyle.None;
@@ -721,22 +731,42 @@ public class BattleUIManager : MonoBehaviour
 
     private void HandleDefendClicked() => _battleManager?.PlayerDefend();
 
-    /// <summary>AoE attacks fire at once; single-target attacks hit the enemy chosen by clicking its nameplate.</summary>
+    /// <summary>
+    /// AoE attacks fire at once. Single-target skills use the enemy whose plate was clicked this turn; if there are
+    /// several enemies and none was clicked yet, the skill waits and the next enemy plate click fires it.
+    /// </summary>
     private void SelectTargetFor(AttackAction action)
     {
         var enemies = _battleManager.GetAliveEnemies();
         if (enemies.Count == 0) return;
 
-        Unit target = action.isAoE || _selectedTarget == null || _selectedTarget.isDead
-            ? enemies[0] : _selectedTarget;
-        _battleManager.PlayerSelectTarget(target, action);
+        if (action.isAoE || enemies.Count == 1 || (_targetChosen && _selectedTarget != null && !_selectedTarget.isDead))
+        {
+            Unit target = action.isAoE || _selectedTarget == null || _selectedTarget.isDead ? enemies[0] : _selectedTarget;
+            _battleManager.PlayerSelectTarget(target, action);
+            return;
+        }
+
+        ShowCommandMenu();   // bring the command panel back while waiting
+        _pendingAction = action;
+        Nameplates.SetPicking(true);
+        SetMessage($"Choose a target for {action.actionName}: click an enemy.");
     }
 
     private void OnPlateClicked(Unit unit)
     {
         if (!_playerTurn || unit == null || unit.isPlayer || unit.isDead) return;
         _selectedTarget = unit;
+        _targetChosen = true;
         Nameplates.SetTarget(unit);
+
+        if (_pendingAction != null)
+        {
+            AttackAction action = _pendingAction;
+            _pendingAction = null;
+            Nameplates.SetPicking(false);
+            _battleManager.PlayerSelectTarget(unit, action);
+        }
     }
 
     // ─── SUB-MENUS ─────────────────────────────────────────────────────────

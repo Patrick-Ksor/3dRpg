@@ -40,6 +40,12 @@ public static class Nameplates
         foreach (Plate p in s_Plates) p.SetTargeted(p.Unit == unit && unit != null);
     }
 
+    /// <summary>Pulses every living enemy plate to say "click one" while a skill waits for its target.</summary>
+    public static void SetPicking(bool picking)
+    {
+        foreach (Plate p in s_Plates) p.SetPicking(picking);
+    }
+
     public static void SetVisible(bool visible)
     {
         if (s_Layer != null) s_Layer.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
@@ -129,6 +135,11 @@ public static class Nameplates
 
             if (!isPlayer && onClick != null)
                 _root.RegisterCallback<ClickEvent>(_ => { if (!unit.isDead) onClick(unit); });
+        }
+
+        public void SetPicking(bool picking)
+        {
+            if (!_isPlayer) _root.EnableInClassList("np--pick", picking);
         }
 
         public void SetTargeted(bool targeted)

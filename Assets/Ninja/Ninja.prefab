@@ -186,13 +186,13 @@ MonoBehaviour:
   portrait: {fileID: 21300000, guid: 666962dfb52e03b4696d17e429ce42e3, type: 3}
   isPlayer: 0
   attack: 15
-  defense: 5
-  speed: 15
+  defense: 10
+  speed: 20
   luck: 15
-  maxHealth: 100
-  currentHealth: 100
-  maxMana: 20
-  currentMana: 0
+  maxHealth: 110
+  currentHealth: 110
+  maxMana: 30
+  currentMana: 30
   isDead: 0
   runAnimatorState: Run
   idleAnimatorState: Idle
