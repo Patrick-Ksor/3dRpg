@@ -85,6 +85,12 @@ public class BattleUIManager : MonoBehaviour
     private VisualElement _upgradeChoices;
     private VisualElement _rerollContainer;
     private VisualElement _summaryPanel;
+    private VisualElement _victoryPanel;
+    private Label _victorySub;
+    private Label _victoryGold;
+    private Label _victoryGoldTotal;
+    private VisualElement _victoryFoes;
+    private Button _victoryClaim;
     private Label _summaryTitle;
     private Label _summaryStats;
     private VisualElement _summaryGrid;
@@ -228,6 +234,12 @@ public class BattleUIManager : MonoBehaviour
         _intermissionInstruction = _root.Q<Label>("intermission-instruction");
         _upgradeChoices = _root.Q<VisualElement>("upgrade-choices");
         _summaryPanel = _root.Q<VisualElement>("run-summary-panel");
+        _victoryPanel = _root.Q<VisualElement>("victory-panel");
+        _victorySub = _root.Q<Label>("victory-sub");
+        _victoryGold = _root.Q<Label>("victory-gold");
+        _victoryGoldTotal = _root.Q<Label>("victory-gold-total");
+        _victoryFoes = _root.Q<VisualElement>("victory-foes");
+        _victoryClaim = _root.Q<Button>("victory-claim");
         _summaryTitle = _root.Q<Label>("summary-title");
         _summaryStats = _root.Q<Label>("summary-stats");
         _summaryGrid = _root.Q<VisualElement>("summary-grid");
@@ -900,6 +912,7 @@ public class BattleUIManager : MonoBehaviour
     {
         HidePanel(_intermissionPanel);
         HidePanel(_summaryPanel);
+        HidePanel(_victoryPanel);
     }
 
     private static void HidePanel(VisualElement panel)
@@ -958,30 +971,142 @@ public class BattleUIManager : MonoBehaviour
         ShowPanel(_intermissionPanel);
     }
 
+    /// <summary>Inserts spaces into CamelCase unit names ("SkeletonKnight 1" -> "Skeleton Knight 1").</summary>
+    public static string PrettyName(string name) =>
+        string.IsNullOrEmpty(name) ? "" : System.Text.RegularExpressions.Regex.Replace(name, "(?<=[a-z])(?=[A-Z])", " ");
+
+    private static void AddPills(VisualElement parent, IEnumerable<string> names, string extraClass)
+    {
+        if (parent == null || names == null) return;
+        var seen = new Dictionary<string, int>();
+        var order = new List<string>();
+        foreach (string raw in names)
+        {
+            // "Skeleton Knight 1" and "Skeleton Knight 2" collapse into "Skeleton Knight x2".
+            string n = System.Text.RegularExpressions.Regex.Replace(PrettyName(raw), @"\s*\d+$", "");
+            if (!seen.ContainsKey(n)) { seen[n] = 0; order.Add(n); }
+            seen[n]++;
+        }
+        foreach (string n in order)
+        {
+            var pill = new Label(seen[n] > 1 ? $"{n} x{seen[n]}" : n);
+            pill.AddToClassList("loot-pill");
+            pill.AddToClassList(extraClass);
+            parent.Add(pill);
+        }
+    }
+
+    /// <summary>Full-screen victory card shown after boss and mini-boss fights, before the loot screen.</summary>
+    public void ShowVictory(int clearedEncounter, int rounds, int goldEarned, int totalGold,
+                            IEnumerable<string> foes, Action onClaim)
+    {
+        if (!EnsureUiReady() || _victoryPanel == null) { onClaim?.Invoke(); return; }
+        HideOverlays();
+        ClearTargetButtons();
+        ClearTurnOrder();
+
+        if (_victorySub != null)
+            _victorySub.text = $"ENCOUNTER {clearedEncounter} CLEARED IN {rounds} ROUND{(rounds == 1 ? "" : "S")}";
+        if (_victoryGold != null) _victoryGold.text = $"+{goldEarned}";
+        if (_victoryGoldTotal != null) _victoryGoldTotal.text = $"{totalGold} total";
+        if (_victoryFoes != null)
+        {
+            _victoryFoes.Clear();
+            AddPills(_victoryFoes, foes, "loot-pill--foe");
+        }
+        if (_victoryClaim != null)
+        {
+            _victoryClaim.clickable = new Clickable(() => onClaim?.Invoke());
+        }
+        ShowPanel(_victoryPanel);
+    }
+
+    /// <summary>
+    /// Loot screen: click a card to select it, then confirm with the Take button.
+    /// <paramref name="rounds"/> and <paramref name="foes"/> are optional run-through details.
+    /// </summary>
     public void ShowIntermission(int clearedEncounter, int goldEarned, List<RewardChoice> choices,
-                                 Action<RewardChoice> onChoose, Action onReroll = null)
+                                 Action<RewardChoice> onChoose, Action onReroll = null,
+                                 int rounds = 0, IEnumerable<string> foes = null)
     {
         if (!EnsureUiReady()) return;
-        BeginChoiceScreen($"Encounter {clearedEncounter} Clear!", $"+{goldEarned} Gold", "Choose an upgrade:");
+        string sub = rounds > 0 ? $"Cleared in {rounds} round{(rounds == 1 ? "" : "s")}" : "";
+        BeginChoiceScreen($"Spoils of Encounter {clearedEncounter}", sub, "CHOOSE ONE REWARD");
 
-        if (_upgradeChoices != null)
+        if (_upgradeChoices == null) { EndChoiceScreen(); return; }
+
+        RewardChoice selected = null;
+        VisualElement selectedCard = null;
+        Button takeBtn = null;
+        Label hint = null;
+
+        foreach (RewardChoice choice in choices)
         {
-            foreach (RewardChoice choice in choices)
-                _upgradeChoices.Add(RewardCardBuilder.CreateRewardCard(choice, onChoose));
-
-            if (onReroll != null && _rerollContainer != null)
+            _upgradeChoices.Add(RewardCardBuilder.CreateRewardCard(choice, null, 0, -1, (card, picked) =>
             {
-                var rerollBtn = new Button { text = "Reroll" };
+                selectedCard?.RemoveFromClassList("reward-card--selected");
+                selected = picked;
+                selectedCard = card;
+                card.AddToClassList("reward-card--selected");
+                if (takeBtn != null)
+                {
+                    takeBtn.SetEnabled(true);
+                    takeBtn.text = $"TAKE {picked.name.ToUpperInvariant()}";
+                }
+                if (hint != null) hint.text = "Confirm your choice, or pick a different card.";
+            }));
+        }
+
+        if (_rerollContainer != null)
+        {
+            // Row: also collected + foes defeated
+            var collected = new VisualElement();
+            collected.AddToClassList("loot-row");
+            var lbl = new Label("ALSO COLLECTED");
+            lbl.AddToClassList("loot-row-label");
+            collected.Add(lbl);
+            var gold = new Label($"+{goldEarned} Gold");
+            gold.AddToClassList("loot-pill");
+            gold.AddToClassList("loot-pill--gold");
+            collected.Add(gold);
+            if (foes != null)
+            {
+                var foesLbl = new Label("FOES DEFEATED");
+                foesLbl.AddToClassList("loot-row-label");
+                foesLbl.AddToClassList("loot-row-label--gap");
+                collected.Add(foesLbl);
+                AddPills(collected, foes, "loot-pill--foe");
+            }
+            _rerollContainer.Add(collected);
+
+            // Footer: reroll | hint | take
+            var footer = new VisualElement();
+            footer.AddToClassList("loot-footer");
+
+            if (onReroll != null)
+            {
+                var rerollBtn = new Button { text = "REROLL" };
                 rerollBtn.AddToClassList("menu-button");
                 rerollBtn.AddToClassList("reroll-button");
                 rerollBtn.clicked += () =>
                 {
-                    onReroll.Invoke();
                     rerollBtn.SetEnabled(false);
-                    rerollBtn.text = "Rerolled";
+                    onReroll.Invoke();
                 };
-                _rerollContainer.Add(rerollBtn);
+                footer.Add(rerollBtn);
             }
+
+            hint = new Label("Select a reward.");
+            hint.AddToClassList("loot-hint");
+            footer.Add(hint);
+
+            takeBtn = new Button(() => { if (selected != null) onChoose?.Invoke(selected); }) { text = "TAKE REWARD" };
+            takeBtn.AddToClassList("reward-button");
+            takeBtn.AddToClassList("loot-take");
+            takeBtn.SetEnabled(false);
+            footer.Add(takeBtn);
+
+            _rerollContainer.Add(footer);
         }
         EndChoiceScreen();
     }

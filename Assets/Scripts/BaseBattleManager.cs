@@ -112,6 +112,7 @@ public class BaseBattleManager : MonoBehaviour
 
     private BattleUIManager _uiManager;
     private bool _isMiniBoss = false;
+    private int _battleRounds;   // turn-queue rebuilds this fight; shown on the victory/loot screens
 
     public static BaseBattleManager Instance { get; private set; }
 
@@ -142,6 +143,7 @@ public class BaseBattleManager : MonoBehaviour
         RunManager rm = RunManager.Instance;
         _enemyAffixes.Clear();
         _isMiniBoss = false;
+        _battleRounds = 0;
         int encounterTier = (rm != null && rm.IsRunActive) ? RunManager.GetEncounterTier(rm.CurrentEncounter) : 1;
         bool isBossEncounter = rm != null && rm.IsRunActive && rm.CurrentEncounter % 10 == 0;
 
@@ -383,6 +385,7 @@ public class BaseBattleManager : MonoBehaviour
     private void BuildTurnQueue()
     {
         _turnQueue.Clear();
+        _battleRounds++;
         RunManager.Instance?.CurrentRunStats?.AddTurnSurvived();
         var allAlive = playerTeam.Concat(enemyTeam).Where(u => !u.isDead).ToList();
         _turnQueue = allAlive.OrderByDescending(u => u.speed).ToList();
@@ -1134,13 +1137,23 @@ public class BaseBattleManager : MonoBehaviour
                     });
                 };
 
+                int rounds = _battleRounds;
+                var foes = enemyTeam.Where(u => u != null).Select(u => u.unitName).ToList();
+
                 Action onReroll = () =>
                 {
                     var newChoices = RunManager.GenerateRewardChoices(playerTeam, clearedEncounter, choiceCount);
-                    _uiManager.ShowIntermission(clearedEncounter, goldEarned, newChoices, applyChoice, null);
+                    _uiManager.ShowIntermission(clearedEncounter, goldEarned, newChoices, applyChoice, null, rounds, foes);
                 };
 
-                _uiManager.ShowIntermission(clearedEncounter, goldEarned, choices, applyChoice, onReroll);
+                Action showLoot = () =>
+                    _uiManager.ShowIntermission(clearedEncounter, goldEarned, choices, applyChoice, onReroll, rounds, foes);
+
+                // Boss and mini-boss fights get their own victory card first; normal fights go straight to loot.
+                if (_isMiniBoss || clearedEncounter % 10 == 0)
+                    _uiManager.ShowVictory(clearedEncounter, rounds, goldEarned, rm.Gold, foes, showLoot);
+                else
+                    showLoot();
             }
             else
             {

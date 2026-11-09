@@ -592,7 +592,7 @@
     display: none;
     align-items: center;
     justify-content: center;
-    background-color: rgba(6, 4, 6, 0.8);
+    background-color: rgba(6, 4, 6, 0.93);
     opacity: 0;
     transition-property: opacity;
     transition-duration: 0.25s;
@@ -617,7 +617,7 @@
 }
 
 .overlay-title {
-    font-size: 30px;
+    font-size: 34px;
     -unity-font-style: bold;
     color: var(--torch);
     letter-spacing: 2px;
@@ -664,7 +664,7 @@
 /* ── Reward / event / room cards ────────────────────────────────────────── */
 
 .reward-card {
-    width: 190px;
+    width: 214px;
     margin: 6px;
     background-color: var(--stone-2);
     border-radius: 5px;
@@ -680,13 +680,22 @@
 }
 
 .reward-card-type {
-    padding: 4px 0;
-    background-color: var(--iron-dark);
-    align-items: center;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 5px 10px;
+    background-color: rgba(0, 0, 0, 0.35);
+    border-bottom-width: 2px;
+    border-bottom-color: var(--iron);
+}
+
+.reward-card-tag {
+    font-size: 12px;
+    letter-spacing: 1px;
+    color: var(--muted);
 }
 
 .reward-card-type-label {
-    font-size: 11px;
+    font-size: 13px;
     -unity-font-style: bold;
     letter-spacing: 2px;
     color: var(--parchment);
@@ -699,9 +708,13 @@
 }
 
 .reward-card-icon {
-    width: 54px;
-    height: 54px;
-    margin-bottom: 8px;
+    width: 64px;
+    height: 64px;
+    margin-bottom: 10px;
+    padding: 14px;
+    background-color: rgba(255, 255, 255, 0.04);
+    border-width: 2px;
+    border-color: var(--iron-dark);
 }
 
 .reward-card-name,
@@ -770,15 +783,31 @@
     border-color: var(--torch);
 }
 
-/* rarity variants */
-.reward-card--legendary { border-color: var(--violet); }
-.reward-card--legendary .reward-card-type { background-color: rgb(84, 48, 120); }
+/* rarity variants: coloured header line + label */
+.reward-card--legendary { border-color: rgb(110, 76, 150); }
+.reward-card--legendary .reward-card-type { border-bottom-color: var(--violet); }
+.reward-card--legendary .reward-card-type-label { color: var(--violet); }
 
-.reward-card--relic { border-color: var(--gold); }
-.reward-card--relic .reward-card-type { background-color: rgb(130, 96, 24); }
+.reward-card--relic { border-color: rgb(140, 110, 50); }
+.reward-card--relic .reward-card-type { border-bottom-color: var(--gold); }
+.reward-card--relic .reward-card-type-label { color: var(--gold); }
 
-.reward-card--curse { border-color: var(--curse); }
-.reward-card--curse .reward-card-type { background-color: rgb(52, 84, 32); }
+.reward-card--curse { border-color: rgb(80, 110, 56); }
+.reward-card--curse .reward-card-type { border-bottom-color: var(--curse); }
+.reward-card--curse .reward-card-type-label { color: var(--curse); }
+
+.reward-card--skill .reward-card-type { border-bottom-color: rgb(110, 160, 230); }
+.reward-card--skill .reward-card-type-label { color: rgb(110, 160, 230); }
+
+/* pick-then-confirm loot cards */
+.reward-card--pick:hover { scale: 1.02 1.02; }
+
+.reward-card--selected {
+    background-color: var(--stone-3);
+    border-color: var(--torch);
+    border-width: 3px;
+    scale: 1.04 1.04;
+}
 
 /* ── Tooltip ────────────────────────────────────────────────────────────── */
 
@@ -908,4 +937,140 @@
 .menu-button,
 .reward-button {
     -unity-font-definition: url("/Assets/Fonts/Cinzel.ttf");
+}
+
+/* ── Loot footer (also collected + confirm) ─────────────────────────────── */
+
+.reroll-container {
+    align-self: stretch;
+    align-items: stretch;
+}
+
+.loot-row {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-top: 6px;
+}
+
+.loot-row-label {
+    margin-right: 10px;
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: var(--muted);
+}
+
+.loot-row-label--gap {
+    margin-left: 18px;
+}
+
+.loot-chips {
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin-top: 4px;
+}
+
+.loot-pill {
+    margin: 0 6px 4px 0;
+    padding: 1px 8px;
+    font-size: 14px;
+    color: var(--parchment);
+    background-color: var(--stone-1);
+    border-width: 1px;
+    border-color: var(--iron);
+}
+
+.loot-pill--gold { color: var(--gold); border-color: var(--torch-dim); }
+.loot-pill--foe  { color: rgb(236, 150, 140); border-color: rgb(130, 58, 52); }
+
+.loot-footer {
+    flex-direction: row;
+    align-items: center;
+    margin-top: 12px;
+}
+
+.loot-hint {
+    flex-grow: 1;
+    margin: 0 14px;
+    font-size: 15px;
+    white-space: normal;
+    -unity-text-align: middle-center;
+    color: var(--muted);
+}
+
+.loot-take {
+    min-width: 230px;
+    height: 40px;
+    margin: 0;
+    padding: 0 14px;
+}
+
+/* ── Victory screen ─────────────────────────────────────────────────────── */
+
+.victory-layout {
+    align-items: center;
+}
+
+.victory-title {
+    -unity-font-definition: url("/Assets/Fonts/Cinzel.ttf");
+    font-size: 64px;
+    -unity-font-style: bold;
+    letter-spacing: 12px;
+    color: var(--torch);
+}
+
+.victory-sub {
+    margin-top: 2px;
+    font-size: 17px;
+    letter-spacing: 3px;
+    color: var(--muted);
+}
+
+.victory-card {
+    width: 520px;
+    margin-top: 22px;
+    padding: 18px 22px;
+    background-color: var(--stone-1);
+    border-width: 2px;
+    border-color: var(--line);
+}
+
+.victory-row {
+    flex-direction: row;
+    align-items: flex-start;
+}
+
+.victory-block {
+    margin-right: 30px;
+}
+
+.victory-block--grow {
+    flex-grow: 1;
+    flex-shrink: 1;
+    margin-right: 0;
+}
+
+.victory-label {
+    font-size: 13px;
+    letter-spacing: 3px;
+    color: var(--muted);
+}
+
+.victory-gold {
+    -unity-font-definition: url("/Assets/Fonts/Cinzel.ttf");
+    font-size: 34px;
+    -unity-font-style: bold;
+    color: var(--torch);
+}
+
+.victory-small {
+    font-size: 14px;
+    color: var(--muted);
+}
+
+.victory-claim {
+    height: 46px;
+    margin: 20px 0 0 0;
+    font-size: 17px;
+    letter-spacing: 3px;
 }

@@ -13,7 +13,8 @@ public static class RewardCardBuilder
     /// missing, and asks for a second click to confirm the purchase).
     /// </summary>
     public static VisualElement CreateRewardCard(RewardChoice choice, Action<RewardChoice> onSelect,
-                                                 int price = 0, int currentGold = -1)
+                                                 int price = 0, int currentGold = -1,
+                                                 Action<VisualElement, RewardChoice> onPick = null)
     {
         bool isShop = price > 0;
         bool affordable = !isShop || currentGold < 0 || currentGold >= price;
@@ -23,9 +24,14 @@ public static class RewardCardBuilder
 
         if (choice.legendaryRelic != null) card.AddToClassList("reward-card--relic");
         else if (IsLegendaryTrait(choice)) card.AddToClassList("reward-card--legendary");
+        else if (choice.attackUpgrade != null && choice.attackUpgrade.upgradeType == AttackUpgradeType.UnlockNewAttack)
+            card.AddToClassList("reward-card--skill");
         if (choice.curseEffect != null) card.AddToClassList("reward-card--curse");
 
-        card.Add(CreateTypeHeader(GetChoiceTypeLabel(choice)));
+        string tag = choice.curseEffect != null ? "CURSED"
+                   : choice.legendaryRelic != null ? "RELIC"
+                   : IsLegendaryTrait(choice) ? "LEGENDARY" : "";
+        card.Add(CreateTypeHeader(GetChoiceTypeLabel(choice), tag));
 
         var body = new VisualElement();
         body.AddToClassList("reward-card-body");
@@ -60,8 +66,17 @@ public static class RewardCardBuilder
                 card.Add(CreateLabel($"Need {price - currentGold} more gold", "reward-card-need"));
         }
 
-        string text = isShop ? (affordable ? "BUY" : "TOO EXPENSIVE") : "SELECT";
-        card.Add(CreateSelectButton(text, affordable, () => onSelect?.Invoke(choice), confirm: isShop));
+        if (onPick != null)
+        {
+            // Pick-then-confirm mode: the whole card is clickable, the screen owns the confirm button.
+            card.AddToClassList("reward-card--pick");
+            card.RegisterCallback<ClickEvent>(_ => onPick(card, choice));
+        }
+        else
+        {
+            string text = isShop ? (affordable ? "BUY" : "TOO EXPENSIVE") : "SELECT";
+            card.Add(CreateSelectButton(text, affordable, () => onSelect?.Invoke(choice), confirm: isShop));
+        }
 
         if (!affordable) card.style.opacity = 0.55f;
         return card;
@@ -87,11 +102,12 @@ public static class RewardCardBuilder
 
     // ── helpers ────────────────────────────────────────────────────────────
 
-    private static VisualElement CreateTypeHeader(string text)
+    private static VisualElement CreateTypeHeader(string text, string tag = "")
     {
         var header = new VisualElement();
         header.AddToClassList("reward-card-type");
         header.Add(CreateLabel(text, "reward-card-type-label"));
+        if (!string.IsNullOrEmpty(tag)) header.Add(CreateLabel(tag, "reward-card-tag"));
         return header;
     }
 

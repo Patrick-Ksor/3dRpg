@@ -94,6 +94,26 @@
                 <ui:VisualElement name="reroll-container" class="reroll-container"/>
             </ui:VisualElement>
         </ui:VisualElement>
+        <ui:VisualElement name="victory-panel" class="overlay-panel">
+            <ui:VisualElement class="victory-layout">
+                <ui:Label name="victory-title" text="VICTORY" class="victory-title"/>
+                <ui:Label name="victory-sub" text="" class="victory-sub"/>
+                <ui:VisualElement class="victory-card">
+                    <ui:VisualElement class="victory-row">
+                        <ui:VisualElement class="victory-block">
+                            <ui:Label text="GOLD" class="victory-label"/>
+                            <ui:Label name="victory-gold" text="+0" class="victory-gold"/>
+                            <ui:Label name="victory-gold-total" text="" class="victory-small"/>
+                        </ui:VisualElement>
+                        <ui:VisualElement class="victory-block victory-block--grow">
+                            <ui:Label text="FOES DEFEATED" class="victory-label"/>
+                            <ui:VisualElement name="victory-foes" class="loot-chips"/>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:Button name="victory-claim" text="CLAIM LOOT  &gt;" class="reward-button victory-claim"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
         <ui:VisualElement name="run-summary-panel" class="overlay-panel">
             <ui:VisualElement class="overlay-card">
                 <ui:Label name="summary-title" text="Run Complete!" class="overlay-title"/>
