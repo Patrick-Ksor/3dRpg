@@ -47,7 +47,8 @@ public static class Nameplates
 
     public static void ClearAll()
     {
-        foreach (Plate p in s_Plates) p.Destroy();
+        // Plate.Destroy removes itself from s_Plates, so iterate over a copy.
+        foreach (Plate p in s_Plates.ToArray()) p.Destroy();
         s_Plates.Clear();
         s_Target = null;
     }
