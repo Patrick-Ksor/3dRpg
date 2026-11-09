@@ -47,6 +47,7 @@ public class Unit : MonoBehaviour
     [HideInInspector] public List<StatusEffect> activeStatusEffects = new List<StatusEffect>();
 
     private Animator _animator;
+    private int _idleHash;   // resolved idle state (the prefab's configured name may not exist in its controller)
 
     private Vector3 _homePosition;
     private Quaternion _homeRotation;
@@ -54,6 +55,8 @@ public class Unit : MonoBehaviour
     private void Awake()
     {
         _animator = GetComponent<Animator>();
+        // Movement is script-driven (lunges, return slides). Root motion on top of that makes units drift and then snap home.
+        _animator.applyRootMotion = false;
         currentHealth = maxHealth;
         currentMana = maxMana;
 
@@ -69,6 +72,49 @@ public class Unit : MonoBehaviour
         // Store exact spawn position to ensure we always return to the same spot
         _homePosition = transform.position;
         _homeRotation = transform.rotation;
+        StartCoroutine(ResolveIdleState());
+    }
+
+    /// <summary>
+    /// The controller's default state is the idle pose. Prefabs often name it "Barb_Idle" rather than the
+    /// default "Idle", and CrossFade to a missing state is silently ignored, so find the real one.
+    /// </summary>
+    private IEnumerator ResolveIdleState()
+    {
+        int configured = Animator.StringToHash(idleAnimatorState);
+        if (_animator.HasState(0, configured))
+        {
+            _idleHash = configured;
+            yield break;
+        }
+        yield return null;   // the first frame has run, so the animator sits in its default state
+        _idleHash = _animator.GetCurrentAnimatorStateInfo(0).fullPathHash;
+    }
+
+    private void CrossFadeToIdle(float duration)
+    {
+        if (_idleHash != 0) _animator.CrossFadeInFixedTime(_idleHash, duration);
+    }
+
+    /// <summary>Smoothly turns to face a point on the ground plane.</summary>
+    private IEnumerator TurnToward(Vector3 worldPoint, float duration)
+    {
+        Vector3 flat = new Vector3(worldPoint.x, transform.position.y, worldPoint.z) - transform.position;
+        if (flat.sqrMagnitude < 0.0001f) yield break;
+        yield return TurnTo(Quaternion.LookRotation(flat), duration);
+    }
+
+    private IEnumerator TurnTo(Quaternion target, float duration)
+    {
+        Quaternion start = transform.rotation;
+        float t = 0f;
+        while (t < duration)
+        {
+            t += Time.deltaTime;
+            transform.rotation = Quaternion.Slerp(start, target, Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(t / duration)));
+            yield return null;
+        }
+        transform.rotation = target;
     }
 
     public void TakeDamage(int damage, bool silent = false)
@@ -157,9 +203,8 @@ public class Unit : MonoBehaviour
         // Move towards target, getting very close before stopping
         Vector3 endPos = lungeAnchor + (_homePosition - lungeAnchor).normalized * 0.75f;
 
-        // Face the target
-        Vector3 lookTarget = new Vector3(lungeAnchor.x, transform.position.y, lungeAnchor.z);
-        transform.LookAt(lookTarget);
+        // Face the target (a quick turn instead of a snap)
+        yield return TurnToward(lungeAnchor, 0.12f);
 
         float moveDuration = .5f;
         float elapsed = 0f;
@@ -190,7 +235,11 @@ public class Unit : MonoBehaviour
         }
 
         // Perform Attack Animation (Use CrossFade for a smooth blend)
-        _animator.CrossFadeInFixedTime(action.animationName, 0.15f);
+        int attackHash = Animator.StringToHash(action.animationName);
+        if (_animator.HasState(0, attackHash))
+            _animator.CrossFadeInFixedTime(attackHash, 0.1f);
+        else
+            Debug.LogWarning($"[Unit] {unitName}: animator has no state '{action.animationName}' for {action.actionName}.");
 
         if (action.gruntSound != null)
         {
@@ -308,27 +357,26 @@ public class Unit : MonoBehaviour
             footstepRoutine = StartCoroutine(PlayFootstepSounds());
 
             // Turn around to run back
-            Vector3 lookHome = new Vector3(_homePosition.x, transform.position.y, _homePosition.z);
-            transform.LookAt(lookHome);
+            yield return TurnToward(_homePosition, 0.12f);
 
+            Vector3 runFrom = transform.position;   // not endPos: the attack may have moved us
             elapsed = 0f;
             while (elapsed < moveDuration)
             {
                 float t = Mathf.SmoothStep(0f, 1f, elapsed / moveDuration);
-                transform.position = Vector3.Lerp(endPos, _homePosition, t);
+                transform.position = Vector3.Lerp(runFrom, _homePosition, t);
                 elapsed += Time.deltaTime;
                 yield return null;
             }
 
             transform.position = _homePosition;
-            transform.rotation = _homeRotation; // Reset to face opponent perfectly
-
             _animator.SetBool("isRunning", false);
+            yield return TurnTo(_homeRotation, 0.15f);   // settle back to facing the opponent
         }
         else
         {
             // Blend to idle and simultaneously slide position/rotation smoothly back to home
-            _animator.CrossFade(idleAnimatorState, 0.3f);
+            CrossFadeToIdle(0.3f);
 
             Vector3 driftedPos = transform.position;
             Quaternion driftedRot = transform.rotation;
@@ -346,7 +394,7 @@ public class Unit : MonoBehaviour
             transform.rotation = _homeRotation;
         }
 
-        _animator.CrossFade(idleAnimatorState, 0.2f);
+        CrossFadeToIdle(0.2f);
         if (footstepRoutine != null) StopCoroutine(footstepRoutine);
 
         if (chargeVfxInstance != null)
