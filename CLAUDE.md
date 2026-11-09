@@ -48,7 +48,7 @@ Unity 6 (URP 17, Input System, UI Toolkit + uGUI hybrid) 3D turn-based roguelike
 ## Conventions and gotchas
 - Impact feel lives in `HitFeedback.Play(target, damage, crit)` (called next to each `DamagePopSpawner.Show` for a hit): target recoil (`Unit.PlayRecoil`), `CameraShake` trauma, and a very short `HitStop` on crits/kills. Unit movement is script-driven (root motion is forced off); the idle state is resolved from the controller's default state because prefabs name it `<Hero>_Idle`.
 - Hero base stats (HP+MP+ATK+DEF+SPD+Luck) total 200 each; see the table in `RunMechanics.md` before changing a hero prefab.
-- `BattleCamera` (added to the camera by `GameBootstrapper`) holds the camera presets; press `C` in battle to cycle them, the choice is saved in PlayerPrefs (`BattleCameraPreset`). Edit the `Presets` array to add or tune a view; preset 0 is the original low over-the-shoulder camera.
+- `BattleCamera` (added to the camera by `GameBootstrapper`) holds the camera presets; press `C` in battle to cycle them, the choice is saved in PlayerPrefs (`BattleCameraPreset`). Edit the `Presets` array to add or tune a view; preset 1 (High three-quarter) is the default, preset 0 is the original low over-the-shoulder camera.
 - Units are re-instantiated every encounter; upgrades are re-applied from `RunManager` lists. Anything stored only on a `Unit` is lost between encounters.
 - Attack enhancements work by cloning the `AttackAction` asset (`Instantiate`) and replacing the reference on the unit; attacks are matched by `actionName`, so names must be unique per hero.
 - A hero's `Unit.unitName` is set from the prefab name and is the key for `LegendaryRelicSO.targetCharacterName`.

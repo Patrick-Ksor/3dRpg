@@ -20,6 +20,7 @@ public class BattleCamera : MonoBehaviour
         }
     }
 
+    // Index 1 (High three-quarter) is the default.
     // Heroes stand around (-2.5, 0, -1.5), enemies spread around (2.5, 0, -3). Each preset aims at the midpoint.
     private static readonly Preset[] Presets =
     {
@@ -30,6 +31,7 @@ public class BattleCamera : MonoBehaviour
     };
 
     private const string PrefKey = "BattleCameraPreset";
+    private const int DefaultPreset = 1;   // "High three-quarter" (index 1); the saved choice overrides it
 
     private Camera _camera;
     private int _index;
@@ -40,7 +42,7 @@ public class BattleCamera : MonoBehaviour
     private void Start()
     {
         _camera = GetComponent<Camera>();
-        _index = Mathf.Clamp(PlayerPrefs.GetInt(PrefKey, 0), 0, Presets.Length - 1);
+        _index = Mathf.Clamp(PlayerPrefs.GetInt(PrefKey, DefaultPreset), 0, Presets.Length - 1);
         Apply(_index, instant: true);
     }
 
