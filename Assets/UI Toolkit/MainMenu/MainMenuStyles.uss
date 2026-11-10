@@ -195,7 +195,7 @@
     flex-shrink: 0;
     flex-direction: row;
     align-items: center;
-    margin-bottom: 5px;
+    margin-bottom: 3px;
 }
 
 .stat-dot {
@@ -263,13 +263,12 @@
 }
 
 .skill-note-row {
-    flex-direction: row;
-    flex-wrap: wrap;
+    flex-direction: column;
     margin-top: 8px;
 }
 
 .skill-note {
-    font-size: 17px;
+    font-size: 16px;
     white-space: normal;
     color: var(--muted);
 }

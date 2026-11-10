@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Ninja_Shuriken_Storm
   m_EditorClassIdentifier: Assembly-CSharp::AttackAction
   actionName: Shuriken Storm
-  minDamage: 5
-  maxDamage: 8
+  minDamage: 4
+  maxDamage: 6
   manaCost: 20
   isRanged: 1
   isAoE: 0
@@ -35,7 +35,7 @@ MonoBehaviour:
   rotateToFaceTarget: 1
   returnsToCaster: 0
   projectileFireDelay: 5.5
-  projectileCount: 20
+  projectileCount: 10
   projectileSpreadAngle: 100
   delayBetweenProjectiles: 0.01
   hitCount: 1

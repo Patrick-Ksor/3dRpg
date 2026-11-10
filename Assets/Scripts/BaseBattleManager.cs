@@ -185,6 +185,7 @@ public class BaseBattleManager : MonoBehaviour
                 rm.ApplyUpgradesToUnit(pUnit);
                 rm.ApplyAttackUpgradesToUnit(pUnit);
                 rm.ApplyRelicToUnit(pUnit);
+                rm.ApplyItemsToUnit(pUnit);   // the run's pack (potions) replaces the prefab's inventory
                 ApplyRelicVisuals(playerGO, pUnit.unitName);
             }
             // Use RunManager counts so a 2× acquired trait spawns two stacked aura instances
@@ -541,6 +542,7 @@ public class BaseBattleManager : MonoBehaviour
         state = BattleState.BUSY;
 
         _activeUnit.inventory.Remove(item);
+        RunManager.Instance?.ConsumeItem(item);   // gone for the rest of the run
 
         switch (item.itemType)
         {
@@ -1133,6 +1135,8 @@ public class BaseBattleManager : MonoBehaviour
                         rm.EquipRelic(choice.targetUnitName, choice.legendaryRelic);
                     else if (choice.statUpgrade != null)
                         rm.ApplyUpgrade(choice.statUpgrade);
+                    else if (choice.battleItem != null)
+                        rm.AddItems(choice.battleItem, choice.itemCount);
                     else
                         rm.ApplyAttackUpgrade(choice.attackUpgrade);
 
@@ -1357,6 +1361,8 @@ public class BaseBattleManager : MonoBehaviour
                 rm.EquipRelic(choice.targetUnitName, choice.legendaryRelic);
             else if (choice.statUpgrade != null)
                 rm.ApplyUpgrade(choice.statUpgrade);
+            else if (choice.battleItem != null)
+                rm.AddItems(choice.battleItem, choice.itemCount);
             else
                 rm.ApplyAttackUpgrade(choice.attackUpgrade);
 

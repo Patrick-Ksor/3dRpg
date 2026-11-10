@@ -217,6 +217,7 @@ public static class RewardCardBuilder
     public static string GetChoiceTypeLabel(RewardChoice choice)
     {
         if (choice.curseEffect != null) return "CURSE";
+        if (choice.battleItem != null) return "SUPPLIES";
         if (choice.legendaryRelic != null) return "RELIC";
         if (choice.statUpgrade != null)
             return IsTrait(choice.statUpgrade.upgradeType) ? "TRAIT" : "UPGRADE";
@@ -233,6 +234,7 @@ public static class RewardCardBuilder
     public static string GetFallbackIconClass(RewardChoice choice)
     {
         if (choice.curseEffect != null) return "icon-skull";
+        if (choice.battleItem != null) return choice.battleItem.itemType == ItemType.ManaPotion ? "icon-potion-mana" : "icon-potion-health";
         if (choice.legendaryRelic != null) return "icon-gem";
         if (choice.statUpgrade != null)
         {

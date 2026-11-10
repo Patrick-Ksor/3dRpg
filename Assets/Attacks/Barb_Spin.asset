@@ -38,7 +38,7 @@ MonoBehaviour:
   projectileCount: 20
   projectileSpreadAngle: 1000
   delayBetweenProjectiles: 0.1
-  hitCount: 5
+  hitCount: 3
   delayBetweenHits: 0.1
   appliesStatus: 4
   statusDuration: 2

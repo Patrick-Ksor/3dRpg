@@ -50,6 +50,45 @@ public class RunManager : MonoBehaviour
     public IReadOnlyList<RunUpgrade> AppliedUpgrades => _appliedUpgrades;
     public IReadOnlyList<AttackUpgrade> AppliedAttackUpgrades => _appliedAttackUpgrades;
     public IReadOnlyDictionary<string, LegendaryRelicSO> EquippedRelics => _equippedRelics;
+
+    // ── Run inventory (potions) ────────────────────────────────────────────────
+    // Units are rebuilt every encounter, so the pack lives here and is copied onto the hero each fight.
+    public readonly List<BattleItem> RunItems = new List<BattleItem>();
+
+    public static BattleItem FindItem(ItemType type) =>
+        Resources.LoadAll<BattleItem>("Items").FirstOrDefault(i => i.itemType == type);
+
+    public void AddItems(BattleItem item, int count)
+    {
+        if (item == null) return;
+        for (int i = 0; i < count; i++) RunItems.Add(item);
+        Debug.Log($"[RunManager] +{count} {item.itemName}. Pack: {RunItems.Count}");
+    }
+
+    public void ConsumeItem(BattleItem item) => RunItems.Remove(item);
+
+    public void ApplyItemsToUnit(Unit unit)
+    {
+        unit.inventory = new List<BattleItem>(RunItems);
+    }
+
+    // ── Best run per hero (saved between sessions) ─────────────────────────────
+    public bool LastRunWasNewBest { get; private set; }
+
+    public static int BestEncounterFor(string heroName) => PlayerPrefs.GetInt("BestEncounter_" + heroName, 0);
+
+    private void RecordBestRun()
+    {
+        string hero = CurrentRunStats != null ? CurrentRunStats.characterName : null;
+        LastRunWasNewBest = false;
+        if (string.IsNullOrEmpty(hero)) return;
+        if (CurrentEncounter > BestEncounterFor(hero))
+        {
+            PlayerPrefs.SetInt("BestEncounter_" + hero, CurrentEncounter);
+            PlayerPrefs.Save();
+            LastRunWasNewBest = true;
+        }
+    }
     public RunStatistics CurrentRunStats { get; private set; }
     private void Awake()
     {
@@ -69,6 +108,11 @@ public class RunManager : MonoBehaviour
         _appliedUpgrades.Clear();
         _appliedAttackUpgrades.Clear();
         _equippedRelics.Clear();
+
+        // Starting kit, the same for every hero.
+        RunItems.Clear();
+        AddItems(FindItem(ItemType.HealthPotion), 2);
+        AddItems(FindItem(ItemType.ManaPotion), 1);
 
         string charName = SelectedCharacterPrefab != null ? SelectedCharacterPrefab.name : "Unknown Hero";
         CurrentRunStats = new RunStatistics(charName);
@@ -142,6 +186,7 @@ public class RunManager : MonoBehaviour
             CurrentRunStats.finalEncounter = CurrentEncounter;
             CurrentRunStats.finalGold = Gold;
         }
+        RecordBestRun();
         Debug.Log($"[RunManager] Run ended at encounter {CurrentEncounter}. Gold: {Gold}");
     }
 
@@ -397,6 +442,13 @@ public class RunManager : MonoBehaviour
         pool.Add(RewardChoice.FromStat(new RunUpgrade($"+{defMain} Defense", $"Significantly increase defense.", UpgradeType.Defense, defMain)));
         pool.Add(RewardChoice.FromStat(new RunUpgrade($"+{spdVal} Speed", $"Act earlier in the turn order.", UpgradeType.Speed, spdVal)));
         pool.Add(RewardChoice.FromStat(new RunUpgrade($"+{manaVal} Max Mana", $"More mana for special abilities.", UpgradeType.MaxMana, manaVal)));
+
+        // ── Supplies ───────────────────────────────────────────────────────────
+        // Potions are kept for the whole run, so they give the Item command something to do.
+        BattleItem healthPotion = FindItem(ItemType.HealthPotion);
+        BattleItem manaPotion = FindItem(ItemType.ManaPotion);
+        if (healthPotion != null) pool.Add(RewardChoice.FromItem(healthPotion, 2));
+        if (manaPotion != null && playerUnits.Any(u => u != null && u.maxMana > 0)) pool.Add(RewardChoice.FromItem(manaPotion, 2));
 
         // ── Attack upgrades (context-aware) ────────────────────────────────────
         // Build the set of attacks explicitly unlocked through the reward system so we
@@ -661,6 +713,10 @@ public class RunManager : MonoBehaviour
                     // Curses are rare and risky, give them a high base weight so they appear consistently
                     w = 40;
                 }
+                else if (choice.battleItem != null)
+                {
+                    w = 18;   // supplies show up regularly but do not crowd out upgrades
+                }
                 else if (choice.statUpgrade != null)
                 {
                     // Stat upgrades and passives get a higher base weight to compete with the sheer volume of attack upgrades
@@ -735,9 +791,19 @@ public class RunManager : MonoBehaviour
     public static List<RewardChoice> GenerateMerchantChoices(List<Unit> playerUnits, int encounter, int count = 3)
     {
         var choices = GenerateRewardChoices(playerUnits, encounter, count);
+
+        // A shop always stocks potions: swap the last card for a Health Potion offer if none came up.
+        BattleItem hp = FindItem(ItemType.HealthPotion);
+        if (hp != null && choices.Count >= 3 && !choices.Any(c => c.battleItem != null))
+            choices[choices.Count - 1] = RewardChoice.FromItem(hp, 2);
+
         int baseGold = 20 + 5 * (encounter - 1);   // one winning fight's gold income
         foreach (var choice in choices)
-            choice.goldCost = Mathf.Max(10, Mathf.RoundToInt(baseGold * UnityEngine.Random.Range(1.2f, 2.2f)));   // 1.2-2.2 fights of income
+        {
+            float price = baseGold * UnityEngine.Random.Range(1.2f, 2.2f);   // 1.2-2.2 fights of income
+            if (choice.battleItem != null) price *= 0.45f;                    // potions are cheap
+            choice.goldCost = Mathf.Max(10, Mathf.RoundToInt(price));
+        }
         return choices;
     }
 

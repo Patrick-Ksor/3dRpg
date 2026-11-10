@@ -133,7 +133,7 @@ Each round all living units are sorted by **Speed (highest first)** and act once
 Attack (basic attack, then a target), Special (attacks with mana cost), Item, Defend.
 
 - **Defend:** halves incoming damage until that unit's next turn starts.
-- **Items:** `BattleItem` (Health / Mana potion) in a unit's `inventory`. No reward or shop currently grants items, so inventories are only filled in the prefab.
+- **Items:** potions (`BattleItem`, `Resources/Items`) live in the **run's pack** (`RunManager.RunItems`), which is copied onto the hero every encounter; using one removes it for the rest of the run. Every hero starts with 2 Health Potions and 1 Mana Potion. More come from reward cards ("Supplies", 2 potions, about 7% of cards) and the Merchant (always stocks a cheap potion offer, about 0.45x the normal price). A potion uses the player's turn.
 
 ### Enemy AI
 
@@ -177,6 +177,12 @@ Applied by attacks (`AttackAction.appliesStatus`, with chance and duration). Tic
 ### Summons
 
 Summon attacks (`isSummon`) spawn pooled minion prefabs that rise, run to the target and hit using the **caster's** ATK and the attack's damage values. `summonCount` minions per target. The Necromancer's *Raise Skeleton* summons 3.
+
+---
+
+## Best run
+
+The deepest encounter reached with each hero is saved (`PlayerPrefs`, key `BestEncounter_<prefab name>`), shown on the hero list, and the run summary says "New best!" when it is beaten.
 
 ---
 
@@ -297,6 +303,22 @@ Every hero's six base stats add up to **200** (keep that when editing a prefab).
 | Wizard      | 100 | 20   | 30  | 5   | 15  | 0    |
 | Ninja       | 100 | 20   | 15  | 5   | 15  | 15   |
 | Necromancer | 100 | 20   | 25  | 5   | 15  | 5    |
+
+---
+
+## Hero special attacks (tuned)
+
+Specials were tuned to roughly 1.5-3x their hero's basic attack per cast, so mana (which now regenerates) matters but they do not dwarf basic attacks. Damage per cast, before ATK/DEF:
+
+| Special        | Hero        | Cost | Base damage per cast |
+| -------------- | ----------- | ---- | -------------------- |
+| Axe Storm      | Barbarian   | 20   | 3 hits x 10-12 (+ Fortify 35%) |
+| Shuriken Storm | Ninja       | 20   | 10 projectiles x 4-6 |
+| Judgement      | Knight      | 20   | 8 projectiles x 10-12 (+ Burn) |
+| Heavy Slash    | Knight      | 10   | 70-90                |
+| Meteor         | Wizard      | 20   | 2 hits x 40-60       |
+
+The Dark Knight boss's Heavy Slash is 30-40 (mana 10, so at most twice a fight). Several enemies have specials of their own: Skeleton Knights and Foot Soldiers use Heavy Slash, the Necromancer boss uses Dark Bolt, Raise Skeleton and Soul Drain.
 
 ---
 

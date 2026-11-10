@@ -47,6 +47,8 @@ Unity 6 (URP 17, Input System, UI Toolkit + uGUI hybrid) 3D turn-based roguelike
 
 ## Conventions and gotchas
 - Impact feel lives in `HitFeedback.Play(target, damage, crit)` (called next to each `DamagePopSpawner.Show` for a hit): target recoil (`Unit.PlayRecoil`), `CameraShake` trauma, and a very short `HitStop` on crits/kills. Unit movement is script-driven (root motion is forced off); the idle state is resolved from the controller's default state because prefabs name it `<Hero>_Idle`.
+- Potions are run state (`RunManager.RunItems`), not prefab inventory: units are rebuilt each encounter, so `BaseBattleManager` copies the pack onto the hero and `PlayerUseItem` removes the potion from the run. Item rewards are `RewardChoice.battleItem`.
+- Enemy corpses sink into the floor and deactivate (`Unit.SinkToGround`); first-time hints are `BattleUIManager.ShowTip` (flags `tip_*` in PlayerPrefs); the select screen's 3D model is `UI/HeroPreview` (RenderTexture rig at y=-500).
 - Hero base stats (HP+MP+ATK+DEF+SPD+Luck) total 200 each; see the table in `RunMechanics.md` before changing a hero prefab.
 - `BattleCamera` (added to the camera by `GameBootstrapper`) holds the camera presets; press `C` in battle to cycle them, the choice is saved in PlayerPrefs (`BattleCameraPreset`). Edit the `Presets` array to add or tune a view; preset 1 (High three-quarter) is the default, preset 0 is the original low over-the-shoulder camera.
 - Units are re-instantiated every encounter; upgrades are re-applied from `RunManager` lists. Anything stored only on a `Unit` is lost between encounters.

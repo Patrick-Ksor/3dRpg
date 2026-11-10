@@ -25,6 +25,7 @@ public class MainMenuManager : MonoBehaviour
     private VisualElement _heroList;
     private Label _characterRoleLabel;
     private bool _switching;
+    private HeroPreview _preview;
 
     // Bar scale: the value that fills a bar completely, plus each stat's colour.
     private static readonly (string label, Color color, float max)[] StatDefs =
@@ -69,6 +70,7 @@ public class MainMenuManager : MonoBehaviour
         if (start != null) start.clicked += OnStartRun;
         if (quit != null) quit.clicked += OnQuit;
 
+        _preview = HeroPreview.Create();
         BuildStatBars();
         BuildHeroList();
         UpdateUI();
@@ -160,7 +162,9 @@ public class MainMenuManager : MonoBehaviour
             var name = new Label(def.characterName);
             name.AddToClassList("hero-entry-name");
             text.Add(name);
-            var sub = new Label(string.IsNullOrEmpty(def.role) ? "HERO" : def.role.ToUpperInvariant());
+            string roleText = string.IsNullOrEmpty(def.role) ? "HERO" : def.role.ToUpperInvariant();
+            int best = RunManager.BestEncounterFor(def.characterPrefab != null ? def.characterPrefab.name : def.characterName);
+            var sub = new Label(best > 0 ? $"{roleText}  ·  BEST: ENCOUNTER {best}" : roleText);
             sub.AddToClassList("hero-entry-sub");
             text.Add(sub);
             entry.Add(text);
@@ -187,8 +191,14 @@ public class MainMenuManager : MonoBehaviour
 
         if (_characterNameLabel != null) _characterNameLabel.text = selected.characterName.ToUpperInvariant();
         if (_characterDescLabel != null) _characterDescLabel.text = selected.description;
-        if (_characterPreviewImage != null && selected.icon != null)
-            _characterPreviewImage.style.backgroundImage = new StyleBackground(selected.icon);
+        if (_characterPreviewImage != null)
+        {
+            // 3D model when the prefab can be previewed, otherwise the portrait icon.
+            if (_preview != null && _preview.Show(selected.characterPrefab))
+                _characterPreviewImage.style.backgroundImage = new StyleBackground(Background.FromRenderTexture(_preview.Texture));
+            else if (selected.icon != null)
+                _characterPreviewImage.style.backgroundImage = new StyleBackground(selected.icon);
+        }
 
         Unit unit = selected.characterPrefab != null ? selected.characterPrefab.GetComponent<Unit>() : null;
         UpdateStats(unit);

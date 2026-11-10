@@ -783,37 +783,28 @@ public class Unit : MonoBehaviour
         return results;
     }
 
+    /// <summary>
+    /// After the death animation has played, enemy corpses sink into the floor and switch off, so the arena does not
+    /// fill up with bodies. The hero's body stays for the defeat screen.
+    /// </summary>
     private IEnumerator SinkToGround()
     {
-        yield return new WaitForSeconds(0.5f);
+        if (isPlayer) yield break;
 
-        float targetY = 0f;
-        // Raycast from slightly above the current position down to find the ground
-        if (Physics.Raycast(transform.position + Vector3.up * 0.5f, Vector3.down, out RaycastHit hit, 5f))
+        yield return new WaitForSeconds(1.6f);   // let the death animation and knockback finish
+
+        Vector3 start = transform.position;
+        const float depth = 1.6f;
+        const float duration = 0.9f;
+        float t = 0f;
+        while (t < duration)
         {
-            targetY = hit.point.y;
-        }
-
-        float startY = transform.position.y;
-
-        // If already close enough to the ground, exit
-        if (Mathf.Abs(startY - targetY) < 0.01f) yield break;
-
-        float elapsed = 0f;
-        float duration = 0.8f;
-
-        while (elapsed < duration)
-        {
-            elapsed += Time.deltaTime;
-            Vector3 pos = transform.position;
-            pos.y = Mathf.Lerp(startY, targetY, Mathf.SmoothStep(0f, 1f, elapsed / duration));
-            transform.position = pos;
+            t += Time.deltaTime;
+            float k = Mathf.Clamp01(t / duration);
+            transform.position = start + Vector3.down * (depth * k * k);   // ease-in: starts slowly, then drops
             yield return null;
         }
-
-        Vector3 finalPos = transform.position;
-        finalPos.y = targetY;
-        transform.position = finalPos;
+        gameObject.SetActive(false);
     }
 }
 

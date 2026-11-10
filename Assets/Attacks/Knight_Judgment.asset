@@ -35,7 +35,7 @@ MonoBehaviour:
   rotateToFaceTarget: 1
   returnsToCaster: 0
   projectileFireDelay: 0.8
-  projectileCount: 10
+  projectileCount: 8
   projectileSpreadAngle: 50
   delayBetweenProjectiles: 0.01
   hitCount: 1

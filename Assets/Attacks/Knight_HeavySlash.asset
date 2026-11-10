@@ -13,23 +13,41 @@ MonoBehaviour:
   m_Name: Knight_HeavySlash
   m_EditorClassIdentifier: Assembly-CSharp::AttackAction
   actionName: Heavy Slash
-  minDamage: 40
-  maxDamage: 55
+  minDamage: 70
+  maxDamage: 90
   manaCost: 10
   isRanged: 0
   isAoE: 0
   animationName: Knight_Heavy_Attack
   hitDelay: 0.6
   finishDelay: 1.06
+  chargeVfxPrefab: {fileID: 0}
   hitVfxPrefab: {fileID: 500345726442012828, guid: 50a810bfd70577b41a2d43ae0241ea2d, type: 3}
   projectilePrefab: {fileID: 0}
+  hitVfxDamageDelay: 0
   chargeSoundEffect: {fileID: 0}
   gruntSound: {fileID: 8300000, guid: ec9eb0861f60a5e48bb077fec585c736, type: 3}
+  gruntSoundDelay: 0
   hitSoundEffect: {fileID: 8300000, guid: 6a88bdeeddefdf9468cfaf2d9ea348b9, type: 3}
   projectileSpeed: 15
+  projectileScaleMultiplier: 1
+  spinProjectile: 1
+  rotateToFaceTarget: 1
+  returnsToCaster: 0
   projectileFireDelay: 0.4
   projectileCount: 1
   projectileSpreadAngle: 0
   delayBetweenProjectiles: 0
   hitCount: 1
   delayBetweenHits: 0.1
+  appliesStatus: 0
+  statusDuration: 2
+  statusValue: 0.08
+  statusChance: 1
+  isSummon: 0
+  summonCount: 1
+  summonPrefab: {fileID: 0}
+  summonSpawnVfxPrefab: {fileID: 0}
+  summonSpawnSoundEffect: {fileID: 0}
+  summonHitDelay: 0.35
+  lifeStealPercent: 0

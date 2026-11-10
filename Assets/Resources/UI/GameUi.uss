@@ -91,6 +91,8 @@
 .icon-book    { background-image: url("/Assets/Violet Theme Ui/Colored Icons/Book.png"); }
 .icon-hammer  { background-image: url("/Assets/Violet Theme Ui/Colored Icons/Hammer.png"); }
 .icon-potion  { background-image: url("/Assets/Violet Theme Ui/Colored Icons/Potion Green.png"); }
+.icon-potion-health { background-image: url("/Assets/Violet Theme Ui/Colored Icons/Potion Red.png"); }
+.icon-potion-mana   { background-image: url("/Assets/Violet Theme Ui/Colored Icons/Potion Violet.png"); }
 .icon-gem     { background-image: url("/Assets/Violet Theme Ui/Colored Icons/Gem 1 Purple.png"); }
 .icon-skull   { background-image: url("/Assets/Violet Theme Ui/Colored Icons/Dark Gem.png"); }
 .icon-attack  { background-image: url("/Assets/Violet Theme Ui/Colored Icons/Sword.png"); }
@@ -1324,3 +1326,23 @@
 }
 
 .target-row:hover .target-row-hp { color: var(--stone-0); }
+
+/* First-time hints under the turn banner */
+.tip-label {
+    display: none;
+    margin-top: 6px;
+    padding: 5px 16px;
+    font-size: 17px;
+    color: var(--parchment);
+    background-color: rgba(12, 10, 9, 0.92);
+    border-width: 1px;
+    border-color: var(--torch-dim);
+    opacity: 0;
+    transition-property: opacity;
+    transition-duration: 0.3s;
+}
+
+.tip-label--shown {
+    display: flex;
+    opacity: 1;
+}

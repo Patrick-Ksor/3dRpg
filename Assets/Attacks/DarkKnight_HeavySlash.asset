@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: DarkKnight_HeavySlash
   m_EditorClassIdentifier: Assembly-CSharp::AttackAction
   actionName: Heavy Slash
-  minDamage: 15
-  maxDamage: 20
+  minDamage: 30
+  maxDamage: 40
   manaCost: 10
   isRanged: 0
   isAoE: 0
@@ -30,6 +30,7 @@ MonoBehaviour:
   gruntSoundDelay: 0
   hitSoundEffect: {fileID: 8300000, guid: 6a88bdeeddefdf9468cfaf2d9ea348b9, type: 3}
   projectileSpeed: 15
+  projectileScaleMultiplier: 1
   spinProjectile: 1
   rotateToFaceTarget: 1
   returnsToCaster: 0

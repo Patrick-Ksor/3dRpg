@@ -90,6 +90,21 @@ public class RewardChoice
             curseEffect = curse,
         };
 
+    /// <summary>Non-null for supply rewards: adds <see cref="itemCount"/> copies of this potion to the run's pack.</summary>
+    public BattleItem battleItem;
+    public int itemCount = 1;
+
+    public static RewardChoice FromItem(BattleItem item, int count) =>
+        new RewardChoice
+        {
+            name = $"{count}x {item.itemName}",
+            description = item.itemType == ItemType.HealthPotion
+                ? $"Restores {item.potency} HP when used from the Item command. Potions are kept until you use them."
+                : $"Restores {item.potency} MP when used from the Item command. Potions are kept until you use them.",
+            battleItem = item,
+            itemCount = count,
+        };
+
     /// <summary>Gold cost for merchant purchases. Zero means free (standard reward).</summary>
     public int goldCost = 0;
 

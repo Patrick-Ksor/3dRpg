@@ -91,6 +91,7 @@
         </ui:VisualElement>
         <ui:VisualElement name="bottom-message-zone" class="bottom-message-zone">
             <ui:Label name="battle-message" text="" class="battle-message" style="display: none;"/>
+            <ui:Label name="tip-label" text="" class="tip-label"/>
         </ui:VisualElement>
 
         <!-- Overlays -->

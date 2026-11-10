@@ -37,6 +37,8 @@ public class BattleUIManager : MonoBehaviour
     private Label _itemSub;
     private Label _commandTitle;
     private Label _commandRound;
+    private Label _tipLabel;
+    private int _turnsShown;
     private Button _claimBtn;
     private VisualElement _nameplateLayer;
     private Unit _selectedTarget;
@@ -186,6 +188,7 @@ public class BattleUIManager : MonoBehaviour
         _itemSub = _root.Q<Label>("item-btn-sub");
         _commandTitle = _root.Q<Label>("command-title");
         _commandRound = _root.Q<Label>("command-round");
+        _tipLabel = _root.Q<Label>("tip-label");
         _claimBtn = _root.Q<Button>("claim-btn");
         _nameplateLayer = _root.Q<VisualElement>("nameplate-layer");
         Nameplates.SetLayer(_nameplateLayer, OnPlateClicked);
@@ -616,6 +619,32 @@ public class BattleUIManager : MonoBehaviour
         return sb.ToString();
     }
 
+    // ─── FIRST-TIME HINTS ──────────────────────────────────────────────────
+
+    /// <summary>One-line hints that appear once per install (flags in PlayerPrefs), at the moment they matter.</summary>
+    private void MaybeShowTips(Unit hero)
+    {
+        if (_turnsShown == 1)
+            ShowTip("target", "Tip: click an enemy to choose your target, then press Attack.");
+        else if (_turnsShown == 2)
+            ShowTip("camera", "Tip: press C to change the camera angle.");
+        else if (hero.specialAttacks != null && hero.specialAttacks.Count > 0 && hero.maxMana > 0)
+            ShowTip("mana", "Tip: Specials cost mana. You regain 10% of your max mana every turn.");
+        else if (hero.inventory != null && hero.inventory.Count > 0 && _turnsShown >= 3)
+            ShowTip("items", "Tip: potions are kept for the whole run. Use them from Item.");
+    }
+
+    private void ShowTip(string key, string text)
+    {
+        if (_tipLabel == null) return;
+        string flag = "tip_" + key;
+        try { if (PlayerPrefs.GetInt(flag, 0) == 1) return; PlayerPrefs.SetInt(flag, 1); } catch { }
+
+        _tipLabel.text = text;
+        _tipLabel.AddToClassList("tip-label--shown");
+        _tipLabel.schedule.Execute(() => _tipLabel.RemoveFromClassList("tip-label--shown")).StartingIn(7000);
+    }
+
     // ─── COMMAND MENU ──────────────────────────────────────────────────────
 
     public void ShowCommandMenu()
@@ -635,6 +664,8 @@ public class BattleUIManager : MonoBehaviour
         bool hasItems = activeUnit.inventory != null && activeUnit.inventory.Count > 0;
 
         _playerTurn = true;
+        _turnsShown++;
+        MaybeShowTips(activeUnit);
         _pendingAction = null;
         Nameplates.SetPicking(false);
         if (_commandRound != null && _battleManager != null) _commandRound.text = $"Round {_battleManager.BattleRounds}";
@@ -1367,7 +1398,8 @@ public class BattleUIManager : MonoBehaviour
         if (_summaryTitle != null) _summaryTitle.text = won ? "Run Complete!" : "Defeated!";
 
         if (_summaryStats != null)
-            _summaryStats.text = $"Reached Encounter {reachedEncounter}   |   {gold} Gold";
+            _summaryStats.text = $"Reached Encounter {reachedEncounter}   |   {gold} Gold"
+                + (RunManager.Instance != null && RunManager.Instance.LastRunWasNewBest ? "   |   New best!" : "");
 
         RunManager rm = RunManager.Instance;
         var stats = rm?.CurrentRunStats;
