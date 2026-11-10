@@ -14,6 +14,11 @@ public static class Nameplates
     private static readonly List<Plate> s_Plates = new List<Plate>();
     private static Unit s_Target;
 
+    private static Action<VisualElement, string, string> s_RegisterTooltip;
+
+    /// <summary>Lets the HUD attach its hover tooltip to plate elements (affix icons).</summary>
+    public static void SetTooltipRegistrar(Action<VisualElement, string, string> registrar) => s_RegisterTooltip = registrar;
+
     private static StatusIconConfig s_IconConfig;
     private static bool s_IconConfigLoaded;
 
@@ -189,13 +194,18 @@ public static class Nameplates
                 _root.Add(mp);
             }
 
-            _statusRow = new VisualElement { pickingMode = PickingMode.Ignore };
-            _statusRow.AddToClassList("np-status");
-            _root.Add(_statusRow);
+            // Affix icons first, then status chips, stacked under the plate.
+            var below = new VisualElement { pickingMode = PickingMode.Ignore };
+            below.AddToClassList("np-below");
+            _root.Add(below);
 
             _affixRow = new VisualElement { pickingMode = PickingMode.Ignore };
             _affixRow.AddToClassList("np-affixes");
-            _root.Add(_affixRow);
+            below.Add(_affixRow);
+
+            _statusRow = new VisualElement { pickingMode = PickingMode.Ignore };
+            _statusRow.AddToClassList("np-status");
+            below.Add(_statusRow);
 
             if (!isPlayer && onClick != null)
                 _root.RegisterCallback<ClickEvent>(_ => { if (!unit.isDead) onClick(unit); });
@@ -218,10 +228,19 @@ public static class Nameplates
             if (affixes == null) return;
             foreach (EnemyAffix a in affixes)
             {
-                var lbl = new Label(a.name) { pickingMode = PickingMode.Ignore };
-                lbl.AddToClassList("np-affix");
-                lbl.style.color = AffixColor(a.type);
-                _affixRow.Add(lbl);
+                // An icon in a coloured frame; hover for its name and effect.
+                var chip = new VisualElement();
+                chip.AddToClassList("np-affix");
+                Color color = AffixColor(a.type);
+                chip.style.borderTopColor = chip.style.borderBottomColor = chip.style.borderLeftColor = chip.style.borderRightColor = color;
+
+                var icon = new VisualElement { pickingMode = PickingMode.Ignore };
+                icon.AddToClassList("np-affix-icon");
+                icon.AddToClassList("affix-" + a.type.ToString().ToLowerInvariant());
+                chip.Add(icon);
+
+                s_RegisterTooltip?.Invoke(chip, a.name, AffixDescription(a.type));
+                _affixRow.Add(chip);
             }
         }
 
@@ -323,6 +342,19 @@ public static class Nameplates
             StatusEffectType.Weaken => "W",
             StatusEffectType.Fortify => "F",
             _ => "?",
+        };
+
+        private static string AffixDescription(EnemyAffixType type) => type switch
+        {
+            EnemyAffixType.Armored => "Defense x1.5.",
+            EnemyAffixType.Berserker => "Attack x1.5.",
+            EnemyAffixType.Swift => "Speed +10, so it acts earlier.",
+            EnemyAffixType.Bulwark => "Max HP x1.4.",
+            EnemyAffixType.Regenerating => "Restores 8% of its max HP at the start of its turn.",
+            EnemyAffixType.Thorns => "Reflects 15% of the damage it takes back to the attacker.",
+            EnemyAffixType.Vampiric => "Heals for 25% of the damage it deals.",
+            EnemyAffixType.Enraged => "Deals double damage while below 50% HP.",
+            _ => "",
         };
 
         private static Color AffixColor(EnemyAffixType type) => type switch

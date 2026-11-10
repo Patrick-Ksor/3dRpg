@@ -685,12 +685,16 @@
     background-color: rgb(74, 120, 196);
 }
 
-.np-status {
+.np-below {
     position: absolute;
     top: 100%;
     left: 0;
     right: 0;
     margin-top: 4px;
+    align-items: center;
+}
+
+.np-status {
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
@@ -731,18 +735,36 @@
 }
 
 .np-affixes {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    margin-top: 32px;
-    align-items: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
+/* Enemy trait: an icon in a frame coloured by trait; hover for the name and effect. */
 .np-affix {
-    font-size: 15px;
-    -unity-font-style: bold;
+    width: 34px;
+    height: 34px;
+    margin: 0 3px 4px 3px;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(12, 10, 9, 0.92);
+    border-width: 2px;
 }
+
+.np-affix-icon {
+    width: 22px;
+    height: 22px;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.affix-armored      { background-image: url("/Assets/Violet Theme Ui/Colored Icons/shield blue.png"); }
+.affix-berserker    { background-image: url("/Assets/Violet Theme Ui/Colored Icons/axe.png"); }
+.affix-swift        { background-image: url("/Assets/Violet Theme Ui/Colored Icons/Energy.png"); }
+.affix-bulwark      { background-image: url("/Assets/Violet Theme Ui/Colored Icons/shield green.png"); }
+.affix-regenerating { background-image: url("/Assets/Violet Theme Ui/Colored Icons/leaf.png"); }
+.affix-thorns       { background-image: url("/Assets/Violet Theme Ui/Colored Icons/Return.png"); }
+.affix-vampiric     { background-image: url("/Assets/Violet Theme Ui/Colored Icons/Heart Dark.png"); }
+.affix-enraged      { background-image: url("/Assets/Violet Theme Ui/Colored Icons/Bomb.png"); }
 
 .np-ring {
     position: absolute;

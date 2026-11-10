@@ -192,6 +192,7 @@ public class BattleUIManager : MonoBehaviour
         _claimBtn = _root.Q<Button>("claim-btn");
         _nameplateLayer = _root.Q<VisualElement>("nameplate-layer");
         Nameplates.SetLayer(_nameplateLayer, OnPlateClicked);
+        Nameplates.SetTooltipRegistrar((el, title, body) => RegisterTooltip(el, () => (title, body)));
 
         // Tooltip
         _tooltip = _root.Q<VisualElement>("tooltip");
