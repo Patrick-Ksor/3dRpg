@@ -71,6 +71,8 @@ public class CameraShake : MonoBehaviour
 public class HitStop : MonoBehaviour
 {
     private static HitStop s_Instance;
+    /// <summary>Set by the pause screen so a finishing hit-stop does not un-pause the game.</summary>
+    public static bool Paused;
     private int _active;
 
     public static void Do(float seconds)
@@ -93,7 +95,7 @@ public class HitStop : MonoBehaviour
         if (_active <= 0)
         {
             _active = 0;
-            Time.timeScale = 1f;
+            Time.timeScale = Paused ? 0f : 1f;
         }
     }
 

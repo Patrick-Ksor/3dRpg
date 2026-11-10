@@ -35,19 +35,7 @@ public static class GameBootstrapper
         c.backgroundColor = new Color(0.15f, 0.15f, 0.15f);
         camObj.AddComponent<AudioListener>();
 
-        // Add BGM
-#if UNITY_EDITOR
-        AudioClip bgmClip = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Battle Music Pack DEMO/Battle Theme 1_demo.wav");
-        if (bgmClip != null)
-        {
-            AudioSource bgmSource = camObj.AddComponent<AudioSource>();
-            bgmSource.clip = bgmClip;
-            bgmSource.loop = true;
-            bgmSource.volume = 0.1f; // Lowered background volume
-            bgmSource.playOnAwake = true;
-            bgmSource.Play();
-        }
-#endif
+        // Music is handled by AudioManager (works in builds); BaseBattleManager picks the track per encounter.
 
         // Side-angled view: lower and further back, roughly 18° tilt
         camObj.transform.position = new Vector3(-4f, 1.5f, -4.5f);

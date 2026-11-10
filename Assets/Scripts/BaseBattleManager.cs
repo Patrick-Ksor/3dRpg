@@ -126,6 +126,9 @@ public class BaseBattleManager : MonoBehaviour
     private void Update()
     {
         // Allow hard reset at any time for quick testing
+        if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
+            _uiManager?.TogglePause();
+
         if (Keyboard.current != null && Keyboard.current.rKey.wasPressedThisFrame)
         {
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
@@ -147,6 +150,8 @@ public class BaseBattleManager : MonoBehaviour
         _battleRounds = 0;
         int encounterTier = (rm != null && rm.IsRunActive) ? RunManager.GetEncounterTier(rm.CurrentEncounter) : 1;
         bool isBossEncounter = rm != null && rm.IsRunActive && rm.CurrentEncounter % 10 == 0;
+        AudioManager.PlayBattleMusic(rm != null && rm.IsRunActive ? rm.CurrentEncounter : 1, isBossEncounter);
+        AudioManager.Play(Sfx.EncounterStart, 0.8f);
 
         // Re-tint the arena (torches, fog, sun) for this encounter's tier / boss status
         ArenaController.Instance?.Apply(
@@ -531,6 +536,7 @@ public class BaseBattleManager : MonoBehaviour
         if (state != BattleState.PLAYERTURN) return;
         state = BattleState.BUSY;
         _activeUnit.isDefending = true;
+        AudioManager.Play(Sfx.Buff, 0.8f);
         _uiManager.SetMessage($"{_activeUnit.unitName} is defending!");
         _uiManager.EnableAttackButton(false);
         StartCoroutine(DelayThenNextTurn(1f));
@@ -542,6 +548,7 @@ public class BaseBattleManager : MonoBehaviour
         state = BattleState.BUSY;
 
         _activeUnit.inventory.Remove(item);
+        AudioManager.Play(Sfx.ItemUse, 0.9f);
         RunManager.Instance?.ConsumeItem(item);   // gone for the rest of the run
 
         switch (item.itemType)
@@ -587,17 +594,8 @@ public class BaseBattleManager : MonoBehaviour
         AudioClip soundToUse = customSfx != null ? customSfx : impactSoundEffect;
         if (soundToUse != null)
         {
-            // Create a temporary audio source with pitch variation for multi-hit enhancement
-            GameObject audioObj = new GameObject("TempHitAudio");
-            audioObj.transform.position = position;
-            AudioSource audioSource = audioObj.AddComponent<AudioSource>();
-            audioSource.clip = soundToUse;
-            audioSource.spatialBlend = 0.5f; // Partially 3D
-            audioSource.volume = 0.8f;
-            audioSource.pitch = Random.Range(0.85f, 1.15f); // Randomize pitch slightly
-            audioSource.Play();
-
-            Destroy(audioObj, soundToUse.length + 0.1f); // Cleanup after sound finishes
+            // Pitch varies a little so rapid multi-hits do not sound identical
+            AudioManager.PlayClip(soundToUse, 0.8f, 0.15f);
         }
     }
 
@@ -638,7 +636,7 @@ public class BaseBattleManager : MonoBehaviour
 
                 int baseDamage = Random.Range(action.minDamage, action.maxDamage + 1);
                 int damage = Mathf.Max(1, (baseDamage * attackingUnit.attack) / Mathf.Max(1, u.defense));
-                if (u.isDefending) damage = Mathf.Max(1, damage / 2);
+                if (u.isDefending) { damage = Mathf.Max(1, damage / 2); AudioManager.Play(Sfx.Block, 0.7f); }
                 if (isCrit) damage = Mathf.RoundToInt(damage * 1.5f);
                 // Enraged perk: double damage below 50% HP
                 if (attackingUnit.hasEnraged && attackingUnit.currentHealth < attackingUnit.maxHealth * 0.5f)
@@ -752,6 +750,10 @@ public class BaseBattleManager : MonoBehaviour
 
     private IEnumerator EnemyTurn()
     {
+        // A Defend lasts until that unit's next turn starts (the player's turn start clears it the same way).
+        // Without this an enemy that defended once kept the halved damage for the rest of the fight.
+        _activeUnit.isDefending = false;
+
         _uiManager.SetMessage($"{_activeUnit.unitName}'s turn...");
 
         yield return new WaitForSeconds(0.3f);
@@ -793,6 +795,7 @@ public class BaseBattleManager : MonoBehaviour
         if (Random.value < 0.2f)
         {
             _activeUnit.isDefending = true;
+            AudioManager.Play(Sfx.Buff, 0.6f);
             _uiManager.SetMessage($"{_activeUnit.unitName} takes a defensive stance!");
             yield return new WaitForSeconds(0.7f);
             ProcessNextTurn();
@@ -867,7 +870,7 @@ public class BaseBattleManager : MonoBehaviour
 
                 int baseDamage = Random.Range(chosenAttack.minDamage, chosenAttack.maxDamage + 1);
                 int damage = Mathf.Max(1, (baseDamage * _activeUnit.attack) / Mathf.Max(1, u.defense));
-                if (u.isDefending) damage = Mathf.Max(1, damage / 2);
+                if (u.isDefending) { damage = Mathf.Max(1, damage / 2); AudioManager.Play(Sfx.Block, 0.7f); }
                 if (isCrit) damage = Mathf.RoundToInt(damage * 1.5f);
                 if (isEnraged) damage = Mathf.RoundToInt(damage * 2f);
 
@@ -1115,6 +1118,7 @@ public class BaseBattleManager : MonoBehaviour
 
         if (state == BattleState.WON)
         {
+            AudioManager.Play(Sfx.Victory, 0.9f);
             if (rm != null && rm.IsRunActive)
             {
                 int goldEarned = rm.GetGoldReward();
@@ -1174,6 +1178,8 @@ public class BaseBattleManager : MonoBehaviour
         }
         else if (state == BattleState.LOST)
         {
+            AudioManager.Play(Sfx.Defeat, 0.9f);
+            AudioManager.StopMusic();
             int reached = rm != null ? rm.CurrentEncounter : 1;
             int gold = rm != null ? rm.Gold : 0;
             rm?.EndRun();
@@ -1434,13 +1440,7 @@ public class BaseBattleManager : MonoBehaviour
 
         if (isFirstSpawn && action.summonSpawnSoundEffect != null)
         {
-            GameObject audioObj = new GameObject("TempSpawnAudio");
-            audioObj.transform.position = caster.transform.position;
-            AudioSource audioSource = audioObj.AddComponent<AudioSource>();
-            audioSource.clip = action.summonSpawnSoundEffect;
-            audioSource.spatialBlend = 0.5f;
-            audioSource.Play();
-            Destroy(audioObj, action.summonSpawnSoundEffect.length + 0.1f);
+            AudioManager.PlayClip(action.summonSpawnSoundEffect);
         }
 
         // Make minion face target early
@@ -1499,7 +1499,7 @@ public class BaseBattleManager : MonoBehaviour
 
                 int baseDamage = Random.Range(action.minDamage, action.maxDamage + 1);
                 int damage = Mathf.Max(1, (baseDamage * caster.attack) / Mathf.Max(1, target.defense));
-                if (target.isDefending) damage = Mathf.Max(1, damage / 2);
+                if (target.isDefending) { damage = Mathf.Max(1, damage / 2); AudioManager.Play(Sfx.Block, 0.7f); }
                 if (isCrit) damage = Mathf.RoundToInt(damage * 1.5f);
                 if (caster.hasEnraged && caster.currentHealth < caster.maxHealth * 0.5f)
                     damage = Mathf.RoundToInt(damage * caster.EnragedMultiplier);

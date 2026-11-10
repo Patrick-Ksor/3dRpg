@@ -30,6 +30,9 @@ public class DamagePopSpawner : MonoBehaviour
         if (screenPos.z < 0f) return;
         screenPos.y = Mathf.Min(screenPos.y, Screen.height - 80f);   // keep the rise on screen
 
+        if (type == PopType.Miss) AudioManager.Play(Sfx.Miss, 0.8f);
+        else if (type == PopType.Heal) AudioManager.Play(Sfx.Heal, 0.7f);
+
         EnsureInstance();
         s_Instance.StartCoroutine(s_Instance.PopRoutine(screenPos, amount, type));
     }

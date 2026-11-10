@@ -38,6 +38,8 @@ public class BattleUIManager : MonoBehaviour
     private Label _commandTitle;
     private Label _commandRound;
     private Label _tipLabel;
+    private VisualElement _pausePanel;
+    public static bool IsPaused { get; private set; }
     private int _turnsShown;
     private Button _claimBtn;
     private VisualElement _nameplateLayer;
@@ -192,6 +194,18 @@ public class BattleUIManager : MonoBehaviour
         _claimBtn = _root.Q<Button>("claim-btn");
         _nameplateLayer = _root.Q<VisualElement>("nameplate-layer");
         Nameplates.SetLayer(_nameplateLayer, OnPlateClicked);
+        AudioManager.AttachUiSounds(_root);
+
+        // Pause screen
+        _pausePanel = _root.Q<VisualElement>("pause-panel");
+        VisualElement volumeHost = _root.Q<VisualElement>("pause-volume");
+        if (volumeHost != null && volumeHost.childCount == 0) volumeHost.Add(AudioManager.BuildVolumePanel());
+        Button pauseBtn = _root.Q<Button>("pause-btn");
+        if (pauseBtn != null && !pauseBtn.ClassListContains("wired")) { pauseBtn.AddToClassList("wired"); pauseBtn.clicked += TogglePause; }
+        Button resumeBtn = _root.Q<Button>("pause-resume");
+        if (resumeBtn != null && !resumeBtn.ClassListContains("wired")) { resumeBtn.AddToClassList("wired"); resumeBtn.clicked += TogglePause; }
+        Button menuBtn = _root.Q<Button>("pause-menu");
+        if (menuBtn != null && !menuBtn.ClassListContains("wired")) { menuBtn.AddToClassList("wired"); menuBtn.clicked += LeaveToMenu; }
         Nameplates.SetTooltipRegistrar((el, title, body) => RegisterTooltip(el, () => (title, body)));
 
         // Tooltip
@@ -618,6 +632,28 @@ public class BattleUIManager : MonoBehaviour
             sb.Append($"\n{Mathf.RoundToInt(a.statusChance * 100f)}% to inflict {a.appliesStatus} for {a.statusDuration} turns.");
         if (a.lifeStealPercent > 0f) sb.Append("\nDrains life from the target.");
         return sb.ToString();
+    }
+
+    // ─── PAUSE ─────────────────────────────────────────────────────────────
+
+    /// <summary>Pauses or resumes (Esc or the II button). Freezes game time; the pause screen has the volume sliders.</summary>
+    public void TogglePause()
+    {
+        if (_pausePanel == null) return;
+        IsPaused = !IsPaused;
+        HitStop.Paused = IsPaused;
+        Time.timeScale = IsPaused ? 0f : 1f;
+
+        if (IsPaused) ShowPanel(_pausePanel); else HidePanel(_pausePanel);
+        AudioManager.Play(IsPaused ? Sfx.Pause : Sfx.Unpause, 0.8f, 0f);
+    }
+
+    private void LeaveToMenu()
+    {
+        IsPaused = false;
+        HitStop.Paused = false;
+        Time.timeScale = 1f;
+        SceneFader.Load("MainMenu");
     }
 
     // ─── FIRST-TIME HINTS ──────────────────────────────────────────────────

@@ -71,6 +71,13 @@ public class MainMenuManager : MonoBehaviour
         if (quit != null) quit.clicked += OnQuit;
 
         _preview = HeroPreview.Create();
+        AudioManager.PlayMenuMusic();
+        AudioManager.AttachUiSounds(root);
+
+        // Music / Effects sliders, bottom left
+        var volume = AudioManager.BuildVolumePanel();
+        volume.AddToClassList("menu-volume");
+        (root.Q<VisualElement>(className: "main-container") ?? root).Add(volume);
         BuildStatBars();
         BuildHeroList();
         UpdateUI();

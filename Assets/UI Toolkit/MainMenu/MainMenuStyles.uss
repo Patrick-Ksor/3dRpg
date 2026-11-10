@@ -329,3 +329,11 @@
     background-color: rgba(34, 27, 22, 0.95);
     border-color: var(--torch);
 }
+
+/* Music / Effects sliders */
+.menu-volume {
+    position: absolute;
+    left: 40px;
+    bottom: 40px;
+    width: 280px;
+}

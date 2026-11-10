@@ -132,7 +132,7 @@ Each round all living units are sorted by **Speed (highest first)** and act once
 
 Attack (basic attack, then a target), Special (attacks with mana cost), Item, Defend.
 
-- **Defend:** halves incoming damage until that unit's next turn starts.
+- **Defend:** halves incoming damage until that unit's next turn starts. This applies to enemies too (an enemy's Defend used to last the whole fight because only the player's turn start cleared it).
 - **Items:** potions (`BattleItem`, `Resources/Items`) live in the **run's pack** (`RunManager.RunItems`), which is copied onto the hero every encounter; using one removes it for the rest of the run. Every hero starts with 2 Health Potions and 1 Mana Potion. More come from reward cards ("Supplies", 2 potions, about 7% of cards) and the Merchant (always stocks a cheap potion offer, about 0.45x the normal price). A potion uses the player's turn.
 
 ### Enemy AI
@@ -356,5 +356,5 @@ The run ends when all player units reach 0 HP. The run summary shows the encount
 
 1. **Relic grants:** Dark Staff (Necromancer) and Crown of the Undying both grant *Undying Wrath*, a melee ×3 attack. Verify that is intended for the Necromancer.
 2. **Boss affix comment mismatch:** a code comment says "3 forced affixes" but `RollAffixes` gives 2.
-3. **Footstep SFX and BGM only play in the Editor** (loaded via `AssetDatabase` under `#if UNITY_EDITOR`).
+3. (fixed) Music and footsteps now work in builds through `AudioManager`.
 4. **Dark Staff** now adds up to +10 minions per Raise Skeleton cast, which is a large power spike; re-check it in playtests.

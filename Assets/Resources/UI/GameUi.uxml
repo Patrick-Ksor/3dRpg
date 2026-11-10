@@ -31,6 +31,7 @@
                 <ui:Label name="gold-label" text="0 Gold" class="run-hud-label gold-label"/>
             </ui:VisualElement>
         </ui:VisualElement>
+        <ui:Button name="pause-btn" text="II" class="hud-pause"/>
         <ui:VisualElement name="run-rewards" class="run-rewards"/>
 
         <!-- Bottom left: hero card -->
@@ -112,6 +113,16 @@
                 <ui:Label name="summary-relics-title" text="RELICS &amp; UPGRADES" class="summary-section-title"/>
                 <ui:VisualElement name="summary-relics" class="summary-relics"/>
                 <ui:Button name="summary-restart" text="New Run" class="menu-button restart-button"/>
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- Pause (Esc or the II button) -->
+        <ui:VisualElement name="pause-panel" class="overlay-panel">
+            <ui:VisualElement class="overlay-card pause-card">
+                <ui:Label text="PAUSED" class="overlay-title"/>
+                <ui:VisualElement name="pause-volume" class="pause-volume"/>
+                <ui:Button name="pause-resume" text="RESUME" class="reward-button pause-resume"/>
+                <ui:Button name="pause-menu" text="MAIN MENU" class="menu-button pause-menu"/>
             </ui:VisualElement>
         </ui:VisualElement>
 

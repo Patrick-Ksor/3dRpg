@@ -1,0 +1,48 @@
+/* Music / Effects sliders (built in code by AudioManager.BuildVolumePanel). Literal colours: this sheet is shared by the menu and the HUD. */
+
+.vol-panel {
+    -unity-font-definition: url("/Assets/Fonts/BarlowCondensed-Regular.ttf");
+}
+
+.vol-row {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.vol-label {
+    width: 86px;
+    font-size: 15px;
+    letter-spacing: 2px;
+    color: rgb(166, 154, 138);
+}
+
+.vol-slider {
+    flex-grow: 1;
+    margin: 0;
+}
+
+.vol-slider .unity-base-slider__drag-container {
+    margin: 0;
+}
+
+.vol-slider .unity-base-slider__tracker {
+    height: 6px;
+    background-color: rgb(46, 39, 34);
+    border-width: 0;
+    border-radius: 0;
+}
+
+.vol-slider .unity-base-slider__dragger {
+    width: 16px;
+    height: 16px;
+    margin-top: -5px;
+    background-color: rgb(224, 178, 86);
+    border-width: 2px;
+    border-color: rgb(243, 208, 138);
+    border-radius: 8px;
+}
+
+.vol-slider .unity-base-slider__dragger-border {
+    display: none;
+}

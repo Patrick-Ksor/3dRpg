@@ -139,13 +139,7 @@ public class Unit : MonoBehaviour
 
         if (!silent)
         {
-            if (hitSound != null)
-            {
-                if (TryGetComponent<AudioSource>(out var audio))
-                {
-                    audio.PlayOneShot(hitSound);
-                }
-            }
+            AudioManager.PlayClip(hitSound, 0.9f, 0.05f);
 
             // Trigger hit animation via boolean
             TriggerHitAnimation();
@@ -269,14 +263,7 @@ public class Unit : MonoBehaviour
 
         if (action.chargeSoundEffect != null)
         {
-            GameObject audioObj = new GameObject("TempChargeAudio");
-            audioObj.transform.position = transform.position;
-            AudioSource audioSource = audioObj.AddComponent<AudioSource>();
-            audioSource.clip = action.chargeSoundEffect;
-            audioSource.spatialBlend = 0.5f; // Partially 3D
-            audioSource.volume = 1.0f;
-            audioSource.Play();
-            Destroy(audioObj, action.chargeSoundEffect.length + 0.1f);
+            AudioManager.PlayClip(action.chargeSoundEffect, 1f);
         }
 
         // Use true _homePosition rather than current position, in case they drifted
@@ -331,8 +318,8 @@ public class Unit : MonoBehaviour
         {
             if (action.gruntSoundDelay > 0f)
                 StartCoroutine(PlayGruntDelayed(action.gruntSound, action.gruntSoundDelay));
-            else if (TryGetComponent<AudioSource>(out var audioSource))
-                audioSource.PlayOneShot(action.gruntSound);
+            else
+                AudioManager.PlayClip(action.gruntSound);
         }
 
         if (action.isRanged)
@@ -690,30 +677,23 @@ public class Unit : MonoBehaviour
     private IEnumerator PlayGruntDelayed(AudioClip clip, float delay)
     {
         yield return new WaitForSeconds(delay);
-        if (TryGetComponent<AudioSource>(out var audioSource))
-            audioSource.PlayOneShot(clip);
+        AudioManager.PlayClip(clip);
     }
 
     private IEnumerator PlayFootstepSounds()
     {
-#if UNITY_EDITOR
-        AudioClip stepSound = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Leohpaz/RPG_Essentials_Free/12_Player_Movement_SFX/08_Step_rock_02.wav");
-        if (stepSound != null)
+        while (true)
         {
-            while (true)
-            {
-                AudioSource.PlayClipAtPoint(stepSound, transform.position);
-                // The running animation has footsteps roughly every 0.3 seconds
-                yield return new WaitForSeconds(0.3f);
-            }
+            AudioManager.Play(Sfx.Footstep, 0.5f, 0.1f);
+            // The running animation has footsteps roughly every 0.3 seconds
+            yield return new WaitForSeconds(0.3f);
         }
-#endif
-        yield break;
     }
 
     private void Die()
     {
         _animator.SetBool("isDead", true);
+        if (!isPlayer) AudioManager.Play(Sfx.EnemyDeath, 0.9f);
 
         // Disable colliders so dead bodies don't float on their caps (check parent/children too)
         foreach (var col in GetComponentsInChildren<Collider>())
